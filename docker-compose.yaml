@@ -1,0 +1,30 @@
+name: sep-drive
+
+services:
+    frontend:
+        build: ./sep-drive-frontend
+        container_name: sep-drive-frontend
+        ports:
+            - 80:80
+        volumes:
+            - ./sep-drive-frontend:/usr/src/app
+
+    database:
+        image: postgres:latest
+        container_name: sep-drive-database
+        environment:
+            POSTGRES_USER: root
+            POSTGRES_PASSWORD: root
+            POSTGRES_DB: sepdrive
+        ports:
+            - 5432:5432
+
+    backend:
+        build: ./sep-drive-backend
+        container_name: sep-drive-backend
+        ports:
+            - 8080:8080
+        environment:
+            DATABASE_URL: postgres://root:root@database:5432/sepdrive
+        depends_on:
+            - database
