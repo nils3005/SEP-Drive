@@ -1,4 +1,4 @@
-FROM node:23-slim AS build
+FROM node:22.14-slim AS build
 WORKDIR /src
 RUN npm install -g @angular/cli
 COPY . ./
