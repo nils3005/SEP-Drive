@@ -9,11 +9,11 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
-public class DriveUserController {
-    private final DriveUserService driveUserService;
+public class UserController {
+    private final UserService userService;
 
-    public DriveUserController(DriveUserService driveUserService) {
-        this.driveUserService = driveUserService;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     /*
@@ -21,17 +21,17 @@ public class DriveUserController {
      */
     @GetMapping("/driveUsers")
     public ResponseEntity<List<DriveUser>> getDriveUsers() {
-        List<DriveUser> users = this.driveUserService.findAll();
+        List<DriveUser> users = this.userService.findAllUsers();
         ResponseEntity<List<DriveUser>> result = new ResponseEntity<>(users, HttpStatus.OK);
         return result;
     }
 
     /*
-    curl -X POST -H "Content-Type: application/json" -d "{\"userName\":\"a\",\"firstName\":\"b\",\"lastName\":\"c\",\"email\":\"d\",\"dateOfBirth\":20050811,\"numberOfRatings\":0,\"sumOfRatings\":0,\"carType\":0,\"password\":\"e\"}" http://localhost:8080/driveUsers
+    curl -X POST -H "Content-Type: application/json" -d "{\"username\":\"a\",\"firstName\":\"b\",\"lastName\":\"c\",\"email\":\"d\",\"role\":0,\"numberOfRatings\":0,\"sumOfRatings\":0,\"carType\":0,\"password\":\"e\",\"birthdate\":\"1234-02-07\"}" http://localhost:8080/driveUsers
      */
     @PostMapping("/driveUsers")
     public void addDriveUser(@RequestBody DriveUser driveUser) {
-        driveUserService.save(driveUser);
+        userService.save(driveUser);
     }
 
 }
