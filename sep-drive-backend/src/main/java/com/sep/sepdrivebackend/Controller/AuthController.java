@@ -3,7 +3,6 @@ package com.sep.sepdrivebackend.Controller;
 import com.sep.sepdrivebackend.Dto.LoginDto;
 import com.sep.sepdrivebackend.Dto.RegisterDto;
 import com.sep.sepdrivebackend.Dto.VerifyDto;
-import com.sep.sepdrivebackend.LoginResponse;
 import com.sep.sepdrivebackend.Service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,8 +22,12 @@ public class AuthController {
 
     @PostMapping(path="/register")
     public ResponseEntity<String> register(@RequestBody RegisterDto registerDto) {
-        authService.registerUser(registerDto);
-        return ResponseEntity.ok("User registered successfully");
+        try{
+            authService.registerUser(registerDto);
+            return ResponseEntity.ok("DriveUser registered successfully");
+        } catch (RuntimeException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping(path="/login")
@@ -33,12 +36,21 @@ public class AuthController {
         String token = authService.login(loginDto);
         LoginResponse loginResponse = new LoginResponse(token, )
          */
-        authService.login(loginDto);
-        return ResponseEntity.ok("Login successful, please verify email");
+        try {
+            authService.login(loginDto);
+            return ResponseEntity.ok("Login successful, please verify email");
+        } catch (RuntimeException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping(path="/verify")
-    public String verify(@RequestBody VerifyDto verifyDto) {
-        return authService.verifyEmail(verifyDto);
+    public ResponseEntity<String> verify(@RequestBody VerifyDto verifyDto) {
+        try{
+            return ResponseEntity.ok(authService.verifyEmail(verifyDto));
+        } catch (RuntimeException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
+
 }

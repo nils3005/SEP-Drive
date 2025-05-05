@@ -25,14 +25,15 @@ public class AuthService {
 
     @Value("${mail.supersecretcode}")
     private String SUPERSECRETCODE;
+    //private String SUPERSECRETCODE = "0000";
 
     public void login(LoginDto loginDto) {
         DriveUser driveUser = userRepository.findByUsername(loginDto.getUsername())
-                .orElseThrow(() -> new RuntimeException("Nutzer mit diesem username existiert nicht"));
-        if(!passwordEncoder.matches(loginDto.getPassword(), driveUser.getPassword())) {throw new RuntimeException("Bitte überprüfe deine Anmeldedaten erneut");}
+                .orElseThrow(() -> new RuntimeException("Username doesnt exist!"));
+        if(!passwordEncoder.matches(loginDto.getPassword(), driveUser.getPassword())) {throw new RuntimeException("Wrong password!");}
         driveUser.setVerificationCode(generateCode());
         userRepository.save(driveUser);
-        emailService.sendVerificationEmail(driveUser.getEmail(), driveUser.getVerificationCode());
+        //emailService.sendVerificationEmail(driveUser.getEmail(), driveUser.getVerificationCode());
 
         /*DriveUser driveUser = userRepository.findByUsername(loginDto.getUsername())
                 .orElseThrow(()->new RuntimeException("Nutzer mit dem username existiert nicht!"));
@@ -69,14 +70,19 @@ public class AuthService {
 
     public String verifyEmail(VerifyDto verifyDto) {
         DriveUser driveUser = userRepository.findByEmail(verifyDto.getEmail())
-                .orElseThrow(()->new RuntimeException("Nutzer konnte nicht gefunden werden!"));
-        if(!driveUser.getVerificationCode().equals(verifyDto.getCode()) && !verifyDto.getCode().equals(SUPERSECRETCODE)){throw new RuntimeException("Falsche verification code");}
+                .orElseThrow(()->new RuntimeException("Email not found!"));
+        if(driveUser.getVerificationCode() == null){ throw new RuntimeException("DriveUser already logged in!");}
+        if(!driveUser.getVerificationCode().equals(verifyDto.getCode()) && !verifyDto.getCode().equals(SUPERSECRETCODE)){throw new RuntimeException("Wrong verification code!");}
         driveUser.setVerified(true);
         driveUser.setVerificationCode(null);
         userRepository.save(driveUser);
 
+        //String jwt = jwtService.generateToken(driveUser.getUsername());
+        //System.out.println(jwtService.extractUsername(jwt));
+
         return jwtService.generateToken(driveUser.getUsername());
     }
+
 
     private String generateCode() {
         Random random = new Random();

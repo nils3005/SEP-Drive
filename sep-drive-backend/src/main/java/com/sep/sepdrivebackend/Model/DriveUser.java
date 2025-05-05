@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Getter
 @Setter
@@ -12,7 +15,7 @@ public class DriveUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userID;
+    private long userID;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -26,12 +29,10 @@ public class DriveUser {
     private String email;
     @Column(nullable = false)
     private String birthDate;
-    private float rating;
     private int numberOfRides;
-    private int numberOfRatings;
-    private float numberOfStars;
     private String profilePicture;
-
+    @OneToMany(mappedBy = "driveUser")
+    private List<Rating> ratings = new ArrayList<>();
     @Enumerated(EnumType.STRING)
     private CarType carType;
 

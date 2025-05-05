@@ -18,8 +18,8 @@ public class EmailService {
     public void sendVerificationEmail(String to, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Your verification code");
-        message.setText("Your 4-digit code is: " + code);
+        message.setSubject("Verification code für SEP-Drive!");
+        message.setText("Dein 4-stelliger Verification Code lautet: " + code);
         mailSender.send(message);
     }
 }
