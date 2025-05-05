@@ -2,14 +2,27 @@ package com.sep.sepdrivebackend.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 @Entity
-public class DriveUser { // Die Klasse darf nicht User heißen, weil der Name als Tabellenname in H2 schon verwendet wird.
+public class DriveUser { // Die Klasse darf nicht User heißen, weil der Name als Tabellenname in H2 schon verwendet wird, leichter fürs Testen
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long userId; // ist eindeutig
+    private long userID; // ist eindeutig
 
-    @Column(name = "userName") //ist eindeutig
-    private String userName;
+    @Column(name = "username") //ist eindeutig
+    private String username;
+
+    @Column(name = "email") // ist eindeutig
+    private String email;
+
+    @Column (name = "password")
+    private String password;
+
+    @Column (name = "role")
+    private Role role;
 
     @Column(name = "firstName")
     private String firstName;
@@ -17,36 +30,37 @@ public class DriveUser { // Die Klasse darf nicht User heißen, weil der Name al
     @Column(name = "lastName")
     private String lastName;
 
-    @Column(name = "email") // ist eindeutig
-    private String email;
+    @Column(name = "birthdate")
+    private Date birthdate;       //yyyy.mm.dd weil nach jahr sortierbar (Alter) wäre einfacher
 
-    @Column(name = "dateOfBirth")
-    private int dateOfBirth;       //yyyy.mm.dd weil nach jahr sortierbar (Alter)
-/*
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sender")
-   // @JoinColumn(name = "ratingId")
-    private List<Rating> ratingsSent = new ArrayList<>();
+    @Column (name = "profilePicture")
+    private String profilePicture;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "receiver")
+
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "driveUser", orphanRemoval = true)
     //@JoinColumn(name = "ratingId")
-    private List<Rating> ratingsReceived = new ArrayList<>();
-*/
-    // Wie will man es machen? Als eigene Klasse siehe Rating Backup irgendwie kacke, darum einfacher als int?
+    private List<Rating> ratings;
 
-    @Column(name = "numberOfRatings")
-    private int numberOfRatings;
+    //@Column (name = "rating")
+    //private ArrayList<Float> rating = new ArrayList<Float>(); geht nicht weil in Colum keine Liste sein darf
 
-    @Column(name = "sumOfRatings")
-    private long sumOfRatings;
+    @Column(name = "numberOfRides")
+    private int numberOfRides;
 
     @Column (name = "carType")
-    private Type carType;     //None ist dann der Kunde (schlauer weil nicht doppelte Verwaltung)
+    private CarType carType;     //None ist dann der Kunde (schlauer weil nicht doppelte Verwaltung)
 
-    @Column (name = "password")
-    private String password;
+    @Column (name = "verified")
+    private boolean verified;
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    @Column (name = "verificationCode")
+    private String verificationCode;
+
+
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void setFirstName(String firstName) {
@@ -61,32 +75,40 @@ public class DriveUser { // Die Klasse darf nicht User heißen, weil der Name al
         this.email = email;
     }
 
-    public void setDateOfBirth(int dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
+    public void setBirthdate(Date birthdate) {
+        this.birthdate = birthdate;
     }
 
-    public void setNumberOfRatings(int numberOfRatings) {
-        this.numberOfRatings = numberOfRatings;
+    public void setNumberOfRides(int numberOfRides) {
+        this.numberOfRides = numberOfRides;
     }
 
-    public void setSumOfRatings(long sumOfRatings) {
-        this.sumOfRatings = sumOfRatings;
-    }
-
-    public void setCarType(Type carType) {
+    public void setCarType(CarType carType) {
         this.carType = carType;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public void setPassword(String password) {
         this.password = password;
     }
 
+    public void setProfilePicture(String profilePicture) {this.profilePicture = profilePicture;}
+
+    public void setVerified(boolean verified) {this.verified = verified;}
+
+    public void setVerificationCode(String verificationCode) {this.verificationCode = verificationCode;}
+
+
+
     public long getUserId() {
-        return userId;
+        return userID;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
     public String getFirstName() {
@@ -101,38 +123,51 @@ public class DriveUser { // Die Klasse darf nicht User heißen, weil der Name al
         return email;
     }
 
-    public int getDateOfBirth() {
-        return dateOfBirth;
+    public Date getBirthdate() {
+        return birthdate;
     }
 
-    public int getNumberOfRatings() {
-        return numberOfRatings;
+    public int getNumberOfRides() {
+        return numberOfRides;
     }
 
-    public long getSumOfRatings() {
-        return sumOfRatings;
-    }
-
-    public Type getCarType() {
+    public CarType getCarType() {
         return carType;
     }
+
+    public Role getRole() {return role;}
 
     public String getPassword() {
         return password;
     }
 
-    // es gibt kein Picture weil man das auch einfach in einen Verzeichnis
-    // als Datei mt der UserID als Dateinamen ablegen kann und mit getter/setter abrufen.
-    // sollte nicht in der DB liegen weil schnell zu große Dateien (macht DB aua)
+    public String getProfilePicture() {return profilePicture;}
 
-    private enum Type {    //None heißt Kunde (evtl. Prototypen anpasssen bzw. Registrierung)
-        NONE(0),
-        SMALL(1),
-        MEDIUM(2),
-        DELUXE(3);
-        private final int typeId;
-        Type(int typeId) {
-            this.typeId = typeId;
+    public boolean isVerified() {return verified;}
+
+    public String getVerificationCode() {return verificationCode;}
+
+    // eigentlich macht man das mit Picture nicht, weil man das auch einfach in einen Verzeichnis
+    // als Datei mt der UserID als Dateinamen ablegen kann und mit getter/setter abrufen.
+    // sollte nicht in der DB liegen, weil schnell zu große Dateien (macht DB aua)
+    //hier machen wir es schon, weil der Kontext kleiner ist
+
+    private enum Role {
+        CUSTOMER(0),
+        DRIVER(1);
+        private final int roleID;
+        Role(int roleID) {
+            this.roleID = roleID;
+        }
+    }
+    private enum CarType {    //Null für Kunde
+
+        SMALL(0),
+        MEDIUM(1),
+        DELUXE(2);
+        private final int carTypeID;
+        CarType(int carTypeID) {
+            this.carTypeID = carTypeID;
         }
     }
 
@@ -141,23 +176,23 @@ public class DriveUser { // Die Klasse darf nicht User heißen, weil der Name al
     }
 
     public DriveUser(
-            String userName,
+            String username,
             String firstName,
             String lastName,
             String email,
-            int dateOfBirth,
-            int numberOfRatings,
-            int sumOfRatings,
+            Date birthdate,
+            int numberOfRides,
+            int role,
             int carType,
             String password) {
-        this.userName = userName;
+        this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.dateOfBirth = dateOfBirth;
-        this.numberOfRatings = numberOfRatings;
-        this.sumOfRatings = sumOfRatings;
-        this.carType = Type.values()[carType];
+        this.birthdate = birthdate;
+        this.numberOfRides = numberOfRides;
+        this.carType = CarType.values()[carType];
+        this.role = Role.values()[role];
         this.password = password;
 
 
