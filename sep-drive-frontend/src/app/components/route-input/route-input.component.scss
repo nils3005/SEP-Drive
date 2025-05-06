@@ -1,0 +1,44 @@
+.routeInputForm {
+  display: flex;
+  flex-direction: column;
+  row-gap: 20px;
+  width: 100%;
+}
+
+.startSuggestions {
+  list-style: none;
+  margin: 35px 0 0;
+  padding: 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  position: absolute;
+  background: white;
+  width: 28%;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.destinationSuggestions {
+  list-style: none;
+  margin: 89px 0 0;
+  padding: 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  position: absolute;
+  background: white;
+  width: 28%;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+li {
+  padding: 10px;
+  cursor: pointer;
+  font-family: Roboto Condensed, sans-serif;
+}
+
+li:hover {
+  background: #f0f0f0;
+}

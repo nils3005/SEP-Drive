@@ -1,0 +1,51 @@
+<form [formGroup]="routeForm" (ngSubmit)="onSubmit()" class="routeInputForm">
+    <div class="textInputContainer">
+        <input
+                type="text"
+                id="route-start"
+                formControlName="start"
+                placeholder="Start"
+                class="textInput"
+                (blur)="onStartBlur()"
+                (focus)="onStartFocus()"
+        >
+    </div>
+    @if(startShowSuggestions && startSuggestions.length > 0) {
+        <ul class="startSuggestions">
+            @for (suggestion of startSuggestions; track suggestion.properties.id) {
+                <li (mousedown)="onStartSelect(suggestion)">
+                    {{ suggestion.properties.label }}
+                </li>
+            }
+        </ul>
+    }
+    <div class="textInputContainer">
+        <input
+                type="text"
+                id="route-destination"
+                formControlName="destination"
+                placeholder="Ziel"
+                class="textInput"
+                (blur)="onDestinationBlur()"
+                (focus)="onDestinationFocus()"
+        >
+    </div>
+    @if(destinationShowSuggestions && destinationSuggestions.length > 0) {
+        <ul class="destinationSuggestions">
+            @for (suggestion of destinationSuggestions; track suggestion.properties.id) {
+                <li (mousedown)="onDestinationSelect(suggestion)">
+                    {{ suggestion.properties.label }}
+                </li>
+            }
+        </ul>
+    }
+    <div class="textInputContainer">
+        <select name="car-type" id="carType" formControlName="carType" class="textInput">
+            <option value="" disabled selected hidden>Autotyp</option>
+            @for (carType of carTypes; track carType.id) {
+                <option [value]="carType.id">{{carType.value}}</option>
+            }
+        </select>
+    </div>
+    <input type="submit" value="Submit" class="buttonPrimary">
+</form>
