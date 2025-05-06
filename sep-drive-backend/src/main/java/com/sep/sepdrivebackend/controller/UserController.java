@@ -34,4 +34,10 @@ public class UserController {
         userService.save(driveUser);
     }
 
+
+    @GetMapping(path = "/findByUserId/{userID}", produces = "application/json")
+    public DriveUser findByUserId(@PathVariable long userID) {
+        return userService.findByUserId(userID);
+    }
+
 }
