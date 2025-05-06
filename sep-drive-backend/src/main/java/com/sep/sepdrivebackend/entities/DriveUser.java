@@ -12,25 +12,25 @@ public class DriveUser { // Die Klasse darf nicht User heißen, weil der Name al
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userID; // ist eindeutig
 
-    @Column(name = "username") //ist eindeutig
+    @Column(name = "username", nullable = false) //ist eindeutig
     private String username;
 
-    @Column(name = "email") // ist eindeutig
+    @Column(name = "email", nullable = false) // ist eindeutig
     private String email;
 
-    @Column (name = "password")
+    @Column (name = "password", nullable = false)
     private String password;
 
-    @Column (name = "role")
+    @Column (name = "role", nullable = false)
     private Role role;
 
-    @Column(name = "firstName")
+    @Column(name = "firstName", nullable = false)
     private String firstName;
 
-    @Column(name = "lastName")
+    @Column(name = "lastName", nullable = false)
     private String lastName;
 
-    @Column(name = "birthdate")
+    @Column(name = "birthdate", nullable = false)
     private Date birthdate;       //yyyy.mm.dd weil nach jahr sortierbar (Alter) wäre einfacher
 
     @Column (name = "profilePicture")
@@ -48,7 +48,7 @@ public class DriveUser { // Die Klasse darf nicht User heißen, weil der Name al
     @Column(name = "numberOfRides")
     private int numberOfRides;
 
-    @Column (name = "carType")
+    @Column (name = "carType", nullable = false)
     private CarType carType;     //None ist dann der Kunde (schlauer weil nicht doppelte Verwaltung)
 
     @Column (name = "verified")
@@ -187,28 +187,5 @@ public class DriveUser { // Die Klasse darf nicht User heißen, weil der Name al
         super();
     }
 
-    public DriveUser(
-            String username,
-            String firstName,
-            String lastName,
-            String email,
-            Date birthdate,
-            int numberOfRides,
-            int role,
-            int carType,
-            String password) {
-        this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.birthdate = birthdate;
-        this.numberOfRides = numberOfRides;
-        this.carType = CarType.values()[carType];
-        this.role = Role.values()[role];
-        this.password = password;
 
-
-
-
-    }
 }
