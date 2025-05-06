@@ -22,6 +22,9 @@ public class UserService {
         userRepository.save(driveUser);
     }
 
+    public DriveUser findByUserId(long userID) {
+        return userRepository.findByUserId(userID);
+    }
 
 
 }

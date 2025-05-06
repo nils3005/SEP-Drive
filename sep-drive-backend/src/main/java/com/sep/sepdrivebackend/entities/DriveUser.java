@@ -103,6 +103,7 @@ public class DriveUser { // Die Klasse darf nicht User heißen, weil der Name al
 
 
 
+
     public long getUserId() {
         return userID;
     }
@@ -121,6 +122,17 @@ public class DriveUser { // Die Klasse darf nicht User heißen, weil der Name al
 
     public String getEmail() {
         return email;
+    }
+
+    public float getAvgRating() {
+        int count = ratings.size();
+        float avgRating = 0;
+        for (Rating rating : ratings) {
+
+            avgRating += rating.getRating();
+        }
+        avgRating /= count;
+        return avgRating;
     }
 
     public Date getBirthdate() {
