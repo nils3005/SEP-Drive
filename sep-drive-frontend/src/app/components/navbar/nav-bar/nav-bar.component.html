@@ -1,0 +1,14 @@
+<nav>
+  <div class="innerNavbar">
+    <ul class="navItems">
+      <li>
+        <app-nav-logo class="appNavLogo"/>
+      </li>
+      @for (navLink of navLinks; track navLink.id) {
+        <li>
+          <app-nav-link [navLink]="navLink"/>
+        </li>
+      }
+    </ul>
+  </div>
+</nav>
