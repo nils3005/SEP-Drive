@@ -1,0 +1,29 @@
+main {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.routeContainer {
+  width: 80%;
+  height: 60%;
+  display: flex;
+  gap: 100px;
+  box-sizing: border-box;
+}
+
+.routeInput {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 35%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.map {
+  flex: 1;
+  height: 100%;
+}
