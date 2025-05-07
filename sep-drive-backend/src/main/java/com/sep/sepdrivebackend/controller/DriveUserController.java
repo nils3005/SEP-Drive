@@ -9,35 +9,34 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
-public class UserController {
-    private final UserService userService;
+public class DriveUserController {
+    private final DriveUserService driveUserService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public DriveUserController(DriveUserService driveUserService) {
+        this.driveUserService = driveUserService;
     }
 
     /*
     curl -X GET http://localhost:8080/driveUsers
      */
-    @GetMapping("/driveUsers")
+    @GetMapping("/users")
     public ResponseEntity<List<DriveUser>> getDriveUsers() {
-        List<DriveUser> users = this.userService.findAllUsers();
-        ResponseEntity<List<DriveUser>> result = new ResponseEntity<>(users, HttpStatus.OK);
-        return result;
+        List<DriveUser> driveUsers = this.driveUserService.findAllUsers();
+        return new ResponseEntity<>(driveUsers, HttpStatus.OK);
     }
 
     /*
     curl -X POST -H "Content-Type: application/json" -d "{\"username\":\"a\",\"firstName\":\"b\",\"lastName\":\"c\",\"email\":\"d\",\"role\":0,\"carType\":0,\"password\":\"e\",\"birthdate\":\"1234-02-07\"}" http://localhost:8080/driveUsers
      */
-    @PostMapping("/driveUsers")
+    @PostMapping("/driveusers")
     public void addDriveUser(@RequestBody DriveUser driveUser) {
-        userService.save(driveUser);
+        driveUserService.save(driveUser);
     }
 
 
-    @GetMapping(path = "/findByUserId/{userID}", produces = "application/json")
-    public DriveUser findByUserId(@PathVariable long userID) {
-        return userService.findByUserId(userID);
+    @GetMapping(path = "/driveusers/{userID}", produces = "application/json")
+    public DriveUser findByUserId(@PathVariable Long userID) {
+        return driveUserService.findByUserId(userID);
     }
 
 }

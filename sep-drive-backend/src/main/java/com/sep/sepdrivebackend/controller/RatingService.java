@@ -14,14 +14,11 @@ public class RatingService {
     }
 
     public List<Rating> findAllRatings() {
-        List<Rating> result = ratingRepository.findAll();
-        return result;
+        return ratingRepository.findAll();
     }
 
     public void save(Rating rating) {
         ratingRepository.save(rating);
     }
-
-
 
 }
