@@ -12,11 +12,11 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:4200")
 public class RatingController {
     private final RatingService ratingService;
-    private final UserService userService;
+    private final DriveUserService driveUserService;
 
-    public RatingController(RatingService ratingService, UserService userService) {
+    public RatingController(RatingService ratingService, DriveUserService driveUserService) {
         this.ratingService = ratingService;
-        this.userService = userService;
+        this.driveUserService = driveUserService;
     }
 
     /*
@@ -25,8 +25,7 @@ public class RatingController {
     @GetMapping("/ratings")
     public ResponseEntity<List<Rating>> getRatings() {
         List<Rating> ratings = this.ratingService.findAllRatings();
-        ResponseEntity<List<Rating>> result = new ResponseEntity<>(ratings, HttpStatus.OK);
-        return result;
+        return new ResponseEntity<>(ratings, HttpStatus.OK);
     }
 
     /*
@@ -34,8 +33,8 @@ public class RatingController {
      */
     @PostMapping("/rate/{userID}")
     public void addRating(@PathVariable Long userID, @RequestBody Rating rating) {
-        DriveUser user = userService.findByUserId(userID);
-        rating.setRecipient(user);
+        DriveUser driveUser = driveUserService.findByUserId(userID);
+        //rating.setRecipient(driveUser); Methode könnte man löschen mit Lösung @ElementCollection
         ratingService.save(rating);
     }
 
