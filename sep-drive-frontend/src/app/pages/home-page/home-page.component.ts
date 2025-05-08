@@ -4,6 +4,7 @@ import {MapComponent} from "../../components/map/map.component";
 import {GeocodeFeature} from "../../types";
 import {OpenRouteServiceService} from "../../services/open-route-service.service";
 import * as L from 'leaflet';
+import {GeoServiceService} from "../../services/geo-service.service";
 
 @Component({
   selector: 'app-home-page',
@@ -15,28 +16,37 @@ import * as L from 'leaflet';
   styleUrl: './home-page.component.scss'
 })
 export class HomePageComponent {
-  public startPoint: GeocodeFeature | undefined;
-  public destinationPoint: GeocodeFeature | undefined;
+  public waypoints: GeocodeFeature[] = [];
+  public currentPoint: GeocodeFeature | undefined;
   public route: any
 
-  constructor(private openRouteServiceService: OpenRouteServiceService) {
-  }
+  constructor(
+      private openRouteServiceService: OpenRouteServiceService,
+      private geoServiceService: GeoServiceService
+  ) {}
 
   onStartEmit(start: GeocodeFeature) {
-    this.startPoint = start;
+    let tempWaypoints = this.waypoints.slice();
+    tempWaypoints[0] = start;
+    this.waypoints = tempWaypoints;
+    this.currentPoint = start;
   }
 
   onDestinationEmit(destination: GeocodeFeature) {
-    this.destinationPoint = destination;
+    let tempWaypoints = this.waypoints.slice();
+    if (tempWaypoints.length > 1) {
+      tempWaypoints[tempWaypoints.length - 1] = destination;
+    } else {
+      tempWaypoints[1] = destination;
+    }
+    this.waypoints = tempWaypoints;
+    this.currentPoint = destination;
   }
 
   onSubmitEventEmit() {
-    if (this.startPoint && this.destinationPoint) {
-      if (this.startPoint) {
-        this.openRouteServiceService.getRouteBetweenPoints(this.startPoint, this.destinationPoint).subscribe(value => {
-          this.route = value;
-        })
-      }
-    }
+    let coordinates = this.geoServiceService.getCoordinateArray(this.waypoints)
+    this.openRouteServiceService.getRouteFromPointArray(coordinates).subscribe(route => {
+      this.route = route;
+    })
   }
 }

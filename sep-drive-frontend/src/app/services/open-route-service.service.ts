@@ -35,4 +35,20 @@ export class OpenRouteServiceService {
         }
       })
   }
+
+  public getRouteFromPointArray(waypoints: number[][]): Observable<any>
+  {
+    return this.http.post<any>(
+        `https://api.openrouteservice.org/v2/directions/driving-car/geojson`,
+        {
+          'coordinates': waypoints
+        },
+        {
+          headers: {
+            accept: 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+            authorization: `${this.apiKey}`
+          }
+        }
+    )
+  }
 }

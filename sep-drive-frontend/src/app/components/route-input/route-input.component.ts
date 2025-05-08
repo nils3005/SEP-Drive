@@ -85,7 +85,6 @@ export class RouteInputComponent {
   }
 
   // Logic for destination suggestions
-
   public destinationSuggestions: GeocodeFeature[] = [];
   public destinationShowSuggestions: boolean = false;
   public destinationSuppressAutocomplete: boolean = false;

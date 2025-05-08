@@ -26,21 +26,18 @@ L.Marker.prototype.options.icon = iconDefault;
 })
 export class MapComponent implements AfterViewInit, OnChanges {
   private map: L.Map | undefined;
-  @Input() start: GeocodeFeature | undefined;
-  @Input() destination: GeocodeFeature | undefined;
   @Input() route: any;
+  @Input() waypoints: GeocodeFeature[] = [];
+  @Input() currentPoint: GeocodeFeature | undefined;
 
-  routeLayer: L.LayerGroup | undefined;
-  startMarker: L.Marker | undefined;
-  destinationMarker: L.Marker | undefined;
+  routeLayer: L.LayerGroup = L.layerGroup();
+  markerLayer: L.LayerGroup = L.layerGroup();
 
   private initMap(): void {
     this.map = L.map('map', {
       center: [51.1657, 10.4515],
       zoom: 6,
     });
-
-    this.routeLayer = L.layerGroup().addTo(this.map)
 
     const tiles = L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -51,11 +48,9 @@ export class MapComponent implements AfterViewInit, OnChanges {
               '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         }
     );
-
     tiles.addTo(this.map);
-  }
-
-  constructor() {
+    this.routeLayer = this.routeLayer.addTo(this.map)
+    this.markerLayer = this.markerLayer.addTo(this.map)
   }
 
   ngAfterViewInit(): void {
@@ -63,30 +58,6 @@ export class MapComponent implements AfterViewInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if(changes['start'] && changes['start'] !== undefined) {
-      if (this.start && this.map && this.routeLayer) {
-        this.routeLayer.clearLayers()
-        this.startMarker?.removeFrom(this.map)
-        L.geoJSON(this.route).removeFrom(this.map)
-        this.startMarker = L.marker([this.start.geometry.coordinates[1], this.start.geometry.coordinates[0]])
-        this.startMarker.addTo(this.map)
-        this.map.flyTo([this.start.geometry.coordinates[1], this.start.geometry.coordinates[0]], 14, {
-          duration: 1
-        })
-      }
-    }
-    if (changes['destination'] && changes['destination'] !== undefined) {
-      if (this.destination && this.map && this.routeLayer) {
-        this.routeLayer.clearLayers()
-        this.destinationMarker?.removeFrom(this.map)
-        L.geoJSON(this.route).removeFrom(this.map)
-        this.destinationMarker = L.marker([this.destination.geometry.coordinates[1], this.destination.geometry.coordinates[0]])
-        this.destinationMarker.addTo(this.map)
-        this.map.flyTo([this.destination.geometry.coordinates[1], this.destination.geometry.coordinates[0]], 14, {
-          duration: 1
-        })
-      }
-    }
     if (changes['route'] && changes['route'] !== undefined) {
       if (this.route && this.map && this.routeLayer) {
         this.routeLayer.clearLayers()
@@ -99,7 +70,31 @@ export class MapComponent implements AfterViewInit, OnChanges {
         let routeJson: GeoJsonRoute = this.route;
         console.log(routeJson.features[0].properties.summary.distance / 1000 + "km")
         console.log(routeJson.features[0].properties.summary.duration / 60 + "min")
-        // console.log(routeJson)
+      }
+    }
+    if (changes['waypoints'] && changes['waypoints'] !== undefined && !changes['waypoints'].firstChange) {
+      if (this.routeLayer) {
+        this.routeLayer.clearLayers()
+        this.markerLayer.clearLayers()
+        for (const waypoint of this.waypoints) {
+          if (waypoint) {
+            let marker = L.marker(
+                [
+                  waypoint.geometry.coordinates[1],
+                  waypoint.geometry.coordinates[0]
+                ]
+            );
+            marker.addTo(this.markerLayer)
+          }
+        }
+        if (this.currentPoint) {
+          this.map?.flyTo([this.currentPoint.geometry.coordinates[1], this.currentPoint.geometry.coordinates[0]],
+              14,
+              {
+                duration: 1
+              }
+          )
+        }
       }
     }
   }
