@@ -1,14 +1,45 @@
 <nav>
-  <div class="innerNavbar">
-    <ul class="navItems">
-      <li>
-        <app-nav-logo class="appNavLogo"/>
-      </li>
-      @for (navLink of navLinks; track navLink.id) {
-        <li>
-          <app-nav-link [navLink]="navLink"/>
-        </li>
-      }
-    </ul>
-  </div>
+    <div class="innerNavbar">
+        <div id="innerNavbar-left">
+            <ul class="navItems">
+                <li>
+                    <app-nav-logo class="appNavLogo"/>
+                </li>
+
+                <!-- Link zur Startseite -->
+                <li>
+                    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+                </li>
+
+                <!-- Link zur Social-Seite -->
+                <li>
+                    <a routerLink="/social" routerLinkActive="active">Social</a>
+                </li>
+            </ul>
+        </div>
+        <div id="innerNavbar-right">
+            <ul class="navItems">
+                <!-- Login-Link (nur wenn nicht eingeloggt) -->
+                @if (!isLoggedIn){
+                    <li>
+                        <a routerLink="/login" routerLinkActive="active">Login</a>
+                    </li>
+                }
+
+                <!-- Logout-Link (nur wenn eingeloggt) -->
+                @if (isLoggedIn) {
+                    <li>
+                        <a routerLink="/logout" routerLinkActive="active" (click)="logout()">Logout</a>
+                    </li>
+                }
+
+                <!-- Profil-Link (nur wenn eingeloggt) -->
+                @if (isLoggedIn) {
+                    <li>
+                        <a routerLink="/profile" routerLinkActive="active">Profile</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
 </nav>

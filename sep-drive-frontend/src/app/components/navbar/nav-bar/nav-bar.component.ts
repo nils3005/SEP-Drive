@@ -1,13 +1,15 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {NavLogoComponent} from '../nav-logo/nav-logo.component';
-import {NavLinkComponent} from '../nav-link/nav-link.component';
 import {NavLink} from '../../../types';
+import {UserServiceService} from "../../../services/user-service.service";
+import {RouterLink, RouterLinkActive} from "@angular/router";
 
 @Component({
   selector: 'app-nav-bar',
   imports: [
     NavLogoComponent,
-    NavLinkComponent
+    RouterLinkActive,
+    RouterLink
   ],
   templateUrl: './nav-bar.component.html',
   styleUrl: './nav-bar.component.scss'
@@ -28,5 +30,18 @@ export class NavBarComponent {
     }
   ]
 
+  isLoggedIn = false;
+
+  userService = inject(UserServiceService);
+
+  ngOnInit(): void {
+    this.userService.getUserStatus().subscribe(status => {
+      this.isLoggedIn = status;
+    });
+  }
+
+  logout(): void {
+    this.userService.logout();
+  }
 
 }
