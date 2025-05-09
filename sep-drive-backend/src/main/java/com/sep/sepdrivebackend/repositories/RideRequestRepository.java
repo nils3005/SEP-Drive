@@ -1,5 +1,6 @@
 package com.sep.sepdrivebackend.repositories;
 
+import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.entities.RideRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
