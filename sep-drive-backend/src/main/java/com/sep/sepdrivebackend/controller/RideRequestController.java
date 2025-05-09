@@ -1,4 +1,4 @@
-package com.sep.sepdrivebackend.controllers;
+package com.sep.sepdrivebackend.controller;
 
 import com.sep.sepdrivebackend.entities.RideRequest;
 import com.sep.sepdrivebackend.services.RideRequestService;
@@ -13,8 +13,12 @@ import java.util.Map;
 @RequestMapping("/api/ride-requests")
 public class RideRequestController {
 
-    @Autowired
-    private RideRequestService rideRequestService;
+    private final RideRequestService rideRequestService;
+
+    public RideRequestController(RideRequestService rideRequestService)
+    {
+        this.rideRequestService = rideRequestService;
+    }
 
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody RideRequest request, @RequestParam Long customerId) {
