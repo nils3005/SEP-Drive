@@ -4,17 +4,20 @@ import com.sep.sepdrivebackend.entities.RideRequest;
 import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.repositories.UserRepository;
 import com.sep.sepdrivebackend.repositories.RideRequestRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RideRequestService {
 
-    @Autowired
-    private RideRequestRepository rideRepo;
 
-    @Autowired
-    private UserRepository userRepo;
+    private final RideRequestRepository rideRepo;
+    private final UserRepository userRepo;
+
+    public RideRequestService(RideRequestRepository rideRepo, UserRepository userRepo)
+    {
+        this.rideRepo = rideRepo;
+        this.userRepo = userRepo;
+    }
 
     public RideRequest createRideRequest(RideRequest rideRequest, Long customerId) {
         User customer = userRepo.findById(customerId)
