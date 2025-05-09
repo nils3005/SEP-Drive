@@ -1,6 +1,6 @@
 package com.sep.sepdrivebackend.controller;
 
-import com.sep.sepdrivebackend.entities.DriveUser;
+import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.entities.Rating;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +12,11 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:4200")
 public class RatingController {
     private final RatingService ratingService;
-    private final DriveUserService driveUserService;
+    private final UserService userService;
 
-    public RatingController(RatingService ratingService, DriveUserService driveUserService) {
+    public RatingController(RatingService ratingService, UserService userService) {
         this.ratingService = ratingService;
-        this.driveUserService = driveUserService;
+        this.userService = userService;
     }
 
     /*
@@ -31,10 +31,10 @@ public class RatingController {
     /*
     curl -X POST -H "Content-Type: application/json" -d "{\"rating\":60.23}" http://localhost:8080/rate/1
      */
-    @PostMapping("/rate/{userID}")
+    @PostMapping("/ratings/{userID}")
     public void addRating(@PathVariable Long userID, @RequestBody Rating rating) {
-        DriveUser driveUser = driveUserService.findByUserId(userID);
-        //rating.setRecipient(driveUser); Methode könnte man löschen mit Lösung @ElementCollection
+        User user = userService.findByUserId(userID);
+        rating.setUser(user);
         ratingService.save(rating);
     }
 

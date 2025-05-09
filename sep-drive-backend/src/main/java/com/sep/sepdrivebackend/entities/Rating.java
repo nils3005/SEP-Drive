@@ -14,8 +14,8 @@ public class Rating {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "driveUserID")
-    private DriveUser driveUser;
+    @JoinColumn(name = "userId", nullable = false)
+    private User user;
 
     private float rating;
 
