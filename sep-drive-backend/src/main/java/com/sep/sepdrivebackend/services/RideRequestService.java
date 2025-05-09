@@ -1,8 +1,8 @@
 package com.sep.sepdrivebackend.services;
 
+import com.sep.sepdrivebackend.controller.UserRepository;
 import com.sep.sepdrivebackend.entities.RideRequest;
 import com.sep.sepdrivebackend.entities.User;
-import com.sep.sepdrivebackend.repositories.UserRepository;
 import com.sep.sepdrivebackend.repositories.RideRequestRepository;
 import org.springframework.stereotype.Service;
 
