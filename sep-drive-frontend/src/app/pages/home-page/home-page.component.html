@@ -1,0 +1,6 @@
+<main>
+    <div class="routeContainer">
+        <app-route-input class="routeInput" (start)="onStartEmit($event)" (destination)="onDestinationEmit($event)" (submitEvent)="onSubmitEventEmit()"/>
+        <app-map class="map" [route]="route" [waypoints]="waypoints" [currentPoint]="currentPoint"/>
+    </div>
+</main>
