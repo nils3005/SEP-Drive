@@ -1,6 +1,6 @@
 package com.sep.sepdrivebackend.Controller;
 
-import com.sep.sepdrivebackend.Model.DriveUser;
+import com.sep.sepdrivebackend.Model.User;
 import com.sep.sepdrivebackend.Service.UserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,16 +18,16 @@ public class UserController {
     }
 
     @GetMapping("")
-    public List<DriveUser> findAll() {
+    public List<User> findAll() {
         return userService.findAll();
     }
 
     @GetMapping(path = "/findByName/{username}", produces = "application/json")
-    public Optional<DriveUser> findByUsername(@PathVariable String username) {
+    public Optional<User> findByUsername(@PathVariable String username) {
         return userService.findByUsernamePublic(username);
     }
     @GetMapping(path = "/findById/{userID}", produces = "application/json")
-    public DriveUser findById(@PathVariable long userID) {
+    public User findById(@PathVariable long userID) {
         return userService.findById(userID);
     }
 

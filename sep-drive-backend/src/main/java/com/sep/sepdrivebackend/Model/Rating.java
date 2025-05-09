@@ -11,5 +11,5 @@ public class Rating {
 
     @ManyToOne
     @JoinColumn(name = "userID")
-    private DriveUser driveUser;
+    private User user;
 }

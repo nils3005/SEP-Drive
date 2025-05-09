@@ -15,16 +15,16 @@ public class UserService {
         this.userRepository = userRepository;
    }
 
-   public List<DriveUser> findAll() {
-       return (List<DriveUser>) userRepository.findAll();
+   public List<User> findAll() {
+       return (List<User>) userRepository.findAll();
    }
 
-   public Optional<DriveUser> findByUsername(String username) {
+   public Optional<User> findByUsername(String username) {
        return userRepository.findByUsername(username);
    }
 
-   public Optional<DriveUser> findByUsernamePublic(String username) {
-       Optional<DriveUser> user = findByUsername(username);
+   public Optional<User> findByUsernamePublic(String username) {
+       Optional<User> user = findByUsername(username);
        if (user.isPresent()) {
            user.get().setPassword(null);
            user.get().setVerificationCode(null);
@@ -32,11 +32,11 @@ public class UserService {
        return user;
    }
 
-   public DriveUser findById(long userID) {
+   public User findById(long userID) {
        return userRepository.findById(userID);
    }
 
-   public void save(DriveUser driveUser) {
-       userRepository.save(driveUser);
+   public void save(User user) {
+       userRepository.save(user);
    }
 }

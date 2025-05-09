@@ -3,19 +3,24 @@ package com.sep.sepdrivebackend.Model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
 @Getter
 @Setter
 @Entity
-public class DriveUser {
+@Table(name="driveUser")
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long userID;
+    private long userid;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -31,7 +36,7 @@ public class DriveUser {
     private String birthDate;
     private int numberOfRides;
     private String profilePicture;
-    @OneToMany(mappedBy = "driveUser")
+    @OneToMany(mappedBy = "user")
     private List<Rating> ratings = new ArrayList<>();
     @Enumerated(EnumType.STRING)
     private CarType carType;
@@ -44,9 +49,9 @@ public class DriveUser {
 
     private String verificationCode;
 
-    public DriveUser(){}
+    public User(){}
 
-    public DriveUser(String username, String password, String firstName, String lastName, String email, String birthDate, /*String profilePicture,*/ /*CarType carType,*/ Role role) {
+    public User(String username, String password, String firstName, String lastName, String email, String birthDate, /*String profilePicture,*/ /*CarType carType,*/ Role role) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
@@ -57,4 +62,28 @@ public class DriveUser {
     }
 
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_"+getRole().toString()));
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

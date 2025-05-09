@@ -3,7 +3,7 @@ package com.sep.sepdrivebackend.Service;
 import com.sep.sepdrivebackend.Dto.LoginDto;
 import com.sep.sepdrivebackend.Dto.RegisterDto;
 import com.sep.sepdrivebackend.Dto.VerifyDto;
-import com.sep.sepdrivebackend.Model.DriveUser;
+import com.sep.sepdrivebackend.Model.User;
 import com.sep.sepdrivebackend.Model.Role;
 import com.sep.sepdrivebackend.Model.UserRepository;
 
@@ -25,22 +25,13 @@ public class AuthService {
 
     @Value("${mail.supersecretcode}")
     private String SUPERSECRETCODE;
-    //private String SUPERSECRETCODE = "0000";
 
     public void login(LoginDto loginDto) {
-        DriveUser driveUser = userRepository.findByUsername(loginDto.getUsername())
-                .orElseThrow(() -> new RuntimeException("Username doesnt exist!"));
-        if(!passwordEncoder.matches(loginDto.getPassword(), driveUser.getPassword())) {throw new RuntimeException("Wrong password!");}
-        driveUser.setVerificationCode(generateCode());
-        userRepository.save(driveUser);
-        //emailService.sendVerificationEmail(driveUser.getEmail(), driveUser.getVerificationCode());
-
-        /*DriveUser driveUser = userRepository.findByUsername(loginDto.getUsername())
-                .orElseThrow(()->new RuntimeException("Nutzer mit dem username existiert nicht!"));
-        if(!driveUser.isVerified()){throw new RuntimeException("Email wurde noch nicht bestätigt!");}
-        if(!passwordEncoder.matches(loginDto.getPassword(), driveUser.getPassword())){throw new RuntimeException("Bitte überprufe deine Anmlededaten!");}
-
-        return jwtService.generateToken(loginDto.getUsername());*/
+        User user = userRepository.findByUsername(loginDto.getUsername()).orElseThrow(() -> new RuntimeException("Username doesnt exist!"));
+        if(!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {throw new RuntimeException("Wrong password!");}
+        user.setVerificationCode(generateCode());
+        userRepository.save(user);
+        emailService.sendVerificationEmail(user.getEmail(), user.getVerificationCode());
     }
 
     public void registerUser(RegisterDto registerDto) {
@@ -50,37 +41,35 @@ public class AuthService {
         if(userRepository.findByUsername(registerDto.getUsername()).isPresent()){
             throw new RuntimeException("Username already in use");
         }
-        DriveUser driveUser = new DriveUser(registerDto.getUsername(),
+        User user = new User(registerDto.getUsername(),
                                             passwordEncoder.encode(registerDto.getPassword()),
                                             registerDto.getFirstName(),
                                             registerDto.getLastName(),
                                             registerDto.getEmail(),
                                             registerDto.getBirthDate(),
                                             registerDto.getRole());
-        //driveUser.setVerificationCode(generateCode());
-        if(driveUser.getRole() == Role.DRIVER && registerDto.getCarType() != null){
-            driveUser.setCarType(registerDto.getCarType());
+        if(user.getRole() == Role.DRIVER && registerDto.getCarType() == null) {
+            throw new RuntimeException("Car type is required");
+        }
+        if(user.getRole() == Role.DRIVER){
+            user.setCarType(registerDto.getCarType());
         }
         if(registerDto.getProfilePicture() != null){
-            driveUser.setProfilePicture(registerDto.getProfilePicture());
+            user.setProfilePicture(registerDto.getProfilePicture());
         }
-        userRepository.save(driveUser);
-        //emailService.sendVerificationEmail(registerDto.getEmail(), driveUser.getVerificationCode());
+        userRepository.save(user);
     }
 
     public String verifyEmail(VerifyDto verifyDto) {
-        DriveUser driveUser = userRepository.findByEmail(verifyDto.getEmail())
+        User user = userRepository.findByEmail(verifyDto.getEmail())
                 .orElseThrow(()->new RuntimeException("Email not found!"));
-        if(driveUser.getVerificationCode() == null){ throw new RuntimeException("DriveUser already logged in!");}
-        if(!driveUser.getVerificationCode().equals(verifyDto.getCode()) && !verifyDto.getCode().equals(SUPERSECRETCODE)){throw new RuntimeException("Wrong verification code!");}
-        driveUser.setVerified(true);
-        driveUser.setVerificationCode(null);
-        userRepository.save(driveUser);
+        if(user.getVerificationCode() == null){ throw new RuntimeException("User already logged in!");}
+        if(!user.getVerificationCode().equals(verifyDto.getCode()) && !verifyDto.getCode().equals(SUPERSECRETCODE)){throw new RuntimeException("Wrong verification code!");}
+        user.setVerified(true);
+        user.setVerificationCode(null);
+        userRepository.save(user);
 
-        //String jwt = jwtService.generateToken(driveUser.getUsername());
-        //System.out.println(jwtService.extractUsername(jwt));
-
-        return jwtService.generateToken(driveUser.getUsername());
+        return jwtService.generateToken(user.getUsername());
     }
 
 
