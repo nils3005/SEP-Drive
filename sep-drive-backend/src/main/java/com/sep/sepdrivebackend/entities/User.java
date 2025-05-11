@@ -1,9 +1,12 @@
 package com.sep.sepdrivebackend.entities;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,6 +28,7 @@ public class User {
     @Column (nullable = false)
     private String password;
 
+    @Setter(AccessLevel.NONE)
     @Column (nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -48,6 +52,7 @@ public class User {
 
     private int numberOfRides;
 
+    @Setter(AccessLevel.NONE)
     @Enumerated(EnumType.STRING)
     private CarType carType;
 
@@ -63,6 +68,44 @@ public class User {
         }
         avgRating /= count;
         return avgRating;
+    }
+
+    public void setCarType(int carType) {
+
+        CarType[] carTypes = CarType.values();
+        if ((0 > carType) || (carTypes.length < carType)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid car type.", null);
+        }
+        setCarType(carTypes[carType]);
+    }
+
+    public void setCarType(String carType) {
+
+        setCarType(Integer.parseInt(carType));
+    }
+
+    public void setCarType(CarType carType) {
+
+        this.carType = carType;
+    }
+
+    public void setRole(int role) {
+
+        Role[] roles = Role.values();
+        if ((0 > role) || (roles.length < role)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role.", null);
+        }
+        setRole(roles[role]);
+    }
+
+    public void setRole(String role) {
+
+        setRole(Integer.parseInt(role));
+    }
+
+    public void setRole(Role role) {
+
+        this.role = role;
     }
 
     public User(String username, String email, String password, Role role, String firstName, String lastName, LocalDate birthdate, String profilePicture) {

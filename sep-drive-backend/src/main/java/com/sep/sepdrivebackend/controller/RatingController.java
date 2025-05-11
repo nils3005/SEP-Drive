@@ -39,7 +39,7 @@ public class RatingController {
         User user = userService.findByUserId(userID);
         if (null == user) {
 
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "UserID not found.", null);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "UserID not found.", null);
         }
         rating.setUser(user);
         ratingService.save(rating);

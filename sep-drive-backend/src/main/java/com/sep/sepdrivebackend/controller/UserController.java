@@ -46,9 +46,8 @@ public class UserController {
     public User findByUserId(@PathVariable Long userID) {
         User user = userService.findByUserId(userID);
         if ( null == user ) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.", null);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "UserId not found.", null);
         }
         return user;
     }
-
 }
