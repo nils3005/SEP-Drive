@@ -18,13 +18,31 @@ public class UserService {
     }
 
     public void save(User user) {
-        if(user != null && !userRepository.existsById(user.getId())) {
-            userRepository.save(user);
+        if ( null == user ) {
+            return;
         }
+        if ( null == user.getId() ) {
+
+            // New user? Check if username already taken!
+            User existing = findByUsername(user.getUsername());
+
+            // Username taken, abort.
+            if ( null != existing ) {
+                return;
+            }
+        }
+       userRepository.save(user);
     }
 
     public User findByUserId(Long userID) {
         return userRepository.findById(userID).orElse(null);
     }
 
+    public User findByUsername(String username) {
+
+        return findAllUsers()
+                .stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst().orElse(null);
+    }
 }

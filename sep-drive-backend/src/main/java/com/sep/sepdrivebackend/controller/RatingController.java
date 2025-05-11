@@ -37,6 +37,4 @@ public class RatingController {
         rating.setUser(user);
         ratingService.save(rating);
     }
-
 }
-

@@ -17,7 +17,7 @@ public class UserController {
     }
 
     /*
-    curl -X GET http://localhost:8080/driveUsers
+    curl -X GET http://localhost:8080/users
      */
     @GetMapping("/users")
     public ResponseEntity<List<User>> getUsers() {
@@ -26,7 +26,7 @@ public class UserController {
     }
 
     /*
-    curl -X POST -H "Content-Type: application/json" -d "{\"username\":\"a\",\"firstName\":\"b\",\"lastName\":\"c\",\"email\":\"d\",\"role\":0,\"carType\":0,\"password\":\"e\",\"birthdate\":\"1234-02-07\"}" http://localhost:8080/driveUsers
+    curl -X POST -H "Content-Type: application/json" -d "{\"username\":\"a\",\"firstName\":\"b\",\"lastName\":\"c\",\"email\":\"d\",\"role\":0,\"carType\":0,\"password\":\"e\",\"birthdate\":\"1234-02-07\"}" http://localhost:8080/users
      */
     @PostMapping("/users")
     public void addUser(@RequestBody User user) {
