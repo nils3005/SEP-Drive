@@ -39,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             try{
-                if(!jwtService.validateToken(token)) { throw new RuntimeException("Expired JWT token"); }
+                if(!jwtService.validateToken(token)) {throw new RuntimeException("Expired JWT token"); }
                 username = jwtService.extractUsername(token);
             } catch(Exception e) {
                 throw new RuntimeException("Invalid or expired JWT token");

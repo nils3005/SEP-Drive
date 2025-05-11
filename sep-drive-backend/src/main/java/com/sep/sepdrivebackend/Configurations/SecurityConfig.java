@@ -38,7 +38,8 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/auth/**").permitAll()
-                    .requestMatchers("/user/findByName/**").hasRole("DRIVER")
+                    //.requestMatchers("/user/findByName/**").hasRole("DRIVER")
+                        .requestMatchers("/api/ride-request").hasRole("CUSTOMER")
                     .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session

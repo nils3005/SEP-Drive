@@ -50,4 +50,13 @@ public class AuthController {
         }
     }
 
+    @PostMapping(path = "logout")
+    public ResponseEntity<String> logout() {
+        try{
+            authService.incrementTokenId();
+            return ResponseEntity.ok("Logout successful");
+        } catch (RuntimeException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 }
