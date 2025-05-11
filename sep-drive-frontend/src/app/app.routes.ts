@@ -10,6 +10,6 @@ export const routes: Routes = [
     { path: 'social', component: SocialComponent },
     { path: 'login', component: LoginComponent },
     { path: 'logout', component: LogoutComponent },
-    { path: 'profile', component: ProfileComponent },
+    { path: 'user/:id', component: ProfileComponent },
     { path: '**', redirectTo: '' } // Fallback, falls keine Route passt
 ];

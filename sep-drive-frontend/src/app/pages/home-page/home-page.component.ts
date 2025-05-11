@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import {RouteInputComponent} from "../../components/route-input/route-input.component";
 import {MapComponent} from "../../components/map/map.component";
 import {GeocodeFeature} from "../../types";
-import {OpenRouteServiceService} from "../../services/open-route-service.service";
+import {OpenRouteServiceService} from "../../services/openroute/open-route-service.service";
 import * as L from 'leaflet';
-import {GeoServiceService} from "../../services/geo-service.service";
+import {GeoServiceService} from "../../services/geo/geo-service.service";
 
 @Component({
   selector: 'app-home-page',
