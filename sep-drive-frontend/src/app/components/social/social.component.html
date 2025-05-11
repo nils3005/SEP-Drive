@@ -1,1 +1,27 @@
-<p>social works!</p>
+<div class="search-container">
+    <input
+            type="text"
+            placeholder="Username"
+            [ngModel]="searchTerm()"
+            (ngModelChange)="searchTerm.set($event)"
+            class="search-input"
+    />
+</div>
+
+<div class="user-list">
+    @for(user of filteredUsers(); track user.id) {
+        <div class="user-card">
+            <div class="user-card-avatar">
+                <i class="fa fa-user"></i>
+            </div>
+            <div>
+                <span class="user-card-name">{{ user.username }}</span>
+            </div>
+            <div class="user-card-action">
+                <a [routerLink]="['/user', user.id]">
+                    <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    }
+</div>
