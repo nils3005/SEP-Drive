@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {GeocodeFeature} from '../types';
+import {GeocodeFeature} from '../../types';
 
 @Injectable({
   providedIn: 'root'

@@ -1,6 +1,6 @@
 import {Component, EventEmitter, inject, Output} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {OpenRouteServiceService} from "../../services/open-route-service.service";
+import {OpenRouteServiceService} from "../../services/openroute/open-route-service.service";
 import {AddressAutocompleteSuggestion, GeocodeFeature} from "../../types";
 
 @Component({

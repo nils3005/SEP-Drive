@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {AddressAutocompleteSuggestion, GeocodeFeature} from '../types';
+import {AddressAutocompleteSuggestion, GeocodeFeature} from '../../types';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import * as L from 'leaflet';
