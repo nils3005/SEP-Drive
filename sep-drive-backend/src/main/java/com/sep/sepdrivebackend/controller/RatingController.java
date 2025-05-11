@@ -7,6 +7,7 @@ import com.sep.sepdrivebackend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -36,6 +37,10 @@ public class RatingController {
     @PostMapping("/ratings/{userID}")
     public void addRating(@PathVariable Long userID, @RequestBody Rating rating) {
         User user = userService.findByUserId(userID);
+        if (null == user) {
+
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "UserID not found.", null);
+        }
         rating.setUser(user);
         ratingService.save(rating);
     }

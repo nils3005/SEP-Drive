@@ -5,6 +5,7 @@ import com.sep.sepdrivebackend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -31,13 +32,23 @@ public class UserController {
      */
     @PostMapping("/users")
     public void addUser(@RequestBody User user) {
+        if ( null == user ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found.", null);
+        }
+        User existing = userService.findByUsername(user.getUsername());
+        if ( null != existing ) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already taken.", null);
+        }
         userService.save(user);
     }
 
-
     @GetMapping(path = "/users/{userID}")
     public User findByUserId(@PathVariable Long userID) {
-        return userService.findByUserId(userID);
+        User user = userService.findByUserId(userID);
+        if ( null == user ) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.", null);
+        }
+        return user;
     }
 
 }

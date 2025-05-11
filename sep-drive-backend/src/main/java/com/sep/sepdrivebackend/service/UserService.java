@@ -19,20 +19,7 @@ public class UserService {
     }
 
     public void save(User user) {
-        if ( null == user ) {
-            return;
-        }
-        if ( null == user.getId() ) {
-
-            // New user? Check if username already taken!
-            User existing = findByUsername(user.getUsername());
-
-            // Username taken, abort.
-            if ( null != existing ) {
-                return;
-            }
-        }
-       userRepository.save(user);
+        userRepository.save(user);
     }
 
     public User findByUserId(Long userID) {
