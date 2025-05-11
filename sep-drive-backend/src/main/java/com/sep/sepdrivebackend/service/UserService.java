@@ -1,5 +1,6 @@
-package com.sep.sepdrivebackend.controller;
+package com.sep.sepdrivebackend.service;
 
+import com.sep.sepdrivebackend.repository.UserRepository;
 import com.sep.sepdrivebackend.entities.User;
 import org.springframework.stereotype.Service;
 

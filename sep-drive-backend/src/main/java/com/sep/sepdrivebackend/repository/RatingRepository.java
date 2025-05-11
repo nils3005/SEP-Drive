@@ -1,4 +1,4 @@
-package com.sep.sepdrivebackend.controller;
+package com.sep.sepdrivebackend.repository;
 
 import com.sep.sepdrivebackend.entities.Rating;
 import org.springframework.data.jpa.repository.JpaRepository;
