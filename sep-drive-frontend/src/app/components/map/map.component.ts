@@ -2,6 +2,7 @@ import {AfterViewInit, Component, Input, OnChanges, SimpleChanges} from '@angula
 import * as L from 'leaflet';
 import {GeocodeFeature, GeoJsonRoute} from "../../types";
 import {routes} from "../../app.routes";
+import {GeoServiceService} from "../../services/geo-service.service";
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -24,11 +25,13 @@ L.Marker.prototype.options.icon = iconDefault;
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss',
 })
-export class MapComponent implements AfterViewInit, OnChanges {
+export class MapComponent implements AfterViewInit {
+
+  constructor(private geoService: GeoServiceService) {
+    this.geoService = geoService;
+  }
+
   private map: L.Map | undefined;
-  @Input() route: any;
-  @Input() waypoints: GeocodeFeature[] = [];
-  @Input() currentPoint: GeocodeFeature | undefined;
 
   routeLayer: L.LayerGroup = L.layerGroup();
   markerLayer: L.LayerGroup = L.layerGroup();
@@ -55,28 +58,14 @@ export class MapComponent implements AfterViewInit, OnChanges {
 
   ngAfterViewInit(): void {
     this.initMap();
+    this.checkChanges()
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['route'] && changes['route'] !== undefined) {
-      if (this.route && this.map && this.routeLayer) {
-        this.routeLayer.clearLayers()
-        L.geoJSON(this.route, {
-          style: {
-            weight: 5
-          }
-        }).addTo(this.routeLayer)
-        this.map.fitBounds(L.geoJSON(this.route).getBounds())
-        let routeJson: GeoJsonRoute = this.route;
-        console.log(routeJson.features[0].properties.summary.distance / 1000 + "km")
-        console.log(routeJson.features[0].properties.summary.duration / 60 + "min")
-      }
-    }
-    if (changes['waypoints'] && changes['waypoints'] !== undefined && !changes['waypoints'].firstChange) {
-      if (this.routeLayer) {
+  checkChanges(): void {
+    this.geoService.waypoints.asObservable().subscribe(waypoints => {
         this.routeLayer.clearLayers()
         this.markerLayer.clearLayers()
-        for (const waypoint of this.waypoints) {
+        for (const waypoint of this.geoService.waypoints.getValue()) {
           if (waypoint) {
             let marker = L.marker(
                 [
@@ -87,15 +76,73 @@ export class MapComponent implements AfterViewInit, OnChanges {
             marker.addTo(this.markerLayer)
           }
         }
-        if (this.currentPoint) {
-          this.map?.flyTo([this.currentPoint.geometry.coordinates[1], this.currentPoint.geometry.coordinates[0]],
-              14,
-              {
-                duration: 1
-              }
-          )
-        }
+    })
+    this.geoService.currentPoint.asObservable().subscribe(currentPoint => {
+      if (currentPoint) {
+        this.routeLayer.clearLayers()
+        this.map?.flyTo([currentPoint.geometry.coordinates[1], currentPoint.geometry.coordinates[0]],
+            14,
+            {
+              duration: 1
+            }
+        )
       }
-    }
+    })
+    this.geoService.route.asObservable().subscribe(route => {
+      if (route && this.map) {
+        this.routeLayer.clearLayers()
+        L.geoJSON(route, {
+          style: {
+            weight: 5
+          }
+        }).addTo(this.routeLayer)
+        this.map.fitBounds(L.geoJSON(route).getBounds())
+        let routeJson: GeoJsonRoute = route;
+        console.log(routeJson.features[0].properties.summary.distance / 1000 + "km")
+        console.log(routeJson.features[0].properties.summary.duration / 60 + "min")
+      }
+    })
   }
+
+  // ngOnChanges(changes: SimpleChanges) {
+  //   if (changes['route'] && changes['route'] !== undefined) {
+  //     if (this.route && this.map && this.routeLayer) {
+  //       this.routeLayer.clearLayers()
+  //       L.geoJSON(this.route, {
+  //         style: {
+  //           weight: 5
+  //         }
+  //       }).addTo(this.routeLayer)
+  //       this.map.fitBounds(L.geoJSON(this.route).getBounds())
+  //       let routeJson: GeoJsonRoute = this.route;
+  //       console.log(routeJson.features[0].properties.summary.distance / 1000 + "km")
+  //       console.log(routeJson.features[0].properties.summary.duration / 60 + "min")
+  //     }
+  //   }
+  //   if (changes['waypoints'] && changes['waypoints'] !== undefined && !changes['waypoints'].firstChange) {
+  //     if (this.routeLayer) {
+  //       this.routeLayer.clearLayers()
+  //       this.markerLayer.clearLayers()
+  //       for (const waypoint of this.waypoints) {
+  //         if (waypoint) {
+  //           let marker = L.marker(
+  //               [
+  //                 waypoint.geometry.coordinates[1],
+  //                 waypoint.geometry.coordinates[0]
+  //               ]
+  //           );
+  //           marker.addTo(this.markerLayer)
+  //         }
+  //       }
+  //       if (this.currentPoint) {
+  //         this.map?.flyTo([this.currentPoint.geometry.coordinates[1], this.currentPoint.geometry.coordinates[0]],
+  //             14,
+  //             {
+  //               duration: 1
+  //             }
+  //         )
+  //       }
+  //     }
+  //   }
+  // }
 }

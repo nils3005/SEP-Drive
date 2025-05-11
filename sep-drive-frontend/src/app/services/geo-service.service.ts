@@ -1,12 +1,20 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {GeocodeFeature} from '../types';
+import {BehaviorSubject} from "rxjs";
+import {OpenRouteServiceService} from "./open-route-service.service";
+import {CarTypes} from "../enums/car-types";
 
 @Injectable({
   providedIn: 'root'
 })
 export class GeoServiceService {
 
-  constructor() { }
+  public waypoints: BehaviorSubject<GeocodeFeature[]> = new BehaviorSubject<GeocodeFeature[]>([]);
+  public route: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+  public currentPoint: BehaviorSubject<GeocodeFeature | null> = new BehaviorSubject<GeocodeFeature | null>(null);
+  public carType: BehaviorSubject<string> = new BehaviorSubject<string>(CarTypes.MEDIUM);
+
+  constructor(private openRouteServiceService: OpenRouteServiceService) {}
 
   public getCoordinateArray(geoCodes: GeocodeFeature[]): number[][]
   {
@@ -16,5 +24,33 @@ export class GeoServiceService {
       coordinates.push([geoCode.geometry.coordinates[0], geoCode.geometry.coordinates[1]]);
     }
     return coordinates;
+  }
+
+  public calculateRoute()
+  {
+    let coordinates = this.getCoordinateArray(this.waypoints.getValue());
+    this.openRouteServiceService.getRouteFromPointArray(coordinates).subscribe(route => {
+      this.route.next(route);
+    })
+  }
+
+  public updateStart(start: GeocodeFeature): void
+  {
+    let tempWaypoints = this.waypoints.getValue();
+    tempWaypoints[0] = start;
+    this.waypoints.next(tempWaypoints);
+    this.currentPoint.next(start);
+  }
+
+  public updateDestination(destination: GeocodeFeature): void
+  {
+    let tempWaypoints = this.waypoints.getValue();
+    if (tempWaypoints.length > 1) {
+      tempWaypoints[tempWaypoints.length - 1] = destination;
+    } else {
+      tempWaypoints[1] = destination;
+    }
+    this.waypoints.next(tempWaypoints);
+    this.currentPoint.next(destination);
   }
 }

@@ -1,8 +1,7 @@
 import {inject, Injectable} from '@angular/core';
-import {AddressAutocompleteSuggestion, GeocodeFeature} from '../types';
+import {AddressAutocompleteSuggestion, Coordinates, GeocodeFeature} from '../types';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import * as L from 'leaflet';
+import {Observable} from 'rxjs'
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +22,18 @@ export class OpenRouteServiceService {
         accept: 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8'
       }
     })
+  }
+
+  public getGeocodeFeatureByCoordinates(cords: Coordinates): Observable<AddressAutocompleteSuggestion>
+  {
+      return this.http.get<any>(
+          `https://api.openrouteservice.org/geocode/reverse?api_key=${this.apiKey}&point.lon=${cords.longitude}&point.lat=${cords.latitude}`,
+          {
+            headers: {
+              accept: 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8'
+            }
+          }
+      )
   }
 
   public getRouteBetweenPoints(start: GeocodeFeature, end: GeocodeFeature): Observable<any>

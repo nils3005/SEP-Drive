@@ -1,52 +1,37 @@
 import { Component } from '@angular/core';
 import {RouteInputComponent} from "../../components/route-input/route-input.component";
 import {MapComponent} from "../../components/map/map.component";
-import {GeocodeFeature} from "../../types";
-import {OpenRouteServiceService} from "../../services/open-route-service.service";
-import * as L from 'leaflet';
-import {GeoServiceService} from "../../services/geo-service.service";
+import {RideRequestService} from "../../services/ride-request.service";
+import {RideRequestStatus} from "../../enums/ride-request-status";
+import {RideRequestSummaryComponent} from "../../components/ride-request-summary/ride-request-summary.component";
 
 @Component({
   selector: 'app-home-page',
   imports: [
     RouteInputComponent,
-    MapComponent
+    MapComponent,
+    RideRequestSummaryComponent
   ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'
 })
 export class HomePageComponent {
-  public waypoints: GeocodeFeature[] = [];
-  public currentPoint: GeocodeFeature | undefined;
-  public route: any
 
-  constructor(
-      private openRouteServiceService: OpenRouteServiceService,
-      private geoServiceService: GeoServiceService
-  ) {}
+  public showInput = true;
 
-  onStartEmit(start: GeocodeFeature) {
-    let tempWaypoints = this.waypoints.slice();
-    tempWaypoints[0] = start;
-    this.waypoints = tempWaypoints;
-    this.currentPoint = start;
+  constructor(private rideRequestService: RideRequestService) {
+    this.checkChanges()
   }
 
-  onDestinationEmit(destination: GeocodeFeature) {
-    let tempWaypoints = this.waypoints.slice();
-    if (tempWaypoints.length > 1) {
-      tempWaypoints[tempWaypoints.length - 1] = destination;
-    } else {
-      tempWaypoints[1] = destination;
-    }
-    this.waypoints = tempWaypoints;
-    this.currentPoint = destination;
-  }
-
-  onSubmitEventEmit() {
-    let coordinates = this.geoServiceService.getCoordinateArray(this.waypoints)
-    this.openRouteServiceService.getRouteFromPointArray(coordinates).subscribe(route => {
-      this.route = route;
+  checkChanges(): void {
+    this.rideRequestService.rideRequest.asObservable().subscribe(rideRequest => {
+      if (rideRequest && (rideRequest.status === RideRequestStatus.COMPLETED || rideRequest.status === RideRequestStatus.CANCELED)) {
+        this.showInput = false;
+      }
+      if (!rideRequest) {
+        this.showInput = true;
+      }
     })
   }
+
 }

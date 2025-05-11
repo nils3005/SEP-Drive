@@ -1,3 +1,5 @@
+import {RideRequestStatus} from "./enums/ride-request-status";
+
 export type NavLink = {
   id: number,
   title: string,
@@ -15,14 +17,14 @@ export type GeocodeFeature = {
     coordinates: [number, number]
   }
   properties: {
-    id: string,
+    id: string
     name: string,
-    housenumber: string,
-    street: string,
-    postalcode: string,
-    country: string,
-    region: string,
-    locality: string,
+    housenumber?: string | undefined,
+    street?: string | undefined,
+    postalcode?: string | undefined,
+    country?: string | undefined,
+    region?: string | undefined,
+    locality?: string | undefined,
     label: string
   }
 }
@@ -38,4 +40,14 @@ export type GeoJsonRoute = {
       }
     }
   ]
+}
+
+export type Coordinates = {
+  latitude: number | string
+  longitude: number | string
+}
+
+export type RideRequest = {
+  id: number
+  status: RideRequestStatus
 }
