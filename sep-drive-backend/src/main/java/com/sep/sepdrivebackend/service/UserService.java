@@ -5,6 +5,7 @@ import com.sep.sepdrivebackend.entities.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -26,11 +27,15 @@ public class UserService {
         return userRepository.findById(userID).orElse(null);
     }
 
+    // Braucht man nicht, wenn man die Zeile im UserRepo nimmt
     public User findByUsername(String username) {
-
         return findAllUsers()
                 .stream()
                 .filter(user -> user.getUsername().equals(username))
                 .findFirst().orElse(null);
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
     }
 }

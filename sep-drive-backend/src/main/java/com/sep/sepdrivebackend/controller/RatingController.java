@@ -1,5 +1,6 @@
 package com.sep.sepdrivebackend.controller;
 
+import com.sep.sepdrivebackend.entities.RatingDTO;
 import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.entities.Rating;
 import com.sep.sepdrivebackend.service.RatingService;
@@ -25,6 +26,10 @@ public class RatingController {
     /*
     curl -X GET http://localhost:8080/ratings
      */
+
+    /**
+     * Welche Komponente braucht das Mapping?
+     */
     @GetMapping("/ratings")
     public ResponseEntity<List<Rating>> getRatings() {
         List<Rating> ratings = this.ratingService.findAllRatings();
@@ -34,14 +39,30 @@ public class RatingController {
     /*
     curl -X POST -H "Content-Type: application/json" -d "{\"rating\":60.23}" http://localhost:8080/rate/1
      */
+
+    /*
+     * Wenn man Rating als ResponseBody nimmt, dann erwartet der controller ein User Objekt. Das bedeuetet,
+     * dass man für jedes Rating den User mit all seinen Werten im POST übergeben muss. Es reicht aber die ID
+     * zu übergeben. Man erstellt ein DTO für Rating und speichert nur die userId anstatt des User als Entity.
+     *
+     * @PostMapping("/ratings/{userID}")
+     *     public void addRating(@PathVariable Long userID, @RequestBody RatingDTO rating) {
+     *         User user = userService.findByUserId(userID);
+     *         if (user == null) {
+     *             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "UserID not found.", null);
+     *         }
+     *         Rating r = new Rating(user, rating.getRating());
+     *         ratingService.save(r);
+     *     }
+     */
     @PostMapping("/ratings/{userID}")
     public void addRating(@PathVariable Long userID, @RequestBody Rating rating) {
         User user = userService.findByUserId(userID);
         if (null == user) {
-
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "UserID not found.", null);
         }
         rating.setUser(user);
         ratingService.save(rating);
     }
+
 }

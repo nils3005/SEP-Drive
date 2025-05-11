@@ -39,6 +39,13 @@ public class UserController {
         if ( null != existing ) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already taken.", null);
         }
+        /*
+        User userForEmail = userService.findByEmail(user.getEmail());
+        if (userForEmail != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already taken.", null);
+        }
+
+         */
         userService.save(user);
     }
 

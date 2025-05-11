@@ -17,7 +17,7 @@ public class Rating {
 
     @Getter(AccessLevel.NONE)
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "userId") // müsste das nicht user_id sein und nullable = false macht doch auch Sinn
     private User user;
 
     private float rating;
