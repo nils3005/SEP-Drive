@@ -9,5 +9,5 @@ export interface User {
     totalRides: number;
     ratings: number[];
     carType: string;
-    // TODO profileImageUrl: string;
+    profileImageBase64: string;
 }

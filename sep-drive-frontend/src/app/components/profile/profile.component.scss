@@ -1,9 +1,10 @@
 .profile-container {
   display: flex;
   gap: 2rem;
-  padding: 150px 1.5rem 1.5rem;
+  padding: 100px 1.5rem 1.5rem;
   justify-content: center;
   align-items: center;
+  font-family: Roboto, 'sans-serif';
 }
 
 .profile-form {
@@ -12,7 +13,7 @@
 }
 .profile-form h2 {
   margin-bottom: 1rem;
-  padding-bottom: 50px;
+  padding-bottom: 25px;
 }
 
 .form-grid {
@@ -51,8 +52,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
+
+.avatar-img {
+  width: 15rem;
+  height: 15rem;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+}
+
 .avatar-circle {
   width: 15rem;
   height: 15rem;

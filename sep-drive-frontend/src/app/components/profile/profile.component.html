@@ -25,6 +25,7 @@
             <input type="text" [value]="user()?.totalRides" readonly />
 
             <label>Rating</label>
+            <!-- TODO: Halbe Sterne werden nicht angezeigt -->
             <div class="stars">
                 @for (star of [1, 2, 3, 4, 5]; track star) {
                     <i
@@ -46,8 +47,17 @@
     </div>
 
     <div class="profile-avatar">
-        <div class="avatar-circle">
-            Profilbild
-        </div>
+
+        @if (user()?.profileImageBase64) {
+            <img
+                    [src]="'data:image/png;base64,' + user()!.profileImageBase64"
+                    alt="Profilbild {{ user()?.username }}"
+                    class="avatar-img"
+            />
+        } @else {
+            <div class="avatar-circle">
+                Profilbild
+            </div>
+        }
     </div>
 </div>
