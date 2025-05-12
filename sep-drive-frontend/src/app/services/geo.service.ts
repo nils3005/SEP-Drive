@@ -3,6 +3,7 @@ import {Coordinates, GeocodeFeature} from '../types';
 import {BehaviorSubject} from "rxjs";
 import {OpenRouteServiceService} from "./open-route-service.service";
 import * as L from 'leaflet';
+import {ErrorService} from './error.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class GeoService {
 
   public map: L.Map | undefined;
 
-  constructor(private openRouteServiceService: OpenRouteServiceService) {}
+  constructor(private openRouteServiceService: OpenRouteServiceService, private errorService: ErrorService) {}
 
   public getCoordinateArray(geoCodes: GeocodeFeature[]): number[][]
   {
@@ -32,9 +33,14 @@ export class GeoService {
   public calculateRoute()
   {
     let coordinates = this.getCoordinateArray(this.waypoints.getValue());
-    this.openRouteServiceService.getRouteFromPointArray(coordinates).subscribe(route => {
-      this.route.next(route);
-      this.showInput.next(false);
+    this.openRouteServiceService.getRouteFromPointArray(coordinates).subscribe({
+      next: response => {
+        this.route.next(response.body);
+        this.showInput.next(false);
+      },
+      error: error => {
+        this.errorService.showError("Route konnte nicht berechnet werden");
+      }
     })
   }
 
