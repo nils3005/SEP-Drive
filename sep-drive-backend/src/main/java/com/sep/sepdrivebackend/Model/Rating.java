@@ -1,38 +1,25 @@
-/*package com.sep.sepdrivebackend.Model;
-
-import jakarta.persistence.*;
-
-@Entity
-public class Rating {
-    @Id
-    private long ratinID;
-
-    private float ratingValue;
-
-    @ManyToOne
-    @JoinColumn(name = "userID")
-    private User user;
-}*/
-
 package com.sep.sepdrivebackend.Model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import lombok.*;
 
 @Entity
-@Setter @Getter @NoArgsConstructor
+@Setter @Getter @NoArgsConstructor @AllArgsConstructor
 public class Rating {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Getter(AccessLevel.NONE)
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "userId") // müsste das nicht user_id sein und nullable = false macht doch auch Sinn
     private User user;
 
     private float rating;
 
+    public Long getUserID() {
+        return user.getId();
+    }
 }

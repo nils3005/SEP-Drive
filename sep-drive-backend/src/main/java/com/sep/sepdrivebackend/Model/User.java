@@ -1,103 +1,15 @@
-/*package com.sep.sepdrivebackend.Model;
-
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-
-@Getter
-@Setter
-@Entity
-@Table(name="driveUser")
-public class User implements UserDetails {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long userid;
-
-    @Column(unique = true, nullable = false)
-    private String username;
-    @Column(nullable = false)
-    private String password;
-    @Column(nullable = false)
-    private String firstName;
-    @Column(nullable = false)
-    private String lastName;
-    @Column(unique = true, nullable = false)
-    private String email;
-    @Column(nullable = false)
-    private String birthDate;
-    private int numberOfRides;
-    private String profilePicture;
-    @OneToMany(mappedBy = "user")
-    private List<Rating> ratings = new ArrayList<>();
-    @Enumerated(EnumType.STRING)
-    private CarType carType;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Role role;
-
-    private boolean verified=false;
-
-    private String verificationCode;
-
-    public User(){}
-
-    public User(String username, String password, String firstName, String lastName, String email, String birthDate, /*String profilePicture,*/ /*CarType carType,*/ /*Role role) {
-        this.username = username;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.birthDate = birthDate;
-        this.role = role;
-    }
-
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_"+getRole().toString()));
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-}
-*/
-
 package com.sep.sepdrivebackend.Model;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -144,25 +56,64 @@ public class User implements UserDetails {
 
     private int numberOfRides;
 
+    @Setter(AccessLevel.NONE)
     @Enumerated(EnumType.STRING)
     private CarType carType;
 
-    //private boolean verified;
 
     private String verificationCode;
 
     //Token id matched to jwt for validation, increments with every logout
     private int tokenId;
 
-    /*public float getAvgRating() {
+    public float getAvgRating() {
         int count = ratings.size();
         float avgRating = 0;
-        for (Ratings rating : ratings) {
+        for (Rating rating : ratings) {
             avgRating += rating.getRating();
         }
         avgRating /= count;
         return avgRating;
-    }*/
+    }
+
+    public void setCarType(int carType) {
+
+        CarType[] carTypes = CarType.values();
+        if ((0 > carType) || (carTypes.length < carType)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid car type.", null);
+        }
+        setCarType(carTypes[carType]);
+    }
+
+    public void setCarType(String carType) {
+
+        setCarType(Integer.parseInt(carType));
+    }
+
+    public void setCarType(CarType carType) {
+
+        this.carType = carType;
+    }
+
+    public void setRole(int role) {
+
+        Role[] roles = Role.values();
+        if ((0 > role) || (roles.length < role)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role.", null);
+        }
+        setRole(roles[role]);
+    }
+
+    public void setRole(String role) {
+
+        setRole(Integer.parseInt(role));
+    }
+
+    public void setRole(Role role) {
+
+        this.role = role;
+    }
+
 
     public User(String username, String email, String password, Role role, String firstName, String lastName, LocalDate birthdate, String profilePicture) {
         this.username = username;
@@ -175,6 +126,7 @@ public class User implements UserDetails {
         this.profilePicture = profilePicture;
     }
 
+    //Methoden von UserDetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_"+getRole().toString()));

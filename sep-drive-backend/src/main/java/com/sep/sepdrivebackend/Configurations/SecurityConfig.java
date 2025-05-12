@@ -1,7 +1,7 @@
 package com.sep.sepdrivebackend.Configurations;
 
-import com.sep.sepdrivebackend.Model.UserRepository;
 import com.sep.sepdrivebackend.Service.JwtService;
+import com.sep.sepdrivebackend.Service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,17 +17,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
-    /*private final JwtFilter jwtFilter;
-
-    public SecurityConfig(JwtFilter jwtFilter) {
-        this.jwtFilter = jwtFilter;
-    }*/
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -37,13 +30,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/auth/**").permitAll()
-                    //.requestMatchers("/user/findByName/**").hasRole("DRIVER")
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/api/ride-request").hasRole("CUSTOMER")
-                    .anyRequest().authenticated())
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
         return http.build();
@@ -55,8 +47,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepository) {
-        return username -> userRepository.findByUsername(username).orElse(null);
+    public UserDetailsService userDetailsService(UserService userService) {
+        return userService::findByUsername;
     }
 
     @Bean

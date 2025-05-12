@@ -26,7 +26,7 @@ public class AuthController {
         try{
             authService.registerUser(registerDto);
             return ResponseEntity.ok("User registered successfully");
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
     }
