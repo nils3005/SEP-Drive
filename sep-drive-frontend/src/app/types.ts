@@ -1,5 +1,5 @@
 import {RideRequestStatus} from "./enums/ride-request-status";
-import {CarTypes} from "./enums/car-types";
+import {CarType} from "./enums/car-type";
 
 export type NavLink = {
   id: number,

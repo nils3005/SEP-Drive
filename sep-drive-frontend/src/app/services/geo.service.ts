@@ -1,22 +1,24 @@
 import {Injectable} from '@angular/core';
-import {GeocodeFeature, GeoJsonRoute, RideRequestSummary} from '../types';
+import {Coordinates, GeocodeFeature} from '../types';
 import {BehaviorSubject} from "rxjs";
 import {OpenRouteServiceService} from "./open-route-service.service";
-import {CarTypes} from "../enums/car-types";
-import {RideRequestService} from "./ride-request.service";
+import * as L from 'leaflet';
+import {ErrorService} from './error.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class GeoServiceService {
+export class GeoService {
 
   public waypoints: BehaviorSubject<GeocodeFeature[]> = new BehaviorSubject<GeocodeFeature[]>([]);
   public route: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   public currentPoint: BehaviorSubject<GeocodeFeature | null> = new BehaviorSubject<GeocodeFeature | null>(null);
-  public carType: BehaviorSubject<string> = new BehaviorSubject<string>(CarTypes.MEDIUM);
+  public carType: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
   public showInput: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
 
-  constructor(private openRouteServiceService: OpenRouteServiceService) {}
+  public map: L.Map | undefined;
+
+  constructor(private openRouteServiceService: OpenRouteServiceService, private errorService: ErrorService) {}
 
   public getCoordinateArray(geoCodes: GeocodeFeature[]): number[][]
   {
@@ -31,9 +33,14 @@ export class GeoServiceService {
   public calculateRoute()
   {
     let coordinates = this.getCoordinateArray(this.waypoints.getValue());
-    this.openRouteServiceService.getRouteFromPointArray(coordinates).subscribe(route => {
-      this.route.next(route);
-      this.showInput.next(false);
+    this.openRouteServiceService.getRouteFromPointArray(coordinates).subscribe({
+      next: response => {
+        this.route.next(response.body);
+        this.showInput.next(false);
+      },
+      error: error => {
+        this.errorService.showError("Route konnte nicht berechnet werden");
+      }
     })
   }
 
@@ -55,5 +62,15 @@ export class GeoServiceService {
     }
     this.waypoints.next(tempWaypoints);
     this.currentPoint.next(destination);
+  }
+
+  public flyMapTo(latitude: number, longitude: number, zoom: number, duration: number): void
+  {
+    this.map?.flyTo([latitude, longitude],
+      zoom,
+      {
+        duration: duration
+      }
+    )
   }
 }

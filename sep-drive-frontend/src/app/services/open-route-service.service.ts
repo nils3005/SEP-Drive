@@ -1,6 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {AddressAutocompleteSuggestion, Coordinates, GeocodeFeature} from '../types';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs'
 
 @Injectable({
@@ -24,42 +24,32 @@ export class OpenRouteServiceService {
     })
   }
 
-  public getGeocodeFeatureByCoordinates(cords: Coordinates): Observable<AddressAutocompleteSuggestion>
+  public getGeocodeFeatureByCoordinates(cords: Coordinates): Observable<HttpResponse<AddressAutocompleteSuggestion>>
   {
       return this.http.get<any>(
           `https://api.openrouteservice.org/geocode/reverse?api_key=${this.apiKey}&point.lon=${cords.longitude}&point.lat=${cords.latitude}`,
           {
             headers: {
               accept: 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8'
-            }
+            },
+            observe: "response"
           }
       )
   }
 
-  public getRouteBetweenPoints(start: GeocodeFeature, end: GeocodeFeature): Observable<any>
-  {
-    return this.http.get<any>(
-      `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${this.apiKey}&start=${start.geometry.coordinates[0]},${start.geometry.coordinates[1]}&end=${end.geometry.coordinates[0]},${end.geometry.coordinates[1]}`,
+  public getRouteFromPointArray(waypoints: number[][]): Observable<any> {
+  return this.http.post<any>(
+      `https://api.openrouteservice.org/v2/directions/driving-car/geojson`,
       {
-        headers: {
-          accept: 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8'
-        }
-      })
-  }
-
-  public getRouteFromPointArray(waypoints: number[][]): Observable<any>
-  {
-    return this.http.post<any>(
-        `https://api.openrouteservice.org/v2/directions/driving-car/geojson`,
-        {
           'coordinates': waypoints
-        },
-        {
+      },
+      {
           headers: {
-            accept: 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
-            authorization: `${this.apiKey}`
-          }
-        }
+              accept: 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+              authorization: `${this.apiKey}`
+          },
+          observe: 'response'
+      }
     )
   }
 }

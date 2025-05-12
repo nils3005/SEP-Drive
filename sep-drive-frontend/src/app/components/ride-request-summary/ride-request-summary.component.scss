@@ -57,8 +57,29 @@
 }
 
 .submitButton {
+  transition: background-color 0.2s;
   padding: 6px 12px;
   background: #914141;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-family: "Roboto", sans-serif;
+  border-radius: 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  display: inline-flex;
+  width: fit-content;
+  border: none;
+}
+
+.submitButton:hover {
+  background: #753838;
+  transition: 0.2s;
+}
+
+.cancelButton {
+  padding: 6px 12px;
+  background: #374151;
   color: #FFFFFF;
   font-size: 16px;
   font-family: "Roboto", sans-serif;
@@ -72,7 +93,7 @@
   transition: background-color 0.2s;
 }
 
-.submitButton:hover {
-  background: #753838;
+.cancelButton:hover {
+  background: #253146;
   transition: 0.2s;
 }
