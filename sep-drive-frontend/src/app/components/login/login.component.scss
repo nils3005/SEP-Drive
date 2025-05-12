@@ -1,8 +1,8 @@
-.fullscreen-container {
+.main {
+  height: 100vh;
   display: flex;
-  justify-content: center;  /* horizontal zentrieren */
-  align-items: center;      /* vertikal zentrieren */
-  height: 100vh;            /* volle Bildschirmhöhe */
+  justify-content: center;
+  align-items: center;
 }
 
 .login_container {
@@ -10,8 +10,10 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 30px;
-  padding: 160px 705px;
-
+  max-width: 500px;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .question{
@@ -78,3 +80,23 @@
   background: #753838;
 }
 
+#register_button {
+  display: flex;
+  height: 35px;
+  padding: var(--t-spacing-15, 6px) var(--t--spacing-3, 12px);
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: var(--t--borders-radius-rounded-lg, 8px);
+  background: #914141;
+  gap: var(--t--spacing-2, 8px);
+  align-self: stretch;
+  width: 455px;
+  /* text */
+  color: var(--d--colors-base-neutral-content, #F9FAFB);
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px; /* 125% */
+}

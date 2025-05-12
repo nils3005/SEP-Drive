@@ -29,7 +29,7 @@ export class AuthenticationComponent {
 
   onVerify(){
 
-
+    //testen ob wirklich alle daten geschickt werden
     console.log('Verify payload:', {
       username: this.username,
       code: this.code
@@ -44,6 +44,8 @@ export class AuthenticationComponent {
       this.errorMessage = "Der Code ist falsch. Bitte richtig eingeben."
     }
     }); */
+
+    //zum testen den token ausgeben
     console.log(localStorage.getItem('jwt'));
 
 
@@ -52,12 +54,12 @@ export class AuthenticationComponent {
       code: this.code
     }, { headers: { 'Content-Type': 'application/json' }, responseType: 'text' }).subscribe({
       next: (token) => {
-        // Erfolg: Token speichern z.B. im localStorage
+        // token speichern
         localStorage.setItem('jwt', token);
-        this.router.navigate(['/login']); // Weiterleiten
+        this.router.navigate(['/login']); // Weiterleiten (eigentlich zur startseite aber zum testen zurück zum login)
       },
       error: (err) => {
-        this.errorMessage = 'Verifizierung fehlgeschlagen: ' + err.error;
+        this.errorMessage = 'Verifizierung fehlgeschlagen: ' + err.error; //error nachrichten vom backend
       }
     });
 

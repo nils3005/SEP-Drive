@@ -44,10 +44,9 @@ export class PasswordComponent {
     this.http.post('http://localhost:8080/auth/login', loginData, {responseType: 'text'}).subscribe({
       //wenn angenommen, dann navigiere zur nächsten seite
       next: (response: any) => {
-        //hier soll noch eine e-mail mit dem verification code geschickt werden
-        this.router.navigate(['authentication'], { state: { username: this.username } }); // oder zur authentication seite navigieren
+        //mit dem post wird eine e-mail gesendet
+        this.router.navigate(['authentication'], { state: { username: this.username } }); // zur authentication navigieren, username weiterhin zwischenspeichern
       },
-      //error Message, später in html
       error: (err) => {
         this.errorMessage = 'Login fehlgeschlagen. Bitte überprüfen Sie Ihre Eingaben.';
       }
