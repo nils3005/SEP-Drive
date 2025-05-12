@@ -4,6 +4,7 @@ import {MapComponent} from "../../components/map/map.component";
 import {RideRequestService} from "../../services/ride-request.service";
 import {RideRequestStatus} from "../../enums/ride-request-status";
 import {RideRequestSummaryComponent} from "../../components/ride-request-summary/ride-request-summary.component";
+import {GeoService} from "../../services/geo.service";
 
 @Component({
   selector: 'app-home-page',
@@ -17,10 +18,10 @@ import {RideRequestSummaryComponent} from "../../components/ride-request-summary
 })
 export class HomePageComponent {
 
-  public showInput = true;
+  public showInput = false;
 
-  constructor(private rideRequestService: RideRequestService) {
-    this.checkChanges()
+  constructor(public rideRequestService: RideRequestService, public geoService: GeoService) {
+    // this.checkChanges()
   }
 
   checkChanges(): void {
@@ -33,5 +34,4 @@ export class HomePageComponent {
       }
     })
   }
-
 }

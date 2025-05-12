@@ -2,15 +2,14 @@ import {Component, inject} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {OpenRouteServiceService} from "../../services/open-route-service.service";
 import {AddressAutocompleteSuggestion, Coordinates, GeocodeFeature} from "../../types";
-import {GeoServiceService} from "../../services/geo-service.service";
-import {CarTypes} from "../../enums/car-types";
-import {ErrorComponent} from "../error/error.component";
+import {GeoService} from "../../services/geo.service";
+import {CarType} from "../../enums/car-type";
+import {ErrorService} from "../../services/error.service";
 
 @Component({
   selector: 'app-route-input',
   imports: [
     ReactiveFormsModule,
-    ErrorComponent,
   ],
   templateUrl: './route-input.component.html',
   styleUrl: './route-input.component.scss'
@@ -18,7 +17,7 @@ import {ErrorComponent} from "../error/error.component";
 export class RouteInputComponent {
   private openRouteServiceService = inject(OpenRouteServiceService);
 
-  constructor(private geoService: GeoServiceService) {
+  constructor(private geoService: GeoService, private errorService: ErrorService) {
     this.checkChanges()
   }
 
@@ -41,15 +40,15 @@ export class RouteInputComponent {
   public carTypes= [
     {
       id: 1,
-      value: CarTypes.SMALL
+      value: CarType.SMALL
     },
     {
       id: 2,
-      value: CarTypes.MEDIUM
+      value: CarType.MEDIUM
     },
     {
       id: 3,
-      value: CarTypes.DELUXE
+      value: CarType.DELUXE
     }
   ];
 
@@ -149,16 +148,44 @@ export class RouteInputComponent {
 
   getLocation() {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const longitude = position.coords.longitude;
-        const latitude = position.coords.latitude;
-        this.openRouteServiceService.getGeocodeFeatureByCoordinates({
-          latitude: latitude,
-          longitude: longitude
-        }).subscribe((features: AddressAutocompleteSuggestion) => {
-          this.onStartSelect(features.features[0]);
-        })
-      })
+      navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const longitude = position.coords.longitude;
+            const latitude = position.coords.latitude;
+            this.openRouteServiceService.getGeocodeFeatureByCoordinates({
+              latitude: latitude,
+              longitude: longitude
+            }).subscribe({
+              next: (response) => {
+                if (response.body) {
+                  this.onStartSelect(response.body.features[0]);
+                }
+              },
+              error: () => {
+                this.errorService.showError("Position konnte nicht gefunden werden");
+              }
+            });
+          },
+          (error) => {
+            switch (error.code) {
+              case error.PERMISSION_DENIED:
+                this.errorService.showError("Standortberechtigung wurde verweigert.");
+                break;
+              case error.POSITION_UNAVAILABLE:
+                this.errorService.showError("Standortinformationen sind nicht verfügbar.");
+                break;
+              case error.TIMEOUT:
+                this.errorService.showError("Zeitüberschreitung beim Abrufen der Standortdaten.");
+                break;
+              default:
+                this.errorService.showError("Unbekannter Fehler beim Abrufen der Standortdaten.");
+                break;
+            }
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    } else {
+      this.errorService.showError("Geolocation wird von diesem Browser nicht unterstützt.");
     }
   }
 
@@ -169,13 +196,19 @@ export class RouteInputComponent {
           latitude: this.routeForm.controls.startCordLat.value,
           longitude: this.routeForm.controls.startCordLon.value
         }
-        this.openRouteServiceService.getGeocodeFeatureByCoordinates(coordinates).subscribe(features => {
-          this.geoService.updateStart(features.features[0]);
-          this.geoService.currentPoint.next(features.features[0]);
+        this.openRouteServiceService.getGeocodeFeatureByCoordinates(coordinates).subscribe({
+          next: (response) => {
+            if (response.body) {
+              this.geoService.updateStart(response.body.features[0]);
+              this.geoService.currentPoint.next(response.body.features[0]);
+            }
+          },
+          error: error => {
+            this.errorService.showError("Position konnte nicht gefunden")
+          }
         })
       } else {
-        this.errorMessage = "Alle Felder müssen ausgefüllt werden"
-        this.showError = true;
+        this.errorService.showError("Alle Felder müssen ausgefüllt sein")
       }
     } else if (source > 0) {
       if (this.routeForm.controls.endCordLat.value && this.routeForm.controls.endCordLon.value) {
@@ -183,13 +216,19 @@ export class RouteInputComponent {
           latitude: this.routeForm.controls.endCordLat.value,
           longitude: this.routeForm.controls.endCordLon.value
         }
-        this.openRouteServiceService.getGeocodeFeatureByCoordinates(coordinates).subscribe(features => {
-          this.geoService.updateDestination(features.features[0]);
-          this.geoService.currentPoint.next(features.features[0]);
+        this.openRouteServiceService.getGeocodeFeatureByCoordinates(coordinates).subscribe({
+          next: (response) => {
+            if (response.body) {
+              this.geoService.updateStart(response.body.features[0]);
+              this.geoService.currentPoint.next(response.body.features[0]);
+            }
+          },
+          error: error => {
+            this.errorService.showError("Position konnte nicht gefunden")
+          }
         })
       } else {
-        this.errorMessage = "Alle Felder müssen ausgefüllt werden"
-        this.showError = true;
+        this.errorService.showError("Alle Felder müssen ausgefüllt sein")
       }
     }
   }
@@ -199,8 +238,7 @@ export class RouteInputComponent {
       this.geoService.carType.next(this.routeForm.controls.carType.value)
       this.geoService.calculateRoute()
     } else {
-      this.errorMessage = "Alle Felder müssen ausgefüllt werden"
-      this.showError = true;
+      this.errorService.showError("Alle Felder müssen ausgefüllt sein")
     }
   }
 }

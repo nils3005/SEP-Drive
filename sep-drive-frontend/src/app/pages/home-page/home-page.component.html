@@ -1,9 +1,9 @@
 <main>
     <div class="routeContainer">
-        @if (showInput) {
+        @if (geoService.showInput.getValue()) {
             <app-route-input class="routeInput" />
         } @else {
-            <app-ride-request-summary />
+            <app-ride-request-summary class="rideRequestSummary"/>
         }
         <app-map class="map" />
     </div>
