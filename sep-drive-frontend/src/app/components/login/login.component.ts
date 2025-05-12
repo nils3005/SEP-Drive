@@ -19,16 +19,16 @@ export class LoginComponent {
 
   onSignIn() {
 
-   /* this.http.post('http://localhost:8080/auth/checkUsername', this.username, {responseType: 'text'}).subscribe({
+   this.http.post('http://localhost:8080/auth/checkUsername', this.username, {responseType: 'text'}).subscribe({
       next: (response: any) => {
         this.router.navigate(['/password'], { state: { username: this.username } }); // zur passworteingabe navigieren, username weiterhin zwischenspeichern
       },
       error: (err) => {
         this.errorMessage = 'Der Benutzername existiert nicht.';
       }
-    }); */
+    });
 
-    this.router.navigate(['/password'], { state: { username: this.username } });
+   // this.router.navigate(['/password'], { state: { username: this.username } });
   }
 
 
