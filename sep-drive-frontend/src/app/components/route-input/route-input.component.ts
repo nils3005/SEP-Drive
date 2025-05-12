@@ -2,8 +2,8 @@ import {Component, inject, Output} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {OpenRouteServiceService} from "../../services/open-route-service.service";
 import {AddressAutocompleteSuggestion, Coordinates, GeocodeFeature, RideRequestSummary} from "../../types";
-import {GeoServiceService} from "../../services/geo-service.service";
-import {CarTypes} from "../../enums/car-types";
+import {GeoService} from "../../services/geo.service";
+import {CarType} from "../../enums/car-type";
 import {RideRequestService} from "../../services/ride-request.service";
 import {Observable} from "rxjs";
 
@@ -18,7 +18,7 @@ import {Observable} from "rxjs";
 export class RouteInputComponent {
   private openRouteServiceService = inject(OpenRouteServiceService);
 
-  constructor(private geoService: GeoServiceService, private rideRequestService: RideRequestService) {
+  constructor(private geoService: GeoService, private rideRequestService: RideRequestService) {
     this.checkChanges()
   }
 
@@ -41,15 +41,15 @@ export class RouteInputComponent {
   public carTypes= [
     {
       id: 1,
-      value: CarTypes.SMALL
+      value: CarType.SMALL
     },
     {
       id: 2,
-      value: CarTypes.MEDIUM
+      value: CarType.MEDIUM
     },
     {
       id: 3,
-      value: CarTypes.DELUXE
+      value: CarType.DELUXE
     }
   ];
 

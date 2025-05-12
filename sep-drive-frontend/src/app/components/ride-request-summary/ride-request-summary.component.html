@@ -42,9 +42,17 @@
             </div>
         </div>
     }
-    <div class="buttonContainer">
-        <button class="submitButton">
-            Bestätigen
-        </button>
-    </div>
+    @if (!isSubmitted) {
+        <div class="buttonContainer">
+            <button class="submitButton" (click)="onSubmit()">
+                Bestätigen
+            </button>
+        </div>
+    } @else {
+        <div class="buttonContainer">
+            <button class="cancelButton" (click)="onCancel()">
+                Abbrechen
+            </button>
+        </div>
+    }
 </div>

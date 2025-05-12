@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import {GeocodeFeature, GeoJsonRoute, RideRequest, RideRequestSummary} from '../types';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {GeoServiceService} from './geo-service.service';
+import {GeoService} from './geo.service';
+import {CarType} from "../enums/car-type";
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ export class RideRequestService {
 
   public rideRequest: BehaviorSubject<RideRequest | null> = new BehaviorSubject<RideRequest | null>(null);
 
-  constructor(private geoService:  GeoServiceService) { }
+  constructor(private geoService:  GeoService) { }
 
   public getRideData()
   {
@@ -23,9 +24,14 @@ export class RideRequestService {
     }
   }
 
-  public requestRide (start: GeocodeFeature, destination: GeocodeFeature): Observable<RideRequest> | undefined {
+  public requestRide (start: GeocodeFeature, destination: GeocodeFeature, carType: string): Observable<RideRequest> | undefined {
     // TODO implemet backend request | remove undefined as return type
     return undefined
+  }
+
+  public cancelRide(): void
+  {
+    // TODO implement cancel request
   }
 
   public getRideRequestSummary(): RideRequestSummary | null
@@ -38,7 +44,7 @@ export class RideRequestService {
         distance: parseFloat((jsonRoute.features[0].properties.summary.distance / 1000).toFixed(2)),
         duration: parseFloat((jsonRoute.features[0].properties.summary.duration / 60).toFixed(2)),
         price: 0,
-        carType: this.geoService.carType.getValue()
+        carType: this.geoService.carType.getValue() ?? CarType.MEDIUM
       };
     }
     return null;

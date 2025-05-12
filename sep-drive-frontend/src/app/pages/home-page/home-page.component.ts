@@ -4,7 +4,7 @@ import {MapComponent} from "../../components/map/map.component";
 import {RideRequestService} from "../../services/ride-request.service";
 import {RideRequestStatus} from "../../enums/ride-request-status";
 import {RideRequestSummaryComponent} from "../../components/ride-request-summary/ride-request-summary.component";
-import {GeoServiceService} from "../../services/geo-service.service";
+import {GeoService} from "../../services/geo.service";
 
 @Component({
   selector: 'app-home-page',
@@ -20,7 +20,7 @@ export class HomePageComponent {
 
   public showInput = false;
 
-  constructor(public rideRequestService: RideRequestService, public geoService: GeoServiceService) {
+  constructor(public rideRequestService: RideRequestService, public geoService: GeoService) {
     // this.checkChanges()
   }
 
