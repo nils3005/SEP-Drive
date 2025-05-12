@@ -1,0 +1,167 @@
+
+.login_container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 30px;
+  padding: 160px 705px;
+
+}
+  .welcome_message{
+  width: 278px;
+  color: #914141;
+  font-family: Roboto, sans-serif;
+  font-size: 31px;
+  font-style: normal;
+  font-weight: 450;
+  line-height: 60px; /* 114.286% */
+}
+
+#code{
+  display: flex;
+  width: 150px;
+  height: 50px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 10px;
+  background: #F3F4F6;
+  /* text */
+  color: #000;
+
+  text-align: center;
+  font-family: Roboto, sans-serif;
+  font-size: 40px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 16px; /* 40% */
+}
+
+.error{
+  color: #914141;
+  font-family: Jost, sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px; /* 106.667% */
+}
+
+.tip{
+  color: #6C6C6C;
+
+  font-family: Jost, sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px; /* 106.667% */
+}
+
+#resend{
+  display: flex;
+  padding: var(--t--spacing-1, 4px) var(--t--spacing-2, 8px);
+  justify-content: center;
+  align-items: center;
+  gap: var(--t--spacing-2, 8px);
+  border: none;
+  border-radius: var(--t--borders-radius-rounded-full, 9999px);
+  background: #F3F4F6;
+  /* text */
+  color: var(--d--colors-base-base-content, #1F2937);
+  /* 🌼 DaisyUI/text-xs */
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px; /* 133.333% */
+}
+
+
+#resend:hover{
+  background: lightslategray;
+  color: var(--d--colors-base-base-content, #FFF);
+}
+
+#resend:active{
+  font-weight: bold;
+}
+
+#supercode {
+  display: flex;
+  padding: var(--t--spacing-1, 4px) var(--t--spacing-2, 8px);
+  justify-content: center;
+  align-items: center;
+  gap: var(--t--spacing-2, 8px);
+  border: none;
+  border-radius: var(--t--borders-radius-rounded-full, 9999px);
+  background: #F3F4F6;
+  /* text */
+  color: var(--d--colors-base-base-content, #1F2937);
+  /* 🌼 DaisyUI/text-xs */
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px; /* 133.333% */
+}
+
+#supercode:hover{
+  background: lightslategray;
+  color: var(--d--colors-base-base-content, #FFF);
+}
+
+#supercode:active{
+  font-weight: bold;
+}
+
+#back{
+  width: 40px;
+  padding: var(--t--spacing-1, 4px) var(--t--spacing-2, 8px);
+  justify-content: center;
+  align-items: center;
+  gap: var(--t--spacing-2, 8px);
+  border: none;
+  border-radius: var(--t--borders-radius-rounded-full, 9999px);
+  background: #F3F4F6;
+  color: var(--d--colors-base-base-content, #1F2937);
+}
+
+#back:hover{
+  background: lightslategray;
+  color: var(--d--colors-base-base-content, #FFF);
+}
+
+#continue{
+  width: 121px;
+  padding: var(--t-spacing-15, 6px) var(--t--spacing-3, 12px);
+  justify-content: center;
+  align-items: center;
+  gap: var(--t--spacing-2, 8px);
+  border: none;
+  border-radius: var(--t--borders-radius-rounded-lg, 8px);
+  background: #914141;
+  margin-left: 260px;
+  /* text */
+  color: var(--d--colors-base-neutral-content, #F9FAFB);
+
+
+  /* 🌼 DaisyUI/text-sm */
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px; /* 142.857% */
+}
+
+#continue:hover{
+  background: #753838;
+}
+
+#continue:active{
+  font-weight: bold;
+}
+
+.button-group {
+  display: flex;
+  /* Abstand zwischen Buttons */
+}
