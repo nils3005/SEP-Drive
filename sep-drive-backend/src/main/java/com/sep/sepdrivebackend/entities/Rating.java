@@ -2,13 +2,10 @@ package com.sep.sepdrivebackend.entities;
 
 import jakarta.persistence.*;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
-@Setter @Getter @NoArgsConstructor
+@Setter @Getter @NoArgsConstructor @AllArgsConstructor
 public class Rating {
 
     @Id

@@ -54,6 +54,19 @@ public class RatingController {
      *         Rating r = new Rating(user, rating.getRating());
      *         ratingService.save(r);
      *     }
+     *
+     *  oder
+     * Man spart sich den HTTP Body komplett - ggf. einfacher im Frontend
+     *
+     * @PostMapping("/ratings/{rating}/{userId}")
+     *     public void addRating(@Pathvariable("rating") Float rating, @PathVariable("userId") Long userId) {
+     *         User user = userService.findByUserId(userId);
+     *         if (user == null) {
+     *             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "UserID not found.", null);
+     *         }
+     *         Rating r = new Rating(user, rating);
+     *         ratingService.save(r);
+     *     }
      */
     @PostMapping("/ratings/{userID}")
     public void addRating(@PathVariable Long userID, @RequestBody Rating rating) {
