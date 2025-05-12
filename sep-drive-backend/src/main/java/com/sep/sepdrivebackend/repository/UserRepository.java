@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    //Optional<User> findByUsername(String username); dann braucht man die eigene Implementierung im Service nicht weil es automatisch generiert wird
+    Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
 }
