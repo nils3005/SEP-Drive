@@ -1,10 +1,10 @@
-package com.sep.sepdrivebackend.Service;
+package com.sep.sepdrivebackend.service;
 
-import com.sep.sepdrivebackend.Model.*;
+import com.sep.sepdrivebackend.entities.*;
+import com.sep.sepdrivebackend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {

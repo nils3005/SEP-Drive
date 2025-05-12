@@ -1,4 +1,4 @@
-package com.sep.sepdrivebackend.Service;
+package com.sep.sepdrivebackend.service;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;

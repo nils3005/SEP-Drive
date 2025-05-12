@@ -1,11 +1,11 @@
-package com.sep.sepdrivebackend.Service;
+package com.sep.sepdrivebackend.service;
 
-import com.sep.sepdrivebackend.Dto.LoginDto;
-import com.sep.sepdrivebackend.Dto.RegisterDto;
-import com.sep.sepdrivebackend.Dto.VerifyDto;
-import com.sep.sepdrivebackend.Model.User;
-import com.sep.sepdrivebackend.Model.Role;
-import com.sep.sepdrivebackend.Model.UserRepository;
+import com.sep.sepdrivebackend.dto.LoginDto;
+import com.sep.sepdrivebackend.dto.RegisterDto;
+import com.sep.sepdrivebackend.dto.VerifyDto;
+import com.sep.sepdrivebackend.entities.User;
+import com.sep.sepdrivebackend.entities.Role;
+import com.sep.sepdrivebackend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +49,7 @@ public class AuthService {
         if(registerDto.getUsername().isEmpty() || registerDto.getPassword().isEmpty() || registerDto.getEmail().isEmpty() ||  registerDto.getRole() == null || registerDto.getFirstName().isEmpty() || registerDto.getLastName().isEmpty() || registerDto.getBirthDate().isEmpty()) {
             throw new RuntimeException("Please fill all the required fields with valid data");
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate localDate = LocalDate.parse(registerDto.getBirthDate(), formatter);
         User user = new User(registerDto.getUsername(),
                 registerDto.getEmail(),

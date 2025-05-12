@@ -1,4 +1,4 @@
-package com.sep.sepdrivebackend.Model;
+package com.sep.sepdrivebackend.entities;
 
 public enum Role {
     CUSTOMER,

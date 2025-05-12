@@ -1,9 +1,9 @@
-package com.sep.sepdrivebackend.Controller;
+package com.sep.sepdrivebackend.controller;
 
-import com.sep.sepdrivebackend.Dto.LoginDto;
-import com.sep.sepdrivebackend.Dto.RegisterDto;
-import com.sep.sepdrivebackend.Dto.VerifyDto;
-import com.sep.sepdrivebackend.Service.AuthService;
+import com.sep.sepdrivebackend.dto.LoginDto;
+import com.sep.sepdrivebackend.dto.RegisterDto;
+import com.sep.sepdrivebackend.dto.VerifyDto;
+import com.sep.sepdrivebackend.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

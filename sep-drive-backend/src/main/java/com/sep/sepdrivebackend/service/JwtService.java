@@ -1,6 +1,6 @@
-package com.sep.sepdrivebackend.Service;
+package com.sep.sepdrivebackend.service;
 
-import com.sep.sepdrivebackend.Model.User;
+import com.sep.sepdrivebackend.entities.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

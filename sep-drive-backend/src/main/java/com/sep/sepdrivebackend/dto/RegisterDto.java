@@ -1,14 +1,11 @@
-package com.sep.sepdrivebackend.Dto;
+package com.sep.sepdrivebackend.dto;
 
-import com.sep.sepdrivebackend.Model.CarType;
-import com.sep.sepdrivebackend.Model.Role;
+import com.sep.sepdrivebackend.entities.CarType;
+import com.sep.sepdrivebackend.entities.Role;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDate;
-import java.util.Date;
 
 @Getter
 @Setter

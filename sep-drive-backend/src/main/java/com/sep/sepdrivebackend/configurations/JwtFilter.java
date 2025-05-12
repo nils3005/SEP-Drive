@@ -1,6 +1,6 @@
-package com.sep.sepdrivebackend.Configurations;
+package com.sep.sepdrivebackend.configurations;
 
-import com.sep.sepdrivebackend.Service.JwtService;
+import com.sep.sepdrivebackend.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

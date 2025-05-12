@@ -1,4 +1,4 @@
-package com.sep.sepdrivebackend.Model;
+package com.sep.sepdrivebackend.entities;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

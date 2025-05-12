@@ -1,7 +1,7 @@
-package com.sep.sepdrivebackend.Controller;
+package com.sep.sepdrivebackend.controller;
 
-import com.sep.sepdrivebackend.Model.User;
-import com.sep.sepdrivebackend.Service.UserService;
+import com.sep.sepdrivebackend.entities.User;
+import com.sep.sepdrivebackend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

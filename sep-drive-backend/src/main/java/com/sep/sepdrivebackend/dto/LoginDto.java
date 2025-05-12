@@ -1,8 +1,7 @@
-package com.sep.sepdrivebackend.Dto;
+package com.sep.sepdrivebackend.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.stereotype.Service;
 
 @Getter
 @Setter
