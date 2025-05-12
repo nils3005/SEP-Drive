@@ -8,6 +8,12 @@
     />
 </div>
 
+@if (filteredUsers().length === 0) {
+    <div class="no-result">
+        Es wurde kein Benutzer mit diesem Namen gefunden.
+    </div>
+}
+
 <div class="user-list">
     @for(user of filteredUsers(); track user.id) {
         <div class="user-card">
