@@ -8,4 +8,3 @@ RUN ng build --configuration=development
 FROM nginx:latest AS final
 EXPOSE 80
 COPY --from=build src/dist/sep-drive-frontend/browser  /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf

@@ -8,4 +8,3 @@ FROM openjdk:21-slim
 WORKDIR /app
 COPY --from=build /app/target/sep-drive-backend-0.0.1-SNAPSHOT.jar .
 CMD ["java", "-jar", "sep-drive-backend-0.0.1-SNAPSHOT.jar"]
-
