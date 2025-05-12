@@ -1,1 +1,50 @@
-<p>ride-request-summary works!</p>
+<div class="rideRequestSummaryContainer">
+    <div class="infoField">
+        <div class="infoLabel">
+            <div class="infoText">Start</div>
+        </div>
+        <div class="infoData">
+            <div class="infoText">{{ summaryData?.start }}</div>
+        </div>
+    </div>
+    <div class="infoField">
+        <div class="infoLabel">
+            <div class="infoText">Ziel</div>
+        </div>
+        <div class="infoData">
+            <div class="infoText">{{ summaryData?.end }}</div>
+        </div>
+    </div>
+    <div class="infoField">
+        <div class="infoLabel">
+            <div class="infoText">Distanz</div>
+        </div>
+        <div class="infoData">
+            <div class="infoText">{{ summaryData?.distance }} km</div>
+        </div>
+    </div>
+    @if (summaryData && summaryData.duration < 60) {
+        <div class="infoField">
+            <div class="infoLabel">
+                <div class="infoText">Dauer</div>
+            </div>
+            <div class="infoData">
+                <div class="infoText">{{ summaryData?.duration }} min</div>
+            </div>
+        </div>
+    } @else if (summaryData) {
+        <div class="infoField">
+            <div class="infoLabel">
+                <div class="infoText">Dauer</div>
+            </div>
+            <div class="infoData">
+                <div class="infoText">{{ minutesToHHMM(summaryData.duration) }} h</div>
+            </div>
+        </div>
+    }
+    <div class="buttonContainer">
+        <button class="submitButton">
+            Bestätigen
+        </button>
+    </div>
+</div>

@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
-import {GeocodeFeature} from '../types';
+import {GeocodeFeature, GeoJsonRoute, RideRequestSummary} from '../types';
 import {BehaviorSubject} from "rxjs";
 import {OpenRouteServiceService} from "./open-route-service.service";
 import {CarTypes} from "../enums/car-types";
+import {RideRequestService} from "./ride-request.service";
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,7 @@ export class GeoServiceService {
   public route: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   public currentPoint: BehaviorSubject<GeocodeFeature | null> = new BehaviorSubject<GeocodeFeature | null>(null);
   public carType: BehaviorSubject<string> = new BehaviorSubject<string>(CarTypes.MEDIUM);
+  public showInput: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
 
   constructor(private openRouteServiceService: OpenRouteServiceService) {}
 
@@ -31,6 +33,7 @@ export class GeoServiceService {
     let coordinates = this.getCoordinateArray(this.waypoints.getValue());
     this.openRouteServiceService.getRouteFromPointArray(coordinates).subscribe(route => {
       this.route.next(route);
+      this.showInput.next(false);
     })
   }
 

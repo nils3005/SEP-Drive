@@ -1,16 +1,16 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, Output} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {OpenRouteServiceService} from "../../services/open-route-service.service";
-import {AddressAutocompleteSuggestion, Coordinates, GeocodeFeature} from "../../types";
+import {AddressAutocompleteSuggestion, Coordinates, GeocodeFeature, RideRequestSummary} from "../../types";
 import {GeoServiceService} from "../../services/geo-service.service";
 import {CarTypes} from "../../enums/car-types";
-import {ErrorComponent} from "../error/error.component";
+import {RideRequestService} from "../../services/ride-request.service";
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'app-route-input',
   imports: [
     ReactiveFormsModule,
-    ErrorComponent,
   ],
   templateUrl: './route-input.component.html',
   styleUrl: './route-input.component.scss'
@@ -18,7 +18,7 @@ import {ErrorComponent} from "../error/error.component";
 export class RouteInputComponent {
   private openRouteServiceService = inject(OpenRouteServiceService);
 
-  constructor(private geoService: GeoServiceService) {
+  constructor(private geoService: GeoServiceService, private rideRequestService: RideRequestService) {
     this.checkChanges()
   }
 

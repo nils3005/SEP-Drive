@@ -1,4 +1,5 @@
 import {RideRequestStatus} from "./enums/ride-request-status";
+import {CarTypes} from "./enums/car-types";
 
 export type NavLink = {
   id: number,
@@ -50,4 +51,13 @@ export type Coordinates = {
 export type RideRequest = {
   id: number
   status: RideRequestStatus
+}
+
+export type RideRequestSummary = {
+  start: string
+  end: string
+  distance: number
+  duration: number
+  price: number
+  carType: string
 }
