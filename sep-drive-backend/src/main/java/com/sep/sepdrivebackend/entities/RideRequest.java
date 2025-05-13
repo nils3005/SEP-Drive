@@ -5,10 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Getter @Setter @NoArgsConstructor
-public class RideRequest {
-
+@Entity  /*Bedeutet, dass diese Klasse in der Datenbank als Tabelle gespeichert wird.*/
+@Getter @Setter @NoArgsConstructor /*automatically generates getter and setter methods for all these fields.*/
+public class RideRequest{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

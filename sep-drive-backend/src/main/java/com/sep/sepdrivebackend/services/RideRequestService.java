@@ -13,12 +13,19 @@ public class RideRequestService {
     @Autowired
     private RideRequestRepository rideRepo;
 
-    @Autowired
-    private UserRepository userRepo;
+    @Autowired /*@Autowired, Spring Boot automatically connects your Service to the Repository*/
+    private UserRepository userRepo;/* This connects your code to the UserRepository and only the server can use it */
 
     public RideRequest createRideRequest(RideRequest rideRequest, Long customerId) {
+        /*this method will give us a Riderequest at the end */
         User customer = userRepo.findById(customerId)
                 .orElseThrow(() -> new IllegalStateException("Customer not found"));
+        /*f the Optional has the User:
+It uses the user and keeps processing.
+ If it's empty:
+It throws an error and stops the process.*/
+/*findById do?
+It is a ready-made tool that Spring Data JPA gives you.It lets you ask the database”*/
 
         boolean hasActiveRide = rideRepo.findByCustomerIdAndActiveTrue(customerId).isPresent();
 
