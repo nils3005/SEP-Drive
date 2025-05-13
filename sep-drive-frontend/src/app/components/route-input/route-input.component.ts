@@ -24,9 +24,6 @@ export class RouteInputComponent {
   public useStartCoordinates = false;
   public useDestinationCoordinates = false;
 
-  public showError = false;
-  public errorMessage: string | undefined;
-
   public routeForm = new FormGroup({
     start: new FormControl(""),
     destination: new FormControl(""),
@@ -54,7 +51,6 @@ export class RouteInputComponent {
 
   checkChanges () {
     this.routeForm.controls.destination.valueChanges.subscribe(value => {
-      this.showError = false;
       if (value && !this.destinationSuppressAutocomplete) {
         this.openRouteServiceService.getAutocompleteSuggestions(value).subscribe(addressAutocompleteSuggestions => {
           this.destinationSuggestions = addressAutocompleteSuggestions.features.slice(0, 5);
@@ -66,7 +62,6 @@ export class RouteInputComponent {
     })
 
     this.routeForm.controls.start.valueChanges.subscribe(value => {
-      this.showError = false;
       if (value && !this.startSuppressAutocomplete) {
         this.openRouteServiceService.getAutocompleteSuggestions(value).subscribe(addressAutocompleteSuggestions => {
           this.startSuggestions = addressAutocompleteSuggestions.features.slice(0, 5);
@@ -75,24 +70,6 @@ export class RouteInputComponent {
       } else {
         this.startSuppressAutocomplete = false;
       }
-    })
-
-    this.routeForm.controls.startCordLat.valueChanges.subscribe(value => {
-      this.showError = false;
-    })
-    this.routeForm.controls.startCordLon.valueChanges.subscribe(value => {
-      this.showError = false;
-    })
-
-    this.routeForm.controls.endCordLat.valueChanges.subscribe(value => {
-      this.showError = false;
-    })
-    this.routeForm.controls.endCordLon.valueChanges.subscribe(value => {
-      this.showError = false;
-    })
-
-    this.routeForm.controls.carType.valueChanges.subscribe(value => {
-      this.showError = false;
     })
   }
 
@@ -219,7 +196,7 @@ export class RouteInputComponent {
         this.openRouteServiceService.getGeocodeFeatureByCoordinates(coordinates).subscribe({
           next: (response) => {
             if (response.body) {
-              this.geoService.updateStart(response.body.features[0]);
+              this.geoService.updateDestination(response.body.features[0]);
               this.geoService.currentPoint.next(response.body.features[0]);
             }
           },
