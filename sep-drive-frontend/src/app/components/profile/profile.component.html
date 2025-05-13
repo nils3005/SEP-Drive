@@ -25,17 +25,9 @@
             <input type="text" [value]="user()?.totalRides" readonly />
 
             <label>Rating</label>
-            <!-- TODO: Halbe Sterne werden nicht angezeigt -->
             <div class="stars">
                 @for (star of [1, 2, 3, 4, 5]; track star) {
-                    <i
-                            class="fa"
-                            [ngClass]="{
-        'fa-star':        averageRating() >= star,
-        'fa-star-half-o': averageRating() >= star - 0.5 && averageRating() < star,
-        'fa-star-o':      averageRating() < star - 0.5
-      }"
-                    ></i>
+                    <i [class]="averageClass(averageRating(), star)"></i>
                 }
             </div>
 
