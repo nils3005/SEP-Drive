@@ -7,6 +7,8 @@ import com.sep.sepdrivebackend.repositories.RideRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class RideRequestService {
 
@@ -45,5 +47,29 @@ It is a ready-made tool that Spring Data JPA gives you.It lets you ask the datab
 
     public void deleteActiveRide(Long customerId) {
         rideRepo.findByCustomerIdAndActiveTrue(customerId).ifPresent(rideRepo::delete);
+    }
+
+    @Service
+    public static class UserService {
+        private final UserRepository userRepository;
+
+        public UserService(UserRepository userRepository) {
+            this.userRepository = userRepository;
+        }
+
+        public List<User> findAllUsers() {
+            return userRepository.findAll();
+        }
+
+        public void save(User user) {
+            if(user != null && !userRepository.existsById(user.getId())) {
+                userRepository.save(user);
+            }
+        }
+
+        public User findByUserId(Long userID) {
+            return userRepository.findById(userID).orElse(null);
+        }
+
     }
 }

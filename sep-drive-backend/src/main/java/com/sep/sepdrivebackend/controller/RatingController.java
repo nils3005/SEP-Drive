@@ -2,6 +2,7 @@ package com.sep.sepdrivebackend.controller;
 
 import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.entities.Rating;
+import com.sep.sepdrivebackend.services.RideRequestService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +13,9 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:4200")
 public class RatingController {
     private final RatingService ratingService;
-    private final UserService userService;
+    private final RideRequestService.UserService userService;
 
-    public RatingController(RatingService ratingService, UserService userService) {
+    public RatingController(RatingService ratingService, RideRequestService.UserService userService) {
         this.ratingService = ratingService;
         this.userService = userService;
     }
