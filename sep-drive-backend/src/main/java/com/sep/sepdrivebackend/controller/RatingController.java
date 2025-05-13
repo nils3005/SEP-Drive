@@ -2,10 +2,12 @@ package com.sep.sepdrivebackend.controller;
 
 import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.entities.Rating;
-import com.sep.sepdrivebackend.services.RideRequestService;
+import com.sep.sepdrivebackend.service.RatingService;
+import com.sep.sepdrivebackend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -13,15 +15,17 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:4200")
 public class RatingController {
     private final RatingService ratingService;
-    private final RideRequestService.UserService userService;
+    private final UserService userService;
 
-    public RatingController(RatingService ratingService, RideRequestService.UserService userService) {
+    public RatingController(RatingService ratingService, UserService userService) {
         this.ratingService = ratingService;
         this.userService = userService;
     }
 
     /*
-    curl -X GET http://localhost:8080/ratings
+     * curl -X GET http://localhost:8080/ratings
+     *
+     * Zu Testzwecken machen wir das GetMapping
      */
     @GetMapping("/ratings")
     public ResponseEntity<List<Rating>> getRatings() {
@@ -30,14 +34,15 @@ public class RatingController {
     }
 
     /*
-    curl -X POST -H "Content-Type: application/json" -d "{\"rating\":60.23}" http://localhost:8080/rate/1
+     * curl -X POST -H "Content-Type: application/json" -d "{\"rating\":60.23}" http://localhost:8080/rate/1
      */
     @PostMapping("/ratings/{userID}")
     public void addRating(@PathVariable Long userID, @RequestBody Rating rating) {
         User user = userService.findByUserId(userID);
+        if (null == user) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "UserID not found.", null);
+        }
         rating.setUser(user);
         ratingService.save(rating);
     }
-
 }
-
