@@ -42,7 +42,6 @@ export class PasswordComponent {
     //login daten werden an das backend geschickt
 
     this.http.post('http://localhost:8080/auth/login', loginData, {responseType: 'text'}).subscribe({
-      //wenn angenommen, dann navigiere zur nächsten seite
       next: (response: any) => {
         //mit dem post wird eine e-mail gesendet
         this.router.navigate(['authentication'], { state: { username: this.username } }); // zur authentication navigieren, username weiterhin zwischenspeichern
@@ -51,7 +50,5 @@ export class PasswordComponent {
         this.errorMessage = 'Login fehlgeschlagen. Bitte überprüfen Sie Ihre Eingaben.';
       }
     });
-
-
   }
 }
