@@ -2,6 +2,7 @@ import {inject, Injectable} from '@angular/core';
 import {AddressAutocompleteSuggestion, Coordinates, GeocodeFeature} from '../../types';
 import {HttpClient, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs'
+import {environment} from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import {Observable} from 'rxjs'
 export class OpenRouteServiceService {
 
   private http = inject(HttpClient);
-  private apiKey = "YOUR_OPENROUTESERVICE_API_KEY"
+  private apiKey = environment.openRouteServiceApiKey;
 
   constructor() { }
 
