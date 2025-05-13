@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import * as L from 'leaflet';
-import {GeocodeFeature, GeoJsonRoute} from "../../types";
-import {routes} from "../../app.routes";
+import {GeoJsonRoute} from "../../types";
+import {GeoService} from "../../services/geo/geo.service";
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -24,17 +24,17 @@ L.Marker.prototype.options.icon = iconDefault;
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss',
 })
-export class MapComponent implements AfterViewInit, OnChanges {
-  private map: L.Map | undefined;
-  @Input() route: any;
-  @Input() waypoints: GeocodeFeature[] = [];
-  @Input() currentPoint: GeocodeFeature | undefined;
+export class MapComponent implements AfterViewInit {
+
+  constructor(private geoService: GeoService) {
+    this.geoService = geoService;
+  }
 
   routeLayer: L.LayerGroup = L.layerGroup();
   markerLayer: L.LayerGroup = L.layerGroup();
 
   private initMap(): void {
-    this.map = L.map('map', {
+    this.geoService.map = L.map('map', {
       center: [51.1657, 10.4515],
       zoom: 6,
     });
@@ -48,35 +48,21 @@ export class MapComponent implements AfterViewInit, OnChanges {
               '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         }
     );
-    tiles.addTo(this.map);
-    this.routeLayer = this.routeLayer.addTo(this.map)
-    this.markerLayer = this.markerLayer.addTo(this.map)
+    tiles.addTo(this.geoService.map);
+    this.routeLayer = this.routeLayer.addTo(this.geoService.map)
+    this.markerLayer = this.markerLayer.addTo(this.geoService.map)
   }
 
   ngAfterViewInit(): void {
     this.initMap();
+    this.checkChanges()
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['route'] && changes['route'] !== undefined) {
-      if (this.route && this.map && this.routeLayer) {
-        this.routeLayer.clearLayers()
-        L.geoJSON(this.route, {
-          style: {
-            weight: 5
-          }
-        }).addTo(this.routeLayer)
-        this.map.fitBounds(L.geoJSON(this.route).getBounds())
-        let routeJson: GeoJsonRoute = this.route;
-        console.log(routeJson.features[0].properties.summary.distance / 1000 + "km")
-        console.log(routeJson.features[0].properties.summary.duration / 60 + "min")
-      }
-    }
-    if (changes['waypoints'] && changes['waypoints'] !== undefined && !changes['waypoints'].firstChange) {
-      if (this.routeLayer) {
+  checkChanges(): void {
+    this.geoService.waypoints.asObservable().subscribe(waypoints => {
         this.routeLayer.clearLayers()
         this.markerLayer.clearLayers()
-        for (const waypoint of this.waypoints) {
+        for (const waypoint of this.geoService.waypoints.getValue()) {
           if (waypoint) {
             let marker = L.marker(
                 [
@@ -87,15 +73,28 @@ export class MapComponent implements AfterViewInit, OnChanges {
             marker.addTo(this.markerLayer)
           }
         }
-        if (this.currentPoint) {
-          this.map?.flyTo([this.currentPoint.geometry.coordinates[1], this.currentPoint.geometry.coordinates[0]],
-              14,
-              {
-                duration: 1
-              }
-          )
-        }
+    })
+    this.geoService.currentPoint.asObservable().subscribe(currentPoint => {
+      if (currentPoint) {
+        this.routeLayer.clearLayers()
+        this.geoService.map?.flyTo([currentPoint.geometry.coordinates[1], currentPoint.geometry.coordinates[0]],
+            14,
+            {
+              duration: 1
+            }
+        )
       }
-    }
+    })
+    this.geoService.route.asObservable().subscribe(route => {
+      if (route && this.geoService.map) {
+        this.routeLayer.clearLayers()
+        L.geoJSON(route, {
+          style: {
+            weight: 5
+          }
+        }).addTo(this.routeLayer)
+        this.geoService.map.fitBounds(L.geoJSON(route).getBounds())
+      }
+    })
   }
 }

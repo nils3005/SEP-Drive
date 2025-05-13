@@ -64,3 +64,8 @@ body{
   background: $primaryColorHover;
   transition: 0.2s;
 }
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}

@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {NavLogoComponent} from '../nav-logo/nav-logo.component';
 import {NavLink} from '../../../types';
-import {UserServiceService} from "../../../services/user-service.service";
+import {UserServiceService} from "../../../services/user/user-service.service";
 import {RouterLink, RouterLinkActive} from "@angular/router";
 
 @Component({
