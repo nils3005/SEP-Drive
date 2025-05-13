@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+
 $backgroundColor: #FFFFFF;
 $textColor: #000000;
 $fontFamily: "Roboto", sans-serif;
@@ -63,4 +64,9 @@ body{
 .buttonPrimary:hover {
   background: $primaryColorHover;
   transition: 0.2s;
+}
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }

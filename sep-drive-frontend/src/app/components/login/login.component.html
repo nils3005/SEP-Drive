@@ -1,1 +1,17 @@
-<p>login works!</p>
+<style>
+  @import url('https://fonts.cdnfonts.com/css/glory');
+</style>
+<div class="main">
+<link href="https://fonts.cdnfonts.com/css/glory" rel="stylesheet">
+<div class="login_container">
+  <div class="question">
+    <h1>Wie lautet dein Benutzername?</h1>
+  </div>
+    <input id="username" type="text" (keydown.enter)="onSignIn()" [(ngModel)]="username" placeholder="Benutername">
+  <div class="sign_in"></div>
+  <button (click)="onSignIn()"  id="sign_in_button">Sign in</button>
+  <div class="register">
+    <button (click)="toRegister()" id="register_button">Noch nicht registriert?</button>
+  </div>
+  </div>
+</div>
