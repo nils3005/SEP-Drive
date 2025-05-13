@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import {NavBarComponent} from "./components/navbar/nav-bar/nav-bar.component";
 import {ErrorComponent} from "./components/error/error.component";
 
+
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, NavBarComponent, ErrorComponent],
