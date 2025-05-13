@@ -4,7 +4,7 @@ import {MapComponent} from "../../components/map/map.component";
 import {GeocodeFeature} from "../../types";
 import {OpenRouteServiceService} from "../../services/openroute/open-route-service.service";
 import * as L from 'leaflet';
-import {GeoServiceService} from "../../services/geo/geo-service.service";
+import {GeoService} from "../../services/geo/geo.service";
 
 @Component({
   selector: 'app-home-page',
@@ -22,7 +22,7 @@ export class HomePageComponent {
 
   constructor(
       private openRouteServiceService: OpenRouteServiceService,
-      private geoServiceService: GeoServiceService
+      private geoServiceService: GeoService
   ) {}
 
   onStartEmit(start: GeocodeFeature) {

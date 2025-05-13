@@ -4,7 +4,7 @@ import {GeocodeFeature} from '../../types';
 @Injectable({
   providedIn: 'root'
 })
-export class GeoServiceService {
+export class GeoService {
 
   constructor() { }
 
