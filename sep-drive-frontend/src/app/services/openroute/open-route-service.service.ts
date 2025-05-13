@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {AddressAutocompleteSuggestion, Coordinates, GeocodeFeature} from '../types';
+import {AddressAutocompleteSuggestion, Coordinates, GeocodeFeature} from '../../types';
 import {HttpClient, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs'
 

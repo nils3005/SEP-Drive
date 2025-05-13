@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Coordinates, GeocodeFeature} from '../types';
+import {Coordinates, GeocodeFeature} from '../../types';
 import {BehaviorSubject} from "rxjs";
-import {OpenRouteServiceService} from "./open-route-service.service";
+import {OpenRouteServiceService} from "../openroute/open-route-service.service";
 import * as L from 'leaflet';
-import {ErrorService} from './error.service';
+import {ErrorService} from '../error/error.service';
 
 @Injectable({
   providedIn: 'root'

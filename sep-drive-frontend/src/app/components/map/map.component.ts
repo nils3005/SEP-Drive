@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import * as L from 'leaflet';
 import {GeoJsonRoute} from "../../types";
-import {GeoService} from "../../services/geo.service";
+import {GeoService} from "../../services/geo/geo.service";
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';

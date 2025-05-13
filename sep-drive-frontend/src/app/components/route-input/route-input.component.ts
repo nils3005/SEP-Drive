@@ -1,10 +1,10 @@
 import {Component, inject} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {OpenRouteServiceService} from "../../services/open-route-service.service";
+import {OpenRouteServiceService} from "../../services/openroute/open-route-service.service";
 import {AddressAutocompleteSuggestion, Coordinates, GeocodeFeature} from "../../types";
-import {GeoService} from "../../services/geo.service";
+import {GeoService} from "../../services/geo/geo.service";
 import {CarType} from "../../enums/car-type";
-import {ErrorService} from "../../services/error.service";
+import {ErrorService} from "../../services/error/error.service";
 
 @Component({
   selector: 'app-route-input',

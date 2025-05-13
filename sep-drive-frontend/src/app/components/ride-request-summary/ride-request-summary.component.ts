@@ -1,8 +1,8 @@
 import {Component} from '@angular/core';
 import {RideRequestSummary} from '../../types';
-import {MapService} from '../../services/map.service';
-import {RideRequestService} from '../../services/ride-request.service';
-import {GeoService} from '../../services/geo.service';
+import {MapService} from '../../services/map/map.service';
+import {RideRequestService} from '../../services/riderequest/ride-request.service';
+import {GeoService} from '../../services/geo/geo.service';
 import {CarType} from '../../enums/car-type';
 
 @Component({

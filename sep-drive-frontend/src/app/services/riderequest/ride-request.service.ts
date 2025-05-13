@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import {GeocodeFeature, GeoJsonRoute, RideRequest, RideRequestSummary} from '../types';
+import {GeocodeFeature, GeoJsonRoute, RideRequest, RideRequestSummary} from '../../types';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {GeoService} from './geo.service';
-import {CarType} from "../enums/car-type";
+import {GeoService} from '../geo/geo.service';
+import {CarType} from "../../enums/car-type";
 
 @Injectable({
   providedIn: 'root'
