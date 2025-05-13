@@ -1,0 +1,63 @@
+import {RideRequestStatus} from "./enums/ride-request-status";
+import {CarType} from "./enums/car-type";
+
+export type NavLink = {
+  id: number,
+  title: string,
+  active: boolean,
+  link: string,
+}
+
+export type AddressAutocompleteSuggestion = {
+  features: GeocodeFeature[]
+}
+
+export type GeocodeFeature = {
+  geometry: {
+    type: string,
+    coordinates: [number, number]
+  }
+  properties: {
+    id: string
+    name: string,
+    housenumber?: string | undefined,
+    street?: string | undefined,
+    postalcode?: string | undefined,
+    country?: string | undefined,
+    region?: string | undefined,
+    locality?: string | undefined,
+    label: string
+  }
+}
+
+export type GeoJsonRoute = {
+  features: [
+    {
+      properties: {
+        summary: {
+          distance: number,
+          duration: number
+        }
+      }
+    }
+  ]
+}
+
+export type Coordinates = {
+  latitude: number | string
+  longitude: number | string
+}
+
+export type RideRequest = {
+  id: number
+  status: RideRequestStatus
+}
+
+export type RideRequestSummary = {
+  start: string
+  end: string
+  distance: number
+  duration: number
+  price: number
+  carType: string
+}

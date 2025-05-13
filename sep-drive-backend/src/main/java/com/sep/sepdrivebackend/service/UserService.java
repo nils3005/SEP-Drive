@@ -1,10 +1,11 @@
 package com.sep.sepdrivebackend.service;
 
-import com.sep.sepdrivebackend.entities.*;
 import com.sep.sepdrivebackend.repository.UserRepository;
+import com.sep.sepdrivebackend.entities.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -19,20 +20,18 @@ public class UserService {
     }
 
     public void save(User user) {
-        if(user != null/* && !userRepository.existsById(user.getId())*/) {
-            userRepository.save(user);
-        }
+        userRepository.save(user);
     }
 
     public User findByUserId(Long userID) {
         return userRepository.findById(userID).orElse(null);
     }
 
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username).orElse(null);
-    }
-
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
     }
 }

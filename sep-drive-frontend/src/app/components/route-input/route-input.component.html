@@ -1,0 +1,125 @@
+<!--@if (showError) {-->
+<!--    <app-error />-->
+<!--}-->
+<form [formGroup]="routeForm" (ngSubmit)="onSubmit()" class="routeInputForm">
+    @if (!useStartCoordinates) {
+        <div class="inputRow">
+            <button class="imageButton" type="button" (click)="useStartCoordinates = !useStartCoordinates">
+                <i class="fa-solid fa-pencil"></i>
+            </button>
+            <div class="textInputContainer">
+                <input
+                        type="text"
+                        id="route-start"
+                        formControlName="start"
+                        placeholder="Start"
+                        class="textInput"
+                        (blur)="onStartBlur()"
+                        (focus)="onStartFocus()"
+                >
+                <button type="button" class="imageButton" (click)="getLocation()">
+                    <i class="fa-solid fa-location-dot"></i>
+                </button>
+            </div>
+            @if(startShowSuggestions && startSuggestions.length > 0) {
+                <ul class="startSuggestions">
+                    @for (suggestion of startSuggestions; track suggestion.properties.id) {
+                        <li (mousedown)="onStartSelect(suggestion)">
+                            {{ suggestion.properties.label }}
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    } @else {
+        <div class="inputRow">
+            <button class="imageButton" type="button" (click)="useStartCoordinates = !useStartCoordinates">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            <div class="textInputContainer">
+                <input
+                        type="number"
+                        id="startLon"
+                        formControlName="startCordLon"
+                        placeholder="50.000000"
+                        class="textInput"
+                >
+            </div>
+            <div class="textInputContainer">
+                <input
+                        type="number"
+                        id="startLat"
+                        formControlName="startCordLat"
+                        placeholder="50.000000"
+                        class="textInput"
+                >
+            </div>
+            <button class="imageButton" type="button" (click)="checkCoordinates(0)">
+                <i class="fa-solid fa-check"></i>
+            </button>
+        </div>
+    }
+    @if (!useDestinationCoordinates) {
+        <div class="inputRow">
+            <button class="imageButton" type="button" (click)="useDestinationCoordinates = !useDestinationCoordinates">
+                <i class="fa-solid fa-pencil"></i>
+            </button>
+            <div class="textInputContainer">
+            <input
+                    type="text"
+                    id="route-destination"
+                    formControlName="destination"
+                    placeholder="Ziel"
+                    class="textInput"
+                    (blur)="onDestinationBlur()"
+                    (focus)="onDestinationFocus()"
+            >
+            </div>
+            @if(destinationShowSuggestions && destinationSuggestions.length > 0) {
+                <ul class="destinationSuggestions">
+                    @for (suggestion of destinationSuggestions; track suggestion.properties.id) {
+                        <li (mousedown)="onDestinationSelect(suggestion)">
+                            {{ suggestion.properties.label }}
+                        </li>
+                    }
+                </ul>
+            }
+            </div>
+    } @else {
+        <div class="inputRow">
+            <button class="imageButton" type="button" (click)="useDestinationCoordinates = !useDestinationCoordinates">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            <div class="textInputContainer">
+                <input
+                        type="number"
+                        id="endtLon"
+                        formControlName="endCordLon"
+                        placeholder="50.000000"
+                        class="textInput"
+                >
+            </div>
+            <div class="textInputContainer">
+                <input
+                        type="number"
+                        id="endtLat"
+                        formControlName="endCordLat"
+                        placeholder="50.000000"
+                        class="textInput"
+                >
+            </div>
+            <button class="imageButton" type="button" (click)="checkCoordinates(1)">
+                <i class="fa-solid fa-check"></i>
+            </button>
+        </div>
+    }
+    <div class="textInputContainer">
+        <select name="car-type" id="carType" formControlName="carType" class="textInput">
+            <option value="" disabled selected hidden>Autotyp</option>
+            @for (carType of carTypes; track carType.id) {
+                <option [value]="carType.id">{{carType.value}}</option>
+            }
+        </select>
+    </div>
+    <input type="submit" value="Submit" class="buttonPrimary">
+</form>

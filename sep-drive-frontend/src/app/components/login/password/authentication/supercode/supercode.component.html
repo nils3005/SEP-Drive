@@ -1,0 +1,18 @@
+
+<div class="main">
+  <div class="login_container">
+    <div class="welcome_message">
+      <h1>Bitte gib den Supercode ein</h1>
+    </div>
+    <div id="input_code">
+      <input id="code" type="text" [(ngModel)]="code">
+    </div>
+    <div class="error">
+      <p *ngIf="errorMessage" class="errorMessage">{{ errorMessage }}</p>
+    </div>
+    <div class="button_group">
+      <button id="back" (click)="backToAuthentication()"><i class="fa-solid fa-arrow-left" style="color: #000000;"></i></button>
+      <button id="continue" (click)="onVerify()">Weiter</button>
+    </div>
+  </div>
+</div>
