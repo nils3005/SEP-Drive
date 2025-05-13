@@ -1,4 +1,4 @@
-import {Component, computed, inject, signal} from '@angular/core';
+import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {UserServiceService} from "../../services/user/user-service.service";
 import {FormsModule} from "@angular/forms";
@@ -14,7 +14,7 @@ import {User} from "../../types";
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
-export class ProfileComponent {
+export class ProfileComponent implements OnInit{
   private route = inject(ActivatedRoute);
   private userService = inject(UserServiceService);
 
