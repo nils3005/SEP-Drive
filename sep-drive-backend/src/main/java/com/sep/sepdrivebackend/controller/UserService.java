@@ -1,6 +1,7 @@
 package com.sep.sepdrivebackend.controller;
 
 import com.sep.sepdrivebackend.entities.User;
+import com.sep.sepdrivebackend.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

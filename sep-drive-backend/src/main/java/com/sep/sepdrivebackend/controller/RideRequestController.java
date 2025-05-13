@@ -1,4 +1,4 @@
-package com.sep.sepdrivebackend.controllers;
+package com.sep.sepdrivebackend.controller;
 
 import com.sep.sepdrivebackend.entities.RideRequest;
 import com.sep.sepdrivebackend.services.RideRequestService;
