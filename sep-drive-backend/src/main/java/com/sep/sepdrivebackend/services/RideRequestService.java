@@ -5,6 +5,7 @@ import com.sep.sepdrivebackend.entities.RideRequest;
 import com.sep.sepdrivebackend.repositories.UserRepository;
 import com.sep.sepdrivebackend.repositories.RideRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,21 +16,15 @@ public class RideRequestService {
     @Autowired
     private RideRequestRepository rideRepo;
 
-    @Autowired /*@Autowired, Spring Boot automatically connects your Service to the Repository*/
-    private UserRepository userRepo;/* This connects your code to the UserRepository and only the server can use it */
+    @Autowired
+    private UserRepository userRepo;
 
-    public RideRequest createRideRequest(RideRequest rideRequest, Long customerId) {
-        /*this method will give us a Riderequest at the end */
-        User customer = userRepo.findById(customerId)
+    public RideRequest createRideRequest(RideRequest rideRequest) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User customer = userRepo.findByUsername(username)
                 .orElseThrow(() -> new IllegalStateException("Customer not found"));
-        /*f the Optional has the User:
-It uses the user and keeps processing.
- If it's empty:
-It throws an error and stops the process.*/
-/*findById do?
-It is a ready-made tool that Spring Data JPA gives you.It lets you ask the database”*/
 
-        boolean hasActiveRide = rideRepo.findByCustomerIdAndActiveTrue(customerId).isPresent();
+        boolean hasActiveRide = rideRepo.findByCustomerIdAndActiveTrue(customer.getId()).isPresent();
 
         if (hasActiveRide) {
             throw new IllegalStateException("You already have an active ride request!");
@@ -46,7 +41,10 @@ It is a ready-made tool that Spring Data JPA gives you.It lets you ask the datab
     }
 
     public void deleteActiveRide(Long customerId) {
-        rideRepo.findByCustomerIdAndActiveTrue(customerId).ifPresent(rideRepo::delete);
+        rideRepo.findByCustomerIdAndActiveTrue(customerId).ifPresent(ride -> {
+            ride.setActive(false);
+            rideRepo.save(ride);
+        });
     }
 
     @Service
@@ -70,6 +68,5 @@ It is a ready-made tool that Spring Data JPA gives you.It lets you ask the datab
         public User findByUserId(Long userID) {
             return userRepository.findById(userID).orElse(null);
         }
-
     }
 }
