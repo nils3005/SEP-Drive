@@ -5,4 +5,3 @@ public enum CarType {
     MEDIUM,
     DELUXE
 }
-
