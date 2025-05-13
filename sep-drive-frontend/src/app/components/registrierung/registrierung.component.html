@@ -37,7 +37,7 @@
       <select class="form-control bg-gray-200 mb-1 h-8 rounded " #rolle="ngModel" [(ngModel)]="registrierungsUser.rolle" id="rolle" name="rolle" required>
         <option disabled selected value hidden> Rolle </option>
         <option value="DRIVER">Fahrer</option>
-        <option value="USER">Beifahrer</option>
+        <option value="CUSTOMER">Beifahrer</option>
       </select>
 
         <label *ngIf="rolle.value === 'DRIVER'" for="carType">Fahrzeug</label> <br>

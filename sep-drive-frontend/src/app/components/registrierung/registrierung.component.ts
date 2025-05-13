@@ -88,7 +88,7 @@ export class RegistrierungComponent {
       el.innerHTML = 'Die eingegebenen Passwörter stimmen nicht überein!';
     }
     else{
-      this.http.post('http://localhost:8081/auth/register',
+      this.http.post('http://localhost:8080/auth/register',
         {
           username: this.registrierungsUser.username,
           firstName: this.registrierungsUser.firstName,
