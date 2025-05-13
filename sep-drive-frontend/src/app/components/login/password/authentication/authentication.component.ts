@@ -46,7 +46,7 @@ export class AuthenticationComponent {
     }); */
 
     //zum testen den token ausgeben
-    console.log(localStorage.getItem('jwt'));
+    // console.log(localStorage.getItem('jwt'));
 
 
 
@@ -56,7 +56,7 @@ export class AuthenticationComponent {
       next: (token) => {
         // token speichern
         localStorage.setItem('jwt', token);
-        this.router.navigate(['/login']); // Weiterleiten (eigentlich zur startseite aber zum testen zurück zum login)
+        this.router.navigate(['/']); // Weiterleiten (eigentlich zur startseite aber zum testen zurück zum login)
       },
       error: (err) => {
         this.errorMessage = 'Verifizierung fehlgeschlagen: ' + err.error; //error nachrichten vom backend
