@@ -1,27 +1,21 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject, Observable, of} from "rxjs";
+import {User} from "../../types";
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserServiceService {
-  private loggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private http = inject(HttpClient);
+  private url: string = 'http://localhost:8080/users'; // TODO ändern für docker?
 
-  constructor() { }
-
-  getUserStatus():Observable<boolean> {
-    return this.loggedInSubject.asObservable();
+  getUsers(): Observable<User[]> {
+    return this.http.get<User[]>(this.url);
   }
 
-  login(): void {
-    // Logik zum Anmelden
-    this.loggedInSubject.next(true);
+  getUserById(id: number): Observable<User> {
+    return this.http.get<User>(this.url + '/' + id);
   }
 
-  logout(): void {
-    // Logik zum Abmelden
-    this.loggedInSubject.next(false);
-  }
 }

@@ -17,5 +17,5 @@ export const routes: Routes = [{ path: 'login', component: LoginComponent },
   { path: '', component: HomePageComponent },
   { path: 'social', component: SocialComponent },
   { path: 'logout', component: LogoutComponent},
-  { path: 'profile', component: ProfileComponent },
+  { path: 'social/user/:id', component: ProfileComponent },
   { path: '**', redirectTo: '' }];

@@ -1,47 +1,33 @@
-import {Component, inject} from '@angular/core';
+import {Component} from '@angular/core';
 import {NavLogoComponent} from '../nav-logo/nav-logo.component';
-import {NavLink} from '../../../types';
-import {UserServiceService} from "../../../services/user/user-service.service";
 import {RouterLink, RouterLinkActive} from "@angular/router";
+import {Observable} from "rxjs";
+import {AuthService} from "../../../services/auth/auth-service.service";
+import {AsyncPipe} from "@angular/common";
+import {User} from "../../../types";
 
 @Component({
   selector: 'app-nav-bar',
   imports: [
     NavLogoComponent,
     RouterLinkActive,
-    RouterLink
+    RouterLink,
+    AsyncPipe
   ],
   templateUrl: './nav-bar.component.html',
   styleUrl: './nav-bar.component.scss'
 })
 export class NavBarComponent {
-  navLinks: NavLink[] = [
-    {
-      id: 1,
-      title: 'Routenplanung',
-      active: true,
-      link: '/',
-    },
-    {
-      id: 2,
-      title: 'Social',
-      active: false,
-      link: '/social',
-    }
-  ]
+  user$: Observable<User|null>;
+  isLoggedIn$: Observable<boolean>;
 
-  isLoggedIn = false;
-
-  userService = inject(UserServiceService);
-
-  ngOnInit(): void {
-    this.userService.getUserStatus().subscribe(status => {
-      this.isLoggedIn = status;
-    });
+  constructor(private auth: AuthService) {
+    this.user$ = this.auth.user$;
+    this.isLoggedIn$ = this.auth.isLoggedIn$;
   }
 
   logout(): void {
-    this.userService.logout();
+    this.auth.logout();
   }
 
 }

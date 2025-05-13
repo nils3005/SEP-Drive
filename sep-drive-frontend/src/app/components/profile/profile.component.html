@@ -1,1 +1,54 @@
-<p>profile works!</p>
+<div class="profile-container">
+    <div class="profile-form">
+        <h2>Benutzerprofil</h2>
+        <div class="form-grid">
+
+            <label>Benutzername</label>
+            <input type="text" [value]="user()?.username" readonly />
+
+            <label>Rolle</label>
+            <input type="text" [value]="user()?.role" readonly />
+
+            <label>Vorname</label>
+            <input type="text" [value]="user()?.firstName" readonly />
+
+            <label>Nachname</label>
+            <input type="text" [value]="user()?.lastName" readonly />
+
+            <label>E-Mail-Adresse</label>
+            <input type="text" [value]="user()?.email" readonly />
+
+            <label>Geburtsdatum</label>
+            <input type="text" [value]="user()?.birthDate" readonly />
+
+            <label>Gesamtzahl der Fahrten</label>
+            <input type="text" [value]="user()?.totalRides" readonly />
+
+            <label>Rating</label>
+            <div class="stars">
+                @for (star of [1, 2, 3, 4, 5]; track star) {
+                    <i [class]="averageClass(averageRating(), star)"></i>
+                }
+            </div>
+
+            @if (user()?.carType) {
+                <label>Autoklasse</label>
+                <input type="text" [value]="user()?.carType">
+            }
+        </div>
+    </div>
+
+    <div class="profile-avatar">
+        @if (user()?.profileImageBase64) {
+            <img
+                    [src]="'data:image/png;base64,' + user()!.profileImageBase64"
+                    alt="Profilbild {{ user()?.username }}"
+                    class="avatar-img"
+            />
+        } @else {
+            <div class="avatar-circle">
+                Profilbild
+            </div>
+        }
+    </div>
+</div>

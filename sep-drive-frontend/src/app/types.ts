@@ -43,6 +43,20 @@ export type GeoJsonRoute = {
   ]
 }
 
+export type User = {
+  id: number;
+  username: string;
+  role: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  birthDate: string;
+  totalRides: number;
+  ratings: number[];
+  carType: string;
+  profileImageBase64: string;
+}
+
 export type Coordinates = {
   latitude: number | string
   longitude: number | string
