@@ -1,9 +1,9 @@
 import {Component, computed, inject, signal} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
-import {User} from "../../models/User";
 import {UserServiceService} from "../../services/user/user-service.service";
 import {FormsModule} from "@angular/forms";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
+import {User} from "../../types";
 
 @Component({
   selector: 'app-profile',

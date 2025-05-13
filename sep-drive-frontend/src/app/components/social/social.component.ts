@@ -1,8 +1,8 @@
 import {Component, computed, inject, OnInit, signal} from '@angular/core';
-import {User} from "../../models/User";
 import {UserServiceService} from "../../services/user/user-service.service";
 import {FormsModule} from "@angular/forms";
 import {RouterLink} from "@angular/router";
+import {User} from "../../types";
 
 @Component({
   selector: 'app-social',

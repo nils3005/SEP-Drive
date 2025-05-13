@@ -20,23 +20,33 @@
         <div id="innerNavbar-right">
             <ul class="navItems">
                 <!-- Login-Link (nur wenn nicht eingeloggt) -->
-                @if (!isLoggedIn){
+                @if (!(isLoggedIn$ | async)){
                     <li>
                         <a routerLink="/login" routerLinkActive="active">Login</a>
                     </li>
-                }
-
-                <!-- Logout-Link (nur wenn eingeloggt) -->
-                @if (isLoggedIn) {
+                } @else {
                     <li>
                         <a routerLink="/logout" routerLinkActive="active" (click)="logout()">Logout</a>
                     </li>
                 }
 
-                <!-- Profil-Link (nur wenn eingeloggt) -->
-                @if (isLoggedIn) {
+                @if (user$ | async; as user) {
                     <li>
-                        <a routerLink="/profile" routerLinkActive="active">Profile</a>
+                        <a
+                                [routerLink]="['/social/user', user.id]"
+                                routerLinkActive="active"
+                                class="profile-link"
+                        >
+                            @if (user.profileImageBase64) {
+                                <img
+                                        [src]="'data:image/png;base64,' + user.profileImageBase64"
+                                        alt="Profilbild"
+                                        class="profile-img"
+                                />
+                            } @else {
+                                <i class="fa fa-user"></i>
+                            }
+                        </a>
                     </li>
                 }
             </ul>
