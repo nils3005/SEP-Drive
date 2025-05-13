@@ -1,0 +1,88 @@
+
+<div class="grid grid-cols-3 grid-rows-1 gap-1 mt-18 font-sans">
+  <div class="col-start-2">
+    <span class="text-[#914141] text-2xl flex">
+      Registrierung
+  </span>
+    <form class="flex flex-col" #registrierungsform="ngForm" (ngSubmit)="onSubmit()">
+      <label for="username">Benutzername</label>
+      <input class="form-control bg-gray-200 mb-1 h-8 rounded" #username="ngModel" [(ngModel)]="registrierungsUser.username"
+             type="text"
+             id="username"
+             name="username"
+             placeholder="Benutzername"
+             required>
+      <label for="firstname">Vorname</label>
+      <input class="form-control bg-gray-200 mb-1 h-8 rounded" #firstName="ngModel" [(ngModel)]="registrierungsUser.firstName"
+             type="text"
+             name="firstname"
+             id="firstname"
+             placeholder="Vorname"
+             required>
+      <label for="lastname">Nachname</label>
+      <input class="form-control bg-gray-200 mb-1 h-8 rounded" #lastName="ngModel" [(ngModel)]="registrierungsUser.lastName"
+             type="text"
+             id="lastname"
+             name="lastname"
+             placeholder="Nachname"
+             required>
+      <label for="email">E-Mail</label>
+      <input class="form-control bg-gray-200 mb-1 h-8 rounded" #email="ngModel" [(ngModel)]="registrierungsUser.email"
+             type="email"
+             id="email"
+             name="email"
+             placeholder="E-Mail"
+             required>
+      <label for="rolle">Rolle</label>
+      <select class="form-control bg-gray-200 mb-1 h-8 rounded " #rolle="ngModel" [(ngModel)]="registrierungsUser.rolle" id="rolle" name="rolle" required>
+        <option disabled selected value hidden> Rolle </option>
+        <option value="DRIVER">Fahrer</option>
+        <option value="CUSTOMER">Beifahrer</option>
+      </select>
+
+        <label *ngIf="rolle.value === 'DRIVER'" for="carType">Fahrzeug</label> <br>
+        <select *ngIf="rolle.value === 'DRIVER'" class="form-control bg-gray-200 mb-1 h-8 rounded " #carType="ngModel" [(ngModel)]="registrierungsUser.carType" id="carType" name="carType" required>
+          <option disabled selected value hidden> Fahrzeug </option>
+          <option value="SMALL">Small</option>
+          <option value="MEDIUM">Medium</option>
+          <option value="DELUXE">Deluxe</option>
+        </select>
+
+      <label for="birthDate">Geburtsdatum</label>
+      <input class="form-control bg-gray-200 mb-1 h-8 rounded" #birthDate="ngModel" [(ngModel)]="registrierungsUser.birthDate"
+             type="date"
+             id="birthDate"
+             name="birthDate"
+             required>
+
+      <label for="password">Passwort</label>
+      <input class="form-control bg-gray-200 mb-1 h-8 rounded" #passwort="ngModel" [(ngModel)]="registrierungsUser.password"
+             type="password"
+             id="password"
+             name="birthDate"
+             placeholder="Passwort"
+             required>
+      <label for="wdhpassword">Passwort bestätigen</label>
+      <input class="form-control bg-gray-200 mb-1 h-8 rounded" #wdhpasswort="ngModel" [(ngModel)]="registrierungsUser.wdhpasswort"
+             type="password"
+             id="wdhpassword"
+             name="wdhpasswort"
+             placeholder="Passwort Bestätigen"
+             required>
+      <label for="profilepicture">Profilbild</label>
+      <input class="form-control bg-gray-200 mb-3 h-8 rounded" #profilepicture="ngModel" [(ngModel)]="registrierungsUser.profilePicture"
+             type="file" (change)="onFileSelected($event)" accept="image/*"
+             id="profilepicture"
+             name="profilepicture">
+
+
+
+      <button [disabled]="registrierungsform.invalid" class="btn btn-info bg-[#914141] text-white rounded h-8"
+              type="submit">Submit
+      </button>
+      <div id="errorMessage" class="text-red-600 bg-red-200"></div>
+
+    </form>
+  </div>
+
+</div>

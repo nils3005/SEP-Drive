@@ -7,10 +7,12 @@ import {HomePageComponent} from './pages/home-page/home-page.component';
 import {SocialComponent} from './components/social/social.component';
 import {LogoutComponent} from './components/logout/logout.component';
 import {ProfileComponent} from './components/profile/profile.component';
+import { RegistrierungComponent } from './components/registrierung/registrierung.component';
 
 export const routes: Routes = [{ path: 'login', component: LoginComponent },
   { path: 'password', component: PasswordComponent },
   {path: 'authentication', component: AuthenticationComponent},
+  {path: 'register', component: RegistrierungComponent},
   {path: 'supercode', component: SupercodeComponent},
   { path: '', component: HomePageComponent },
   { path: 'social', component: SocialComponent },

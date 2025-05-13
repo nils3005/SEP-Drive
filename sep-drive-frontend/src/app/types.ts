@@ -61,3 +61,17 @@ export type RideRequestSummary = {
   price: number
   carType: string
 }
+
+
+export type DriveUser = {
+  username: string,
+  firstName: string,
+  lastName: string,
+  email: string,
+  rolle: string,
+  birthDate: string,
+  profilePicture: string,
+  password: string,
+  wdhpasswort: string,
+  carType: string
+}
