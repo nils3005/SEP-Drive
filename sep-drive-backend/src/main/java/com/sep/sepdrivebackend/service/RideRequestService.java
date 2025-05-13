@@ -1,9 +1,9 @@
-package com.sep.sepdrivebackend.services;
+package com.sep.sepdrivebackend.service;
 
 import com.sep.sepdrivebackend.entities.User;
+import com.sep.sepdrivebackend.repository.RideRequestRepository;
+import com.sep.sepdrivebackend.repository.UserRepository;
 import com.sep.sepdrivebackend.entities.RideRequest;
-import com.sep.sepdrivebackend.repositories.UserRepository;
-import com.sep.sepdrivebackend.repositories.RideRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

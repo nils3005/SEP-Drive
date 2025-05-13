@@ -1,4 +1,4 @@
-package com.sep.sepdrivebackend.repositories;
+package com.sep.sepdrivebackend.repository;
 
 import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.entities.RideRequest;

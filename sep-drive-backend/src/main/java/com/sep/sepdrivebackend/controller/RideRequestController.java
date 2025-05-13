@@ -1,7 +1,8 @@
 package com.sep.sepdrivebackend.controller;
 
 import com.sep.sepdrivebackend.entities.RideRequest;
-import com.sep.sepdrivebackend.services.RideRequestService;
+import com.sep.sepdrivebackend.service.RideRequestService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
