@@ -47,7 +47,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private LocalDate birthdate;
 
-    private String profilePicture;
+    @Lob
+    @Column(name = "profile_picture")
+    private byte[] profilePicture;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     private List<Rating> ratings;
@@ -116,7 +118,7 @@ public class User implements UserDetails {
     }
 
 
-    public User(String username, String email, String password, Role role, String firstName, String lastName, LocalDate birthdate, String profilePicture) {
+    public User(String username, String email, String password, Role role, String firstName, String lastName, LocalDate birthdate) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -124,7 +126,6 @@ public class User implements UserDetails {
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthdate = birthdate;
-        this.profilePicture = profilePicture;
     }
 
     //Methoden von UserDetails

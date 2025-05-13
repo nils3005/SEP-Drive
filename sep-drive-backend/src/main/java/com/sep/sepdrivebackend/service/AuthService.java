@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.Random;
 
 @Service
@@ -63,13 +64,17 @@ public class AuthService {
                 registerDto.getRole(),
                 registerDto.getFirstName(),
                 registerDto.getLastName(),
-                localDate,
-                registerDto.getProfilePicture());
+                localDate);
         if(user.getRole() == Role.DRIVER && registerDto.getCarType() == null) {
             throw new IncompleteFieldException("Car type is required");
         }
         if(user.getRole() == Role.DRIVER){
             user.setCarType(registerDto.getCarType());
+        }
+        if(registerDto.getProfilePicture() != null){
+            String pb = registerDto.getProfilePicture();
+            byte[] decodedBytes = pb.getBytes();
+            user.setProfilePicture(decodedBytes);
         }
         userService.save(user);
     }
