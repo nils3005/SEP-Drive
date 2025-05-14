@@ -54,7 +54,6 @@ export type User = {
   numberOfRides: number;
   ratings: number[];
   carType: string;
-  profileImageBase64: string;
   profilePicture: string;
 }
 
