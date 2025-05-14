@@ -22,8 +22,9 @@ export class AuthenticationComponent {
   password: string = history.state.password;
 
   onVerify() {
+    console.log('Hello from authentication component ', this.username, this.password, this.code);
     this.auth
-        .verifyAndLogin({ username: this.username, password: this.password, code: this.code })
+        .verify(this.username, this.code)
         .subscribe({
           error: err => {
             this.errorMessage = err.message;

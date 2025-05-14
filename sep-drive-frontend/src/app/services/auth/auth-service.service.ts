@@ -1,7 +1,7 @@
 // src/app/services/auth.service.ts
 import {inject, Injectable, signal} from '@angular/core';
 import {BehaviorSubject, Observable, map, tap, catchError, throwError, switchMap} from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {User} from "../../types";
 import {Router} from "@angular/router";
 import {UserServiceService} from "../user/user-service.service";
@@ -11,48 +11,88 @@ export class AuthService {
   private userSubject = new BehaviorSubject<User|null>(null);
   public user$: Observable<User|null> = this.userSubject.asObservable();
   private http = inject(HttpClient);
-  private url: string = 'http://localhost:8080/auth';
+  private api: string = 'http://localhost:8080/auth';
+  private userAPI: string = 'http://localhost:8080/users/username';
   private router: Router = inject(Router);
+  private userService: UserServiceService = inject(UserServiceService);
   public token = signal<string | null>(localStorage.getItem('jwt'));
   /** Gibt true zurück, wenn userSubject aktuell einen Wert ≠ null hat */
   public isLoggedIn$: Observable<boolean> = this.user$.pipe(map(u => !!u));
 
-    checkUsername(username: string, password: string): Observable<void> {
+    checkUsername(username: string): Observable<void> {
         return this.http
-            .post<void>(`${this.url}/checkUsername`, { username, password});
+            .post<string>(
+                `${this.api}/checkUsername`,
+                { username, password: ''},
+                { responseType: 'text' as 'json' }
+            )
+            // Mappe den Text auf void, damit Login Observable<void> bekommt
+            .pipe(
+                map(() => {
+                    // Wir werfen das Textergebnis weg
+                })
+            );
     }
 
-    verifyAndLogin(payload: {
-        username: string;
-        password: string;
-        code: string;
-    }): Observable<User> {
+    login(credentials: { username: string; password: string }): Observable<string> {
         return this.http
-            .post<string>(`${this.url}/verify`, {username: payload.username, code: payload.code})
+            .post(
+                `${this.api}/login`,
+                credentials,
+                { responseType: 'text' }
+            )
             .pipe(
-                tap(jwt => {
-                    this.token.set(jwt);
-                    localStorage.setItem('jwt', jwt);
+                catchError((err: HttpErrorResponse) => {
+                    const msg = err.status === 401
+                        ? 'Ungültige Zugangsdaten.'
+                        : 'Login fehlgeschlagen.';
+                    return throwError(() => new Error(msg));
+                })
+            );
+    }
+
+    verify(username: string, code: string): Observable<void> {
+        return this.http
+            .post(
+                `${this.api}/verify`,
+                { username, code },
+                { responseType: 'text' }
+            )
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    const msg = err.status === 400
+                        ? 'Ungültiger Verifizierungscode.'
+                        : 'Verifizierung fehlgeschlagen.';
+                    return throwError(() => new Error(msg));
                 }),
-                // Jetzt haben wir das Token, dann rufen wir den Login-Endpunkt auf
-                switchMap(() => this.http.post<User>(`${this.url}/login`, {
-                    username: payload.username,
-                    password: payload.password
-                })),
+                tap(token => {
+                    this.token.set(token);
+                    localStorage.setItem('jwt', token);
+                }),
+                switchMap(() => this.fetchUserByUsername(username)),
                 tap(user => {
                     this.userSubject.next(user);
-                    this.router.navigate(['/']); // nach Login auf die Startseite
+                    this.router.navigate(['/']);
                 }),
-                catchError(err => throwError(() => new Error(err.message || 'Login fehlgeschlagen')))
+                map(() => undefined)
             );
     }
 
     logout(): void {
-        this.http.get<void>(`${this.url}/logout`);
+        this.http.get<void>(`${this.api}/logout`);
         localStorage.removeItem('jwt');
         this.token.set(null);
         this.userSubject.next(null);
         this.router.navigate(['/login']);
+    }
+
+    private fetchUserByUsername(username: string): Observable<User> {
+        return this.http.get<User>(`${this.userAPI}/${username}`)
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    return throwError(() => new Error('Fehler beim Laden des Users'));
+                })
+            );
     }
 
 }

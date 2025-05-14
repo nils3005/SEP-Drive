@@ -25,7 +25,7 @@ export class SupercodeComponent {
 
   onVerify() {
     this.auth
-        .verifyAndLogin({username: this.username, password: this.password, code: this.code})
+        .verify(this.username, this.code)
         .subscribe({
           error: err => {
             this.errorMessage = err.message;

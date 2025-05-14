@@ -3,6 +3,7 @@ import {Router} from '@angular/router';
 import {FormsModule} from '@angular/forms';
 import {HttpClient} from '@angular/common/http';
 import {CommonModule} from '@angular/common';
+import {AuthService} from "../../../services/auth/auth-service.service";
 
 
 @Component({
@@ -16,10 +17,23 @@ export class PasswordComponent {
   password: string = '';
   errorMessage: string = '';
   router: Router = inject(Router);
+  auth: AuthService = inject(AuthService);
 
   onSignIn() {
-    this.router.navigate(['authentication'], { state: {
-      username: this.username, password: this.password }
-    }); // zur authentication navigieren, username und password weiterhin zwischenspeichern
+    this.auth.login({username: this.username, password: this.password})
+        .subscribe({
+          next: _ => {
+            this.router.navigate(['authentication'], {
+              state: {
+                username: this.username,
+                password: this.password
+              }
+            });
+          },
+          error: err => {
+            this.errorMessage = err.message;
+          }
+        });
   }
+
 }

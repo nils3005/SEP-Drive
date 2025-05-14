@@ -19,8 +19,8 @@ export class LoginComponent {
   auth: AuthService = inject(AuthService);
 
     onSignIn() {
-        this.auth.checkUsername(this.username, '').subscribe({ // unschön mit leeren String für passwort, aber backend dto braucht das field
-            next: () => {
+        this.auth.checkUsername(this.username).subscribe({
+            next: (_) => {
                 this.router.navigate(['/password'], {
                     state: { username: this.username }
                 });
@@ -32,7 +32,7 @@ export class LoginComponent {
     }
 
   toRegister(){
-    this.router.navigate(['/register']); //hier der register link
+    this.router.navigate(['/register']);
   }
 
 }

@@ -18,4 +18,8 @@ export class UserServiceService {
     return this.http.get<User>(this.url + '/' + id);
   }
 
+  getUserByUsername(name: string) {
+    return this.http.get<User>(this.url + '/' + name);
+  }
+
 }

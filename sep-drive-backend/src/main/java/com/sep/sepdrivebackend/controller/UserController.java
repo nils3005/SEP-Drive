@@ -46,6 +46,16 @@ public class UserController {
         userService.save(user);
     }
 
+    // muss leider so heißen sonst: Ambiguous handler methods mapped for '/users/user'
+    @GetMapping("/users/username/{username}")
+    public User findByUsername(@PathVariable String username) {
+        User user = userService.findByUsername(username);
+        if ( null == user ) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.", null);
+        }
+        return user;
+    }
+
     @GetMapping(path = "/users/{userID}")
     public User findByUserId(@PathVariable Long userID) {
         User user = userService.findByUserId(userID);
