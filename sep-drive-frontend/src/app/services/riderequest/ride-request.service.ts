@@ -42,8 +42,6 @@ export class RideRequestService {
       },
       carType: carType
     }
-    console.log(rideRequest);
-
     return this.http.post<any>(
         'http://localhost:8080/api/ride-requests/create',
         rideRequest,
@@ -82,9 +80,18 @@ export class RideRequestService {
     })
   }
 
-  public cancelRide(): void
+  public cancelRide(): Observable<HttpResponse<any>>
   {
-    // TODO implement cancel request
+    return this.http.delete<any>(
+        'http://localhost:8080/api/ride-requests/cancel',
+        {
+          headers: {
+            accept: 'application/json',
+          }
+          ,
+          observe: 'response'
+        }
+    )
   }
 
   public getRideRequestSummary(): RideRequestSummary | null

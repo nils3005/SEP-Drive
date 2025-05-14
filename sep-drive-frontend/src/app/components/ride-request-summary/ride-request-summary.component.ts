@@ -70,10 +70,16 @@ export class RideRequestSummaryComponent {
   }
 
   onCancel() {
-    this.rideRequestService.cancelRide()
-    this.mapService.resetMap()
-    this.summaryData = null;
-    this.isSubmitted = false;
+    this.rideRequestService.cancelRide().subscribe({
+      next: () => {
+        this.mapService.resetMap()
+        this.summaryData = null;
+        this.isSubmitted = false;
+      },
+      error: (error) => {
+        this.errorService.showError(error.error.message);
+      }
+    })
   }
 
   protected readonly parseFloat = parseFloat;
