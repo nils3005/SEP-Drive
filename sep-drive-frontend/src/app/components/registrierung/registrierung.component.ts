@@ -4,6 +4,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DriveUser} from '../../types';
 import {NgIf} from '@angular/common';
 import {Router} from '@angular/router';
+import {ErrorService} from "../../services/error/error.service";
 
 @Component({
   selector: 'app-registrierung',
@@ -29,6 +30,7 @@ export class RegistrierungComponent {
   @Input() profilePicture: any;
   @Input() carType: any;
 
+  private errorMessage = inject(ErrorService);
 
   private http = inject(HttpClient);
   registrierungsUser: DriveUser;
@@ -52,7 +54,6 @@ export class RegistrierungComponent {
     }
 
   }
-
   onFileSelected(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
@@ -70,15 +71,13 @@ export class RegistrierungComponent {
     const email :string= this.registrierungsUser.email;
 
     if(regex.exec(email)==null){
-      let el = document.querySelector('#errorMessage')
-      // @ts-ignore
-      el.innerHTML = 'Fehler: E-Mail ungültig!';
+      this.errorMessage.showError("Fehler: E-Mail ungültig!")
+    }
+    else if(/[äöüÄÖÜß]/.test(this.registrierungsUser.email)){
+      this.errorMessage.showError('Die eingegebene E-Mail enthält unerlaubte Zeichen (Umlaute)!')
     }
     else if (this.registrierungsUser.password!=this.registrierungsUser.wdhpasswort){
-      let el = document.querySelector('#errorMessage')
-
-      // @ts-ignore
-      el.innerHTML = 'Die eingegebenen Passwörter stimmen nicht überein!';
+      this.errorMessage.showError ('Die eingegebenen Passwörter stimmen nicht überein!');
     }
     else{
       this.http.post('http://localhost:8080/auth/register',
@@ -104,10 +103,7 @@ export class RegistrierungComponent {
         },
         error: (error) => {
           console.log(error);
-          let el = document.querySelector('#errorMessage')
-
-          // @ts-ignore
-          el.innerHTML = error.error;
+          this.errorMessage.showError (error.error);
         }
       });
 
