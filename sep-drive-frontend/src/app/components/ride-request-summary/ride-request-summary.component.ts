@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {RideRequestSummary} from '../../types';
 import {MapService} from '../../services/map/map.service';
 import {RideRequestService} from '../../services/riderequest/ride-request.service';
@@ -6,6 +6,7 @@ import {GeoService} from '../../services/geo/geo.service';
 import {CarType} from '../../enums/car-type';
 import {ErrorService} from "../../services/error/error.service";
 import {Router} from "@angular/router";
+import {BehaviorSubject} from "rxjs";
 
 @Component({
   selector: 'app-ride-request-summary',
@@ -16,7 +17,7 @@ import {Router} from "@angular/router";
 export class RideRequestSummaryComponent {
 
   summaryData: RideRequestSummary | null = null;
-  isSubmitted = false;
+  @Input() isSubmitted = false;
 
   constructor(
       private mapService: MapService,
@@ -30,6 +31,15 @@ export class RideRequestSummaryComponent {
     } else {
       this.summaryData = rideRequestService.getRideRequestSummary();
     }
+    this.checkChanges();
+  }
+
+  private checkChanges(): void {
+    this.geoService.rideRequestSummaryData.asObservable().subscribe(data => {
+      if (data) {
+        this.summaryData = data;
+      }
+    })
   }
 
   public minutesToHHMM(minutes: number): string {
@@ -46,10 +56,9 @@ export class RideRequestSummaryComponent {
           this.geoService.waypoints.getValue()[1],
           carType.toUpperCase()
       ).subscribe({
-        next: (response) => {
+        next: () => {
           this.isSubmitted = true;
           this.geoService.flyMapTo(this.geoService.waypoints.getValue()[0].geometry.coordinates[1], this.geoService.waypoints.getValue()[0].geometry.coordinates[0], 16, 1)
-          console.log(response);
         },
         error: (error) => {
           if (error.status === 400) {
@@ -72,9 +81,9 @@ export class RideRequestSummaryComponent {
   onCancel() {
     this.rideRequestService.cancelRide().subscribe({
       next: () => {
-        this.mapService.resetMap()
-        this.summaryData = null;
         this.isSubmitted = false;
+        this.summaryData = null;
+        this.mapService.resetMap()
       },
       error: (error) => {
         this.errorService.showError(error.error.message);

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Coordinates, GeocodeFeature} from '../../types';
+import {Coordinates, GeocodeFeature, RideRequestSummary} from '../../types';
 import {BehaviorSubject} from "rxjs";
 import {OpenRouteServiceService} from "../openroute/open-route-service.service";
 import * as L from 'leaflet';
@@ -14,7 +14,10 @@ export class GeoService {
   public route: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   public currentPoint: BehaviorSubject<GeocodeFeature | null> = new BehaviorSubject<GeocodeFeature | null>(null);
   public carType: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
-  public showInput: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+
+  public showInput: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
+  public rideRequestSummaryData: BehaviorSubject<RideRequestSummary | null> = new BehaviorSubject<RideRequestSummary | null>(null);
 
   public map: L.Map | undefined;
 

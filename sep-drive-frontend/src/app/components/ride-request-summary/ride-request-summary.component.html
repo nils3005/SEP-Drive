@@ -42,6 +42,14 @@
             </div>
         </div>
     }
+    <div class="infoField">
+      <div class="infoLabel">
+        <div class="infoText">Autotyp</div>
+      </div>
+      <div class="infoData">
+        <div class="infoText">{{ summaryData?.carType }}</div>
+      </div>
+    </div>
     @if (!isSubmitted) {
         <div class="buttonContainer">
             <button class="submitButton" (click)="onSubmit()">
