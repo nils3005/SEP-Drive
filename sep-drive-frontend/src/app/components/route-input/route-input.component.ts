@@ -17,10 +17,6 @@ import {ErrorService} from "../../services/error/error.service";
 export class RouteInputComponent {
   private openRouteServiceService = inject(OpenRouteServiceService);
 
-  constructor(private geoService: GeoService, private errorService: ErrorService) {
-    this.checkChanges()
-  }
-
   public useStartCoordinates = false;
   public useDestinationCoordinates = false;
   public useStopCoordinates = false;
@@ -52,10 +48,6 @@ export class RouteInputComponent {
       this.routeForm.controls.carType.setValue(this.geoService.carType.getValue() || "")
     }
   }
-
-  public useStartCoordinates = false;
-  public useDestinationCoordinates = false;
-
 
   public carTypes= [
     {

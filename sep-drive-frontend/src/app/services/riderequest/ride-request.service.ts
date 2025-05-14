@@ -85,14 +85,12 @@ export class RideRequestService {
   }
 
   public async getRideRequestSummaryFromRideRequest(rideRequest: RideRequest): Promise<RideRequestSummary> {
-    console.log(rideRequest);
     const startResponse = await firstValueFrom(
       this.openRouteService.getGeocodeFeatureByCoordinates({
         latitude: rideRequest.startLocation.latitude,
         longitude: rideRequest.startLocation.longitude,
       })
     );
-    console.log(startResponse);
     const endFeatureResponse = await firstValueFrom(
       this.openRouteService.getGeocodeFeatureByCoordinates({
         longitude: rideRequest.destination.longitude,
@@ -104,7 +102,6 @@ export class RideRequestService {
 
     if (startFeature && endFeature) {
       const cordsArray = this.geoService.getCoordinateArray([startFeature, endFeature]);
-      console.log(cordsArray);
       const routeResponse = await firstValueFrom(
           this.openRouteService.getRouteFromPointArray(cordsArray)
       );
@@ -120,7 +117,8 @@ export class RideRequestService {
           distance: parseFloat((jsonRoute.features[0].properties.summary.distance / 1000).toFixed(2)),
           duration: parseFloat((jsonRoute.features[0].properties.summary.duration / 60).toFixed(2)),
           price: 0,
-          carType: this.geoService.carType.getValue() ?? CarType.MEDIUM
+          carType: this.geoService.carType.getValue() ?? CarType.MEDIUM,
+          stops: []
         };
       }
     }
@@ -128,6 +126,7 @@ export class RideRequestService {
       start: "",
       end: "",
       distance: 0,
+      stops: [],
       duration: 0,
       price: 0,
       carType: ""
