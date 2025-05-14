@@ -70,6 +70,7 @@ export type RideRequest = {
 
 export type RideRequestSummary = {
   start: string
+  stops: GeocodeFeature[]
   end: string
   distance: number
   duration: number
