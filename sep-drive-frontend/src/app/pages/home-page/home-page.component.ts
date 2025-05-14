@@ -21,17 +21,5 @@ export class HomePageComponent {
   public showInput = false;
 
   constructor(public rideRequestService: RideRequestService, public geoService: GeoService) {
-    // this.checkChanges()
-  }
-
-  checkChanges(): void {
-    this.rideRequestService.rideRequest.asObservable().subscribe(rideRequest => {
-      if (rideRequest && (rideRequest.status === RideRequestStatus.COMPLETED || rideRequest.status === RideRequestStatus.CANCELED)) {
-        this.showInput = false;
-      }
-      if (!rideRequest) {
-        this.showInput = true;
-      }
-    })
   }
 }

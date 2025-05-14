@@ -117,7 +117,7 @@
         <select name="car-type" id="carType" formControlName="carType" class="textInput">
             <option value="" disabled selected hidden>Autotyp</option>
             @for (carType of carTypes; track carType.id) {
-                <option [value]="carType.id">{{carType.value}}</option>
+                <option [value]="carType.value">{{carType.value}}</option>
             }
         </select>
     </div>
