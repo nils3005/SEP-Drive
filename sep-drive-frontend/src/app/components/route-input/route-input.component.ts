@@ -16,14 +16,6 @@ import {ErrorService} from "../../services/error/error.service";
 })
 export class RouteInputComponent {
   private openRouteServiceService = inject(OpenRouteServiceService);
-
-  constructor(private geoService: GeoService, private errorService: ErrorService) {
-    this.checkChanges()
-  }
-
-  public useStartCoordinates = false;
-  public useDestinationCoordinates = false;
-
   public routeForm = new FormGroup({
     start: new FormControl(""),
     destination: new FormControl(""),
@@ -33,6 +25,21 @@ export class RouteInputComponent {
     endCordLat: new FormControl(""),
     endCordLon: new FormControl(""),
   })
+
+  constructor(private geoService: GeoService, private errorService: ErrorService) {
+    this.checkChanges()
+    if (this.geoService.waypoints.getValue()[0] && this.geoService.waypoints.getValue()[this.geoService.waypoints.getValue().length-1]) {
+      this.startSuppressAutocomplete = true
+      this.routeForm.controls.start.setValue(this.geoService.waypoints.getValue()[0].properties.label || "")
+      this.destinationSuppressAutocomplete = true
+      this.routeForm.controls.destination.setValue(this.geoService.waypoints.getValue()[this.geoService.waypoints.getValue().length-1].properties.label || "")
+      this.routeForm.controls.carType.setValue(this.geoService.carType.getValue() || "")
+    }
+  }
+
+  public useStartCoordinates = false;
+  public useDestinationCoordinates = false;
+
 
   public carTypes= [
     {

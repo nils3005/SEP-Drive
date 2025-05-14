@@ -83,6 +83,8 @@ export class RideRequestSummaryComponent {
       next: () => {
         this.isSubmitted = false;
         this.summaryData = null;
+        this.geoService.rideRequestSummaryData.next(null);
+        this.rideRequestService.rideRequest.next(null);
         this.mapService.resetMap()
       },
       error: (error) => {

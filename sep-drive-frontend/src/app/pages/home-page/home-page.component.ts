@@ -39,8 +39,9 @@ export class HomePageComponent implements OnInit {
         }
       },
       error: (error)=> {
-        if (error.status !== 404) {
-          this.errorService.showError(error.message);
+        if (error.status === 403 || error.status === 401) {
+          // this.errorService.showError(error.message);
+          this.geoService.showInput.next(true)
           this.isSubmitted = false;
           return
         }
