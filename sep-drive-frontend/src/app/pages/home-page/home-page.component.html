@@ -1,9 +1,11 @@
 <main>
     <div class="routeContainer">
-        @if (geoService.showInput.getValue()) {
-            <app-route-input class="routeInput" />
-        } @else {
-            <app-ride-request-summary class="rideRequestSummary" [isSubmitted]="isSubmitted"/>
+        @if (!showOnlyMap) {
+          @if (geoService.showInput.getValue()) {
+              <app-route-input class="routeInput" />
+          } @else {
+              <app-ride-request-summary class="rideRequestSummary" [isSubmitted]="isSubmitted"/>
+          }
         }
         <app-map class="map" />
     </div>

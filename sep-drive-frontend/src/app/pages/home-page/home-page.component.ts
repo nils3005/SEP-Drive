@@ -8,6 +8,8 @@ import {GeoService} from "../../services/geo/geo.service";
 import {RideRequestSummary} from "../../types";
 import {ErrorService} from "../../services/error/error.service";
 import {BehaviorSubject} from "rxjs";
+import {UserServiceService} from "../../services/user/user-service.service";
+import {jwtDecode} from "jwt-decode";
 
 @Component({
   selector: 'app-home-page',
@@ -24,12 +26,26 @@ export class HomePageComponent implements OnInit {
   constructor(
       public rideRequestService: RideRequestService,
       public geoService: GeoService,
-      private errorService: ErrorService
+      private userService: UserServiceService
   ) {}
 
+  public showOnlyMap = true;
   public isSubmitted = true;
 
   ngOnInit(): void {
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
+      const decode = jwtDecode(jwt);
+      if (decode.sub) {
+        this.userService.getUserByUsername(decode.sub).subscribe(user => {
+          if (user.role == "CUSTOMER") {
+            this.showOnlyMap = false;
+          } else if (user.role == "DRIVER") {
+            this.showOnlyMap = true;
+          }
+        })
+      }
+    }
     this.rideRequestService.getActiveRide().subscribe({
       next: (response)=> {
         if (response.status === 200) {

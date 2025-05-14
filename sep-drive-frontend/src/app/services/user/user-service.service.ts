@@ -19,7 +19,7 @@ export class UserServiceService {
   }
 
   getUserByUsername(name: string) {
-    return this.http.get<User>(this.url + '/' + name);
+    return this.http.get<User>(this.url + '/username/' + name);
   }
 
 }
