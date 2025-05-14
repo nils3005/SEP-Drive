@@ -47,7 +47,7 @@ export class GeoService {
   public updateStart(start: GeocodeFeature): void
   {
     let tempWaypoints = this.waypoints.getValue();
-    tempWaypoints[0] = start;
+    tempWaypoints.splice(0, 0, start);
     this.waypoints.next(tempWaypoints);
     this.currentPoint.next(start);
   }
@@ -55,13 +55,17 @@ export class GeoService {
   public updateDestination(destination: GeocodeFeature): void
   {
     let tempWaypoints = this.waypoints.getValue();
-    if (tempWaypoints.length > 1) {
-      tempWaypoints[tempWaypoints.length - 1] = destination;
-    } else {
-      tempWaypoints[1] = destination;
-    }
+    tempWaypoints.splice(tempWaypoints.length, 0, destination);
     this.waypoints.next(tempWaypoints);
     this.currentPoint.next(destination);
+  }
+
+  public addStop(stop: GeocodeFeature): void
+  {
+    let tempWaypoints = this.waypoints.getValue();
+    tempWaypoints.splice(1, 0, stop)
+    this.waypoints.next(tempWaypoints);
+    this.currentPoint.next(stop);
   }
 
   public flyMapTo(latitude: number, longitude: number, zoom: number, duration: number): void

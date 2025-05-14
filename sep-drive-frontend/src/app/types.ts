@@ -69,6 +69,7 @@ export type RideRequest = {
 
 export type RideRequestSummary = {
   start: string
+  stops: string[]
   end: string
   distance: number
   duration: number

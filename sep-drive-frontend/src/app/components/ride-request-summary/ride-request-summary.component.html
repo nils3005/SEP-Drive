@@ -7,6 +7,18 @@
             <div class="infoText">{{ summaryData?.start }}</div>
         </div>
     </div>
+    @if (summaryData?.stops) {
+      @for (stop of summaryData?.stops; track stop) {
+        <div class="infoField">
+          <div class="infoLabel">
+            <div class="infoText">Zwischenstopp</div>
+          </div>
+          <div class="infoData">
+            <div class="infoText">{{ stop }}</div>
+          </div>
+        </div>
+      }
+    }
     <div class="infoField">
         <div class="infoLabel">
             <div class="infoText">Ziel</div>

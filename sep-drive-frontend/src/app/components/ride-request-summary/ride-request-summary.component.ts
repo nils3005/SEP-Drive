@@ -21,6 +21,7 @@ export class RideRequestSummaryComponent {
       geoService.showInput.next(false);
     } else {
       this.summaryData = rideRequestService.getRideRequestSummary();
+      console.log(this.summaryData)
     }
   }
 
