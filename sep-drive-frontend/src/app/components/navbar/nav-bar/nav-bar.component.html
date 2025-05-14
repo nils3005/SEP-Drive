@@ -37,9 +37,9 @@
                                 routerLinkActive="active"
                                 class="profile-link"
                         >
-                            @if (user.profileImageBase64) {
+                            @if (user.profilePicture) {
                                 <img
-                                        [src]="'data:image/png;base64,' + user.profileImageBase64"
+                                        [src]="'data:image/png;base64,' + user.profilePicture"
                                         alt="Profilbild"
                                         class="profile-img"
                                 />

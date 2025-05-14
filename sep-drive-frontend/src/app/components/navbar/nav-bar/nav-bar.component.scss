@@ -10,9 +10,10 @@ nav {
 }
 
 .innerNavbar {
-  width: 80%;
-  padding-left: 30px;
-  padding-right: 30px;
+  /* auf volle Breite erweitern */
+  width: 100%;
+  /* links und rechts jeweils 30px Abstand */
+  padding: 0 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -26,6 +27,8 @@ nav {
 #innerNavbar-right {
   display: flex;
   align-items: center;
+  /* schiebt den rechten Container ganz an den rechten Rand */
+  margin-left: auto;
 }
 
 .navItems {
@@ -54,8 +57,8 @@ nav {
 }
 
 .profile-img {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
   margin-right: 8px;
