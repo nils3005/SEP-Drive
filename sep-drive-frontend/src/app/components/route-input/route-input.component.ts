@@ -126,7 +126,7 @@ export class RouteInputComponent {
     this.geoService.addStop(geocodeFeature);
     this.stops.push(geocodeFeature);
     this.stopSuppressAutocomplete = true;
-    this.routeForm.controls.stop.setValue(geocodeFeature.properties.label)
+    this.routeForm.controls.stop.setValue("")
     this.stopSuggestions = [];
     this.stopShowSuggestions = false;
   }
@@ -253,6 +253,14 @@ export class RouteInputComponent {
         this.errorService.showError("Alle Felder müssen ausgefüllt sein")
       }
     }
+  }
+
+  onDeleteStop(stop: GeocodeFeature) {
+    const index = this.stops.indexOf(stop);
+    if (index > -1) {
+      this.stops.splice(index, 1);
+    }
+    this.geoService.removeStop(stop);
   }
 
   onSubmit() {

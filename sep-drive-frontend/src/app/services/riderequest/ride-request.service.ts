@@ -29,14 +29,10 @@ export class RideRequestService {
       let jsonRoute: GeoJsonRoute = this.geoService.route.getValue();
       let waypointsLength = this.geoService.waypoints.getValue().length;
       let stops = this.geoService.waypoints.getValue().slice(1, waypointsLength - 1);
-      let stopsString: string[] = []
-      for (const stop of stops) {
-        stopsString.push(stop.properties.label)
-      }
 
       return {
         start: this.geoService.waypoints.getValue()[0].properties.label,
-        stops: stopsString,
+        stops: stops,
         end: this.geoService.waypoints.getValue()[this.geoService.waypoints.getValue().length-1].properties.label,
         distance: parseFloat((jsonRoute.features[0].properties.summary.distance / 1000).toFixed(2)),
         duration: parseFloat((jsonRoute.features[0].properties.summary.duration / 60).toFixed(2)),

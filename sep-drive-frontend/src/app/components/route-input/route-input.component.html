@@ -56,6 +56,7 @@
             </button>
         </div>
     }
+
     @if (showStopInput) {
       @if (!useStopCoordinates) {
         <div class="inputRow">
@@ -123,6 +124,13 @@
       <div class="inputRow">
         <i class="fa-solid fa-plus" (click)="showStopInput = !showStopInput"></i>
       </div>
+    }
+
+    @for (stop of stops; track stop) {
+        <div class="stopRow">
+            <p>{{ stop.properties.label }}</p>
+            <i class="fa-solid fa-xmark" (click)="onDeleteStop(stop)"></i>
+        </div>
     }
 
     @if (!useDestinationCoordinates) {

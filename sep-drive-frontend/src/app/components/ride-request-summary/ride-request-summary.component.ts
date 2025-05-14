@@ -4,6 +4,7 @@ import {MapService} from '../../services/map/map.service';
 import {RideRequestService} from '../../services/riderequest/ride-request.service';
 import {GeoService} from '../../services/geo/geo.service';
 import {CarType} from '../../enums/car-type';
+import {Util} from "leaflet";
 
 @Component({
   selector: 'app-ride-request-summary',
@@ -48,5 +49,11 @@ export class RideRequestSummaryComponent {
     this.isSubmitted = false;
   }
 
+  onBack() {
+    this.mapService.resetMap()
+    this.geoService.showInput.next(true);
+  }
+
   protected readonly parseFloat = parseFloat;
+  protected readonly Util = Util;
 }

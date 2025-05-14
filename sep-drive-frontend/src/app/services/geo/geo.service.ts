@@ -68,6 +68,16 @@ export class GeoService {
     this.currentPoint.next(stop);
   }
 
+  public removeStop(stop: GeocodeFeature): void
+  {
+    let tempWaypoints = this.waypoints.getValue();
+    const index = tempWaypoints.indexOf(stop);
+    if (index > -1) {
+      tempWaypoints.splice(index, 1);
+    }
+    this.waypoints.next(tempWaypoints);
+  }
+
   public flyMapTo(latitude: number, longitude: number, zoom: number, duration: number): void
   {
     this.map?.flyTo([latitude, longitude],
