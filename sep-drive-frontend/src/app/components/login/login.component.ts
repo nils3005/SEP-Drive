@@ -34,7 +34,7 @@ export class LoginComponent {
 
 
   toRegister(){
-    this.router.navigate(['/']); //hier der register link
+    this.router.navigate(['/register']); //hier der register link
   }
   }
 

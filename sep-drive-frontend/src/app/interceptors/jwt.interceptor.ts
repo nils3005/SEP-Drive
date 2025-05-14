@@ -14,15 +14,18 @@ export class JwtInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    const jwt = localStorage.getItem('jwt');
-    if (jwt) {
-      //klont die anfrage und schickt dem server den token
-      const authRequest = request.clone({
-        setHeaders: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-      return next.handle(authRequest);
+    const url = request.url;
+
+    if (url.startsWith('http://localhost')) {
+      const jwt = localStorage.getItem('jwt');
+      if (jwt) {
+        //klont die anfrage und schickt dem server den token
+        request = request.clone({
+          setHeaders: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+      }
     }
     //anfrage wird weitergeschickt
     return next.handle(request);
