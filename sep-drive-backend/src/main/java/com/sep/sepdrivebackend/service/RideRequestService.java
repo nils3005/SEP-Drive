@@ -36,37 +36,22 @@ public class RideRequestService {
         return rideRepo.save(rideRequest);
     }
 
-    public RideRequest getActiveRide(Long customerId) {
-        return rideRepo.findByCustomerIdAndActiveTrue(customerId).orElse(null);
+    public RideRequest getActiveRide() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User customer = userRepo.findByUsername(username)
+                .orElseThrow(() -> new IllegalStateException("Customer not found"));
+
+        return rideRepo.findByCustomerIdAndActiveTrue(customer.getId()).orElse(null);
     }
 
-    public void deleteActiveRide(Long customerId) {
-        rideRepo.findByCustomerIdAndActiveTrue(customerId).ifPresent(ride -> {
+    public void deleteActiveRide() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User customer = userRepo.findByUsername(username)
+                .orElseThrow(() -> new IllegalStateException("Customer not found"));
+
+        rideRepo.findByCustomerIdAndActiveTrue(customer.getId()).ifPresent(ride -> {
             ride.setActive(false);
             rideRepo.save(ride);
         });
-    }
-
-    @Service
-    public static class UserService {
-        private final UserRepository userRepository;
-
-        public UserService(UserRepository userRepository) {
-            this.userRepository = userRepository;
-        }
-
-        public List<User> findAllUsers() {
-            return userRepository.findAll();
-        }
-
-        public void save(User user) {
-            if(user != null && !userRepository.existsById(user.getId())) {
-                userRepository.save(user);
-            }
-        }
-
-        public User findByUserId(Long userID) {
-            return userRepository.findById(userID).orElse(null);
-        }
     }
 }

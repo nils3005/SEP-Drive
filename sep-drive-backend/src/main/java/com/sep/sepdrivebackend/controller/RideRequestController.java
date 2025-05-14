@@ -27,18 +27,18 @@ public class RideRequestController {
         }
     }
 
-    @GetMapping("/active/{customerId}")
-    public ResponseEntity<?> getActive(@PathVariable Long customerId) {
-        RideRequest activeRide = rideRequestService.getActiveRide(customerId);
+    @GetMapping("/active")
+    public ResponseEntity<?> getActive() {
+        RideRequest activeRide = rideRequestService.getActiveRide();
         if (activeRide == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "No active ride request found"));
         }
         return ResponseEntity.ok(activeRide);
     }
 
-    @DeleteMapping("/cancel/{customerId}")
-    public ResponseEntity<?> cancel(@PathVariable Long customerId) {
-        rideRequestService.deleteActiveRide(customerId);
+    @DeleteMapping("/cancel")
+    public ResponseEntity<?> cancel() {
+        rideRequestService.deleteActiveRide();
         return ResponseEntity.ok(Map.of("message", "Ride request cancelled"));
     }
 }
