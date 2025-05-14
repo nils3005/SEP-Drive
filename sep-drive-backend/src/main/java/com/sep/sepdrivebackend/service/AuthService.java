@@ -73,7 +73,7 @@ public class AuthService {
         }
         if(registerDto.getProfilePicture() != null){
             String pb = registerDto.getProfilePicture();
-            byte[] decodedBytes = pb.getBytes();
+            byte[] decodedBytes = Base64.getDecoder().decode(pb);
             user.setProfilePicture(decodedBytes);
         }
         userService.save(user);

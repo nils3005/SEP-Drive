@@ -47,8 +47,8 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private LocalDate birthdate;
 
-    @Lob
-    @Column(name = "profile_picture")
+    //@Lob
+    @Column(name = "profile_picture", columnDefinition = "bytea")
     private byte[] profilePicture;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)

@@ -69,8 +69,13 @@
              name="wdhpasswort"
              placeholder="Passwort Bestätigen"
              required>
-      <label for="profilepicture">Profilbild</label>
+      <!--<label for="profilepicture">Profilbild</label>
       <input class="form-control bg-gray-200 mb-3 h-8 rounded" #profilepicture="ngModel" [(ngModel)]="registrierungsUser.profilePicture"
+             type="file" (change)="onFileSelected($event)" accept="image/*"
+             id="profilepicture"
+             name="profilepicture">-->
+      <label for="profilepicture">Profilbild</label>
+      <input class="form-control bg-gray-200 mb-3 h-8 rounded"
              type="file" (change)="onFileSelected($event)" accept="image/*"
              id="profilepicture"
              name="profilepicture">

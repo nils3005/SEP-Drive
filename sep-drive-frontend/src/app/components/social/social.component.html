@@ -18,9 +18,9 @@
     @for(user of filteredUsers(); track user.id) {
         <div class="user-card">
             <div class="user-card-avatar">
-                @if (user.profileImageBase64) {
+                @if (user.profilePicture) {
                     <img
-                            [src]="'data:image/png;base64,' + user.profileImageBase64"
+                            [src]="'data:image/png;base64,' + user.profilePicture"
                             alt="Profilbild {{ user.username }}"
                             class="avatar-img"
                     />
