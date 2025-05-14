@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Coordinates, GeocodeFeature} from '../../types';
+import {Coordinates, GeocodeFeature, RideRequestSummary} from '../../types';
 import {BehaviorSubject} from "rxjs";
 import {OpenRouteServiceService} from "../openroute/open-route-service.service";
 import * as L from 'leaflet';
@@ -14,7 +14,10 @@ export class GeoService {
   public route: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   public currentPoint: BehaviorSubject<GeocodeFeature | null> = new BehaviorSubject<GeocodeFeature | null>(null);
   public carType: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
-  public showInput: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+
+  public showInput: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
+  public rideRequestSummaryData: BehaviorSubject<RideRequestSummary | null> = new BehaviorSubject<RideRequestSummary | null>(null);
 
   public map: L.Map | undefined;
 
@@ -47,7 +50,7 @@ export class GeoService {
   public updateStart(start: GeocodeFeature): void
   {
     let tempWaypoints = this.waypoints.getValue();
-    tempWaypoints[0] = start;
+    tempWaypoints.splice(0, 0, start);
     this.waypoints.next(tempWaypoints);
     this.currentPoint.next(start);
   }
@@ -55,13 +58,27 @@ export class GeoService {
   public updateDestination(destination: GeocodeFeature): void
   {
     let tempWaypoints = this.waypoints.getValue();
-    if (tempWaypoints.length > 1) {
-      tempWaypoints[tempWaypoints.length - 1] = destination;
-    } else {
-      tempWaypoints[1] = destination;
-    }
+    tempWaypoints.splice(tempWaypoints.length, 0, destination);
     this.waypoints.next(tempWaypoints);
     this.currentPoint.next(destination);
+  }
+
+  public addStop(stop: GeocodeFeature): void
+  {
+    let tempWaypoints = this.waypoints.getValue();
+    tempWaypoints.splice(1, 0, stop)
+    this.waypoints.next(tempWaypoints);
+    this.currentPoint.next(stop);
+  }
+
+  public removeStop(stop: GeocodeFeature): void
+  {
+    let tempWaypoints = this.waypoints.getValue();
+    const index = tempWaypoints.indexOf(stop);
+    if (index > -1) {
+      tempWaypoints.splice(index, 1);
+    }
+    this.waypoints.next(tempWaypoints);
   }
 
   public flyMapTo(latitude: number, longitude: number, zoom: number, duration: number): void

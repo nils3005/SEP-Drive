@@ -64,11 +64,16 @@ export type Coordinates = {
 
 export type RideRequest = {
   id: number
-  status: RideRequestStatus
+  customer: User
+  startLocation: Coordinates
+  destination: Coordinates
+  carType: CarType
+  active: boolean
 }
 
 export type RideRequestSummary = {
   start: string
+  stops: GeocodeFeature[]
   end: string
   distance: number
   duration: number

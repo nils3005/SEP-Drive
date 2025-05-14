@@ -17,12 +17,13 @@ import {ErrorService} from "../../services/error/error.service";
 export class RouteInputComponent {
   private openRouteServiceService = inject(OpenRouteServiceService);
 
-  constructor(private geoService: GeoService, private errorService: ErrorService) {
-    this.checkChanges()
-  }
-
   public useStartCoordinates = false;
   public useDestinationCoordinates = false;
+  public useStopCoordinates = false;
+  public checkedStopCords = false;
+
+  public showStopInput = false
+  public stops: GeocodeFeature[] = [];
 
   public routeForm = new FormGroup({
     start: new FormControl(""),
@@ -32,7 +33,21 @@ export class RouteInputComponent {
     startCordLon: new FormControl(""),
     endCordLat: new FormControl(""),
     endCordLon: new FormControl(""),
+    stop: new FormControl(""),
+    stopCordLat: new FormControl(""),
+    stopCordLon: new FormControl(""),
   })
+
+  constructor(private geoService: GeoService, private errorService: ErrorService) {
+    this.checkChanges()
+    if (this.geoService.waypoints.getValue()[0] && this.geoService.waypoints.getValue()[this.geoService.waypoints.getValue().length-1]) {
+      this.startSuppressAutocomplete = true
+      this.routeForm.controls.start.setValue(this.geoService.waypoints.getValue()[0].properties.label || "")
+      this.destinationSuppressAutocomplete = true
+      this.routeForm.controls.destination.setValue(this.geoService.waypoints.getValue()[this.geoService.waypoints.getValue().length-1].properties.label || "")
+      this.routeForm.controls.carType.setValue(this.geoService.carType.getValue() || "")
+    }
+  }
 
   public carTypes= [
     {
@@ -71,6 +86,17 @@ export class RouteInputComponent {
         this.startSuppressAutocomplete = false;
       }
     })
+
+    this.routeForm.controls.stop.valueChanges.subscribe(value => {
+      if (value && !this.stopSuppressAutocomplete) {
+        this.openRouteServiceService.getAutocompleteSuggestions(value).subscribe(addressAutocompleteSuggestions => {
+          this.stopSuggestions = addressAutocompleteSuggestions.features.slice(0, 5);
+          this.stopShowSuggestions = true;
+        })
+      } else {
+        this.stopSuppressAutocomplete = false;
+      }
+    })
   }
 
   // Logic for start suggestions
@@ -95,6 +121,32 @@ export class RouteInputComponent {
   onStartFocus() {
     if (this.startSuggestions.length > 0) {
       this.startShowSuggestions = true;
+    }
+  }
+
+  // Logic for stop suggestions
+  public stopSuggestions: GeocodeFeature[] = [];
+  public stopShowSuggestions: boolean = false;
+  public stopSuppressAutocomplete: boolean = false;
+
+  onStopSelect(geocodeFeature: GeocodeFeature) {
+    this.geoService.addStop(geocodeFeature);
+    this.stops.push(geocodeFeature);
+    this.stopSuppressAutocomplete = true;
+    this.routeForm.controls.stop.setValue("")
+    this.stopSuggestions = [];
+    this.stopShowSuggestions = false;
+  }
+
+  onStopBlur() {
+    setTimeout(() => {
+      this.stopShowSuggestions = false;
+    }, 100);
+  }
+
+  onStopFocus() {
+    if (this.stopSuggestions.length > 0) {
+      this.stopShowSuggestions = true;
     }
   }
 
@@ -208,6 +260,14 @@ export class RouteInputComponent {
         this.errorService.showError("Alle Felder müssen ausgefüllt sein")
       }
     }
+  }
+
+  onDeleteStop(stop: GeocodeFeature) {
+    const index = this.stops.indexOf(stop);
+    if (index > -1) {
+      this.stops.splice(index, 1);
+    }
+    this.geoService.removeStop(stop);
   }
 
   onSubmit() {

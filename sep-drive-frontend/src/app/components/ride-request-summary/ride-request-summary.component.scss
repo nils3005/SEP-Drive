@@ -56,6 +56,12 @@
   justify-content: center;
 }
 
+.buttonRow {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 .submitButton {
   transition: background-color 0.2s;
   padding: 6px 12px;

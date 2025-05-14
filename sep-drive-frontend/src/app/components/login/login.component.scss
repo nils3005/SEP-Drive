@@ -88,15 +88,24 @@
   align-items: center;
   border: none;
   border-radius: var(--t--borders-radius-rounded-lg, 8px);
-  background: #914141;
+  background: #878787;
   gap: var(--t--spacing-2, 8px);
   align-self: stretch;
   width: 455px;
   /* text */
-  color: var(--d--colors-base-neutral-content, #F9FAFB);
+  color: var(--d--colors-base-neutral-content, #ffffff);
   font-family: Roboto, sans-serif;
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
   line-height: 20px; /* 125% */
+}
+
+#register_button:hover{
+  background: #494545;
+
+}
+
+#register_button:active {
+  font-weight: bold;
 }
