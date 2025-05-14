@@ -1,5 +1,5 @@
 import {Component, inject, Input} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DriveUser} from '../../types';
 import {NgIf} from '@angular/common';
@@ -58,13 +58,7 @@ export class RegistrierungComponent {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64String = (reader.result as string).split(',')[1];
-
-
-        this.registrierungsUser.profilePicture = base64String;
-
-        console.log('Base64 encoded image:', this.registrierungsUser.profilePicture);
-
+        this.registrierungsUser.profilePicture = (reader.result as string).split(',')[1];
       };
       reader.readAsDataURL(file);
     }
@@ -77,11 +71,10 @@ export class RegistrierungComponent {
 
     if(regex.exec(email)==null){
       let el = document.querySelector('#errorMessage')
-
       // @ts-ignore
       el.innerHTML = 'Fehler: E-Mail ungültig!';
     }
-    if (this.registrierungsUser.password!=this.registrierungsUser.wdhpasswort){
+    else if (this.registrierungsUser.password!=this.registrierungsUser.wdhpasswort){
       let el = document.querySelector('#errorMessage')
 
       // @ts-ignore

@@ -56,7 +56,16 @@ li:hover {
 .inputRow {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px; /* optional spacing between elements */
   padding-left: 5px;
   padding-right: 5px;
+}
+
+.stopRow {
+  padding-left: 40px;
+  padding-right: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }

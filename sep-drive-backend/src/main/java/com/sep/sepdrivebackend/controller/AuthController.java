@@ -53,6 +53,8 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (WrongCredentialsException e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (RuntimeException e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
         }
     }
 
@@ -69,7 +71,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping(path = "logout")
+    @PostMapping(path = "/logout")
     public ResponseEntity<String> logout() {
         try{
             authService.incrementTokenId();

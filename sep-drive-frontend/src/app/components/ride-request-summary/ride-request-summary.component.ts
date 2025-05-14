@@ -7,6 +7,7 @@ import {CarType} from '../../enums/car-type';
 import {ErrorService} from "../../services/error/error.service";
 import {Router} from "@angular/router";
 import {BehaviorSubject} from "rxjs";
+import {Util} from "leaflet";
 
 @Component({
   selector: 'app-ride-request-summary',
@@ -30,6 +31,7 @@ export class RideRequestSummaryComponent {
       geoService.showInput.next(false);
     } else {
       this.summaryData = rideRequestService.getRideRequestSummary();
+      console.log(this.summaryData)
     }
     this.checkChanges();
   }
@@ -93,5 +95,11 @@ export class RideRequestSummaryComponent {
     })
   }
 
+  onBack() {
+    this.mapService.resetMap()
+    this.geoService.showInput.next(true);
+  }
+
   protected readonly parseFloat = parseFloat;
+  protected readonly Util = Util;
 }

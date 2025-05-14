@@ -50,11 +50,12 @@ export type User = {
   firstName: string;
   lastName: string;
   email: string;
-  birthDate: string;
-  totalRides: number;
+  birthdate: string;
+  numberOfRides: number;
   ratings: number[];
   carType: string;
   profileImageBase64: string;
+  profilePicture: string;
 }
 
 export type Coordinates = {
@@ -73,6 +74,7 @@ export type RideRequest = {
 
 export type RideRequestSummary = {
   start: string
+  stops: GeocodeFeature[]
   end: string
   distance: number
   duration: number

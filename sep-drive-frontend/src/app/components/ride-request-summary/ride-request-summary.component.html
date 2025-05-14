@@ -7,6 +7,18 @@
             <div class="infoText">{{ summaryData?.start }}</div>
         </div>
     </div>
+    @if (summaryData?.stops) {
+      @for (stop of summaryData?.stops; track stop; let i = $index) {
+        <div class="infoField">
+          <div class="infoLabel">
+            <div class="infoText">Zwischenstopp {{ i + 1 }}</div>
+          </div>
+          <div class="infoData">
+            <div class="infoText">{{ stop.properties.label }}</div>
+          </div>
+        </div>
+      }
+    }
     <div class="infoField">
         <div class="infoLabel">
             <div class="infoText">Ziel</div>
@@ -51,10 +63,17 @@
       </div>
     </div>
     @if (!isSubmitted) {
-        <div class="buttonContainer">
-            <button class="submitButton" (click)="onSubmit()">
-                Bestätigen
-            </button>
+        <div class="buttonRow">
+            <div class="buttonContainer">
+                <button class="cancelButton" (click)="onBack()">
+                    Zurück
+                </button>
+            </div>
+            <div class="buttonContainer">
+                <button class="submitButton" (click)="onSubmit()">
+                    Bestätigen
+                </button>
+            </div>
         </div>
     } @else {
         <div class="buttonContainer">
