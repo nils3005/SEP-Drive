@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormsModule} from '@angular/forms';
 import {HttpClient} from '@angular/common/http';
@@ -12,43 +12,14 @@ import {CommonModule} from '@angular/common';
   styleUrl: './password.component.scss'
 })
 export class PasswordComponent {
-  password: string = '';
-  //hier der username der vorher eingegeben wurde
   username: string = history.state.username;
-  errorMessage: string = "";
-
-
-  constructor(private http: HttpClient,
-              private router: Router) {
-  }
-
+  password: string = '';
+  errorMessage: string = '';
+  router: Router = inject(Router);
 
   onSignIn() {
-    const loginData = {
-      username: this.username,
-      password: this.password
-    };
-
-    //navigationstest
-    //this.router.navigate(['/authentication']);
-
-   /* this.http.post('http://localhost:8080/auth/login', loginData, { responseType: 'text' })
-      .subscribe(response => {
-        console.log('Antwort:', response);
-      }); */
-
-    //gehe zur authenticationseite
-
-    //login daten werden an das backend geschickt
-
-    this.http.post('http://localhost:8080/auth/login', loginData, {responseType: 'text'}).subscribe({
-      next: (response: any) => {
-        //mit dem post wird eine e-mail gesendet
-        this.router.navigate(['authentication'], { state: { username: this.username } }); // zur authentication navigieren, username weiterhin zwischenspeichern
-      },
-      error: (err) => {
-        this.errorMessage = 'Login fehlgeschlagen. Bitte überprüfen Sie Ihre Eingaben.';
-      }
-    });
+    this.router.navigate(['authentication'], { state: {
+      username: this.username, password: this.password }
+    }); // zur authentication navigieren, username und password weiterhin zwischenspeichern
   }
 }

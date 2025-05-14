@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {NavLogoComponent} from '../nav-logo/nav-logo.component';
 import {RouterLink, RouterLinkActive} from "@angular/router";
 import {Observable} from "rxjs";
@@ -18,13 +18,9 @@ import {User} from "../../../types";
   styleUrl: './nav-bar.component.scss'
 })
 export class NavBarComponent {
-  user$: Observable<User|null>;
-  isLoggedIn$: Observable<boolean>;
-
-  constructor(private auth: AuthService) {
-    this.user$ = this.auth.user$;
-    this.isLoggedIn$ = this.auth.isLoggedIn$;
-  }
+  auth: AuthService = inject(AuthService);
+  isLoggedIn$ = this.auth.isLoggedIn$;
+  user$ = this.auth.user$;
 
   logout(): void {
     this.auth.logout();

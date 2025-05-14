@@ -5,7 +5,6 @@ import {AuthenticationComponent} from './components/login/password/authenticatio
 import {SupercodeComponent} from './components/login/password/authentication/supercode/supercode.component';
 import {HomePageComponent} from './pages/home-page/home-page.component';
 import {SocialComponent} from './components/social/social.component';
-import {LogoutComponent} from './components/logout/logout.component';
 import {ProfileComponent} from './components/profile/profile.component';
 import { RegistrierungComponent } from './components/registrierung/registrierung.component';
 
@@ -16,6 +15,5 @@ export const routes: Routes = [{ path: 'login', component: LoginComponent },
   {path: 'supercode', component: SupercodeComponent},
   { path: '', component: HomePageComponent },
   { path: 'social', component: SocialComponent },
-  { path: 'logout', component: LogoutComponent},
   { path: 'social/user/:id', component: ProfileComponent },
   { path: '**', redirectTo: '' }];
