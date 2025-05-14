@@ -93,7 +93,7 @@
   align-self: stretch;
   width: 455px;
   /* text */
-  color: var(--d--colors-base-neutral-content, #4c4646);
+  color: var(--d--colors-base-neutral-content, #ffffff);
   font-family: Roboto, sans-serif;
   font-size: 16px;
   font-style: normal;
@@ -102,8 +102,7 @@
 }
 
 #register_button:hover{
-  background: #393434;
-  color: var(--d--colors-base-neutral-content, #ffffff);
+  background: #494545;
 
 }
 

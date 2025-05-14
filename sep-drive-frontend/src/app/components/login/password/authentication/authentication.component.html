@@ -5,7 +5,7 @@
 <div class="main">
 <div class="login_container">
   <div class="welcome_message">
-    <h1>Willkommen zurück</h1>
+    <h1>Willkommen zurück, {{ username }}!</h1>
   </div>
   <div id="input_code">
     <input id="code" type="text" (keydown.enter)="onVerify()" [(ngModel)]="code">
