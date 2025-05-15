@@ -19,19 +19,34 @@ export class AuthService {
   /** Gibt true zurück, wenn userSubject aktuell einen Wert ≠ null hat */
   public isLoggedIn$: Observable<boolean> = this.user$.pipe(map(u => !!u));
 
-    checkUsername(username: string): Observable<void> {
-        return this.http
-            .post<string>(
-                `${this.api}/checkUsername`,
-                { username, password: ''},
-                { responseType: 'text' as 'json' }
-            )
-            // Mappe den Text auf void, damit Login Observable<void> bekommt
-            .pipe(
-                map(() => {
-                    // Wir werfen das Textergebnis weg
-                })
-            );
+    constructor() {
+        // Wenn beim Start schon ein Token existiert, versuche den User zu laden
+        const existingToken = this.token();
+        if (existingToken) {
+            const username = this.decodeUsernameFromToken(existingToken);
+            if (username) {
+                this.fetchUserByUsername(username)
+                    .subscribe({
+                        next: user => this.userSubject.next(user),
+                        error: () => {
+                            // Token ungültig oder User nicht gefunden => ausloggen
+                            this.clearSession();
+                        }
+                    });
+            } else {
+                // Token-Format falsch => löschen
+                this.clearSession();
+            }
+        }
+    }
+
+    private decodeUsernameFromToken(token: string): string | null {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.sub ?? null;
+        } catch {
+            return null;
+        }
     }
 
     login(credentials: { username: string; password: string }): Observable<string> {
@@ -66,24 +81,53 @@ export class AuthService {
                     return throwError(() => new Error(msg));
                 }),
                 tap(token => {
-                    this.token.set(token);
-                    localStorage.setItem('jwt', token);
-                }),
-                switchMap(() => this.fetchUserByUsername(username)),
-                tap(user => {
-                    this.userSubject.next(user);
-                    this.router.navigate(['/']);
+                    this.setSession(token, username);
                 }),
                 map(() => undefined)
             );
     }
 
+
     logout(): void {
         this.http.get<void>(`${this.api}/logout`);
+        this.clearSession();
+        this.router.navigate(['/login']);
+    }
+
+    private clearSession() {
         localStorage.removeItem('jwt');
         this.token.set(null);
         this.userSubject.next(null);
-        this.router.navigate(['/login']);
+    }
+
+    private setSession(token: string, username: string) {
+        this.token.set(token);
+        localStorage.setItem('jwt', token);
+        this.fetchUserByUsername(username)
+            .subscribe({
+                next: user => {
+                    this.userSubject.next(user);
+                    this.router.navigate(['/']);
+                },
+                error: () => {
+                    this.clearSession();
+                }
+            });
+    }
+
+    checkUsername(username: string): Observable<void> {
+        return this.http
+            .post<string>(
+                `${this.api}/checkUsername`,
+                { username, password: ''},
+                { responseType: 'text' as 'json' }
+            )
+            // Mappe den Text auf void, damit Login Observable<void> bekommt
+            .pipe(
+                map(() => {
+                    // Wir werfen das Textergebnis weg
+                })
+            );
     }
 
     private fetchUserByUsername(username: string): Observable<User> {
