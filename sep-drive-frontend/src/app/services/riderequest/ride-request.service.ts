@@ -135,7 +135,8 @@ export class RideRequestService {
 
   public getRideRequestSummary(): RideRequestSummary | null
   {
-    if (this.geoService.waypoints.getValue().length > 1 && this.geoService.route.getValue() && this.geoService.carType.getValue()) {
+    const carType = this.geoService.carType.getValue();
+    if (this.geoService.waypoints.getValue().length > 1 && this.geoService.route.getValue() && carType) {
       let jsonRoute: GeoJsonRoute = this.geoService.route.getValue();
       let waypointsLength = this.geoService.waypoints.getValue().length;
       let stops = this.geoService.waypoints.getValue().slice(1, waypointsLength - 1);
@@ -147,7 +148,7 @@ export class RideRequestService {
         distance: parseFloat((jsonRoute.features[0].properties.summary.distance / 1000).toFixed(2)),
         duration: parseFloat((jsonRoute.features[0].properties.summary.duration / 60).toFixed(2)),
         price: 0,
-        carType: this.geoService.carType.getValue() ?? CarType.MEDIUM
+        carType: carType
       };
     }
     return null;

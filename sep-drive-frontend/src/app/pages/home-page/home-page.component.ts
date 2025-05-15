@@ -29,7 +29,7 @@ export class HomePageComponent implements OnInit {
       private userService: UserService
   ) {}
 
-  public showOnlyMap = true;
+  public showOnlyMap = false;
   public isSubmitted = true;
 
   ngOnInit(): void {

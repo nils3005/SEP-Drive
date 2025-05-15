@@ -22,7 +22,7 @@ export class RouteInputComponent {
   public useStopCoordinates = false;
   public checkedStopCords = false;
 
-  public showStopInput = false
+  public showStopInput = false;
   public stops: GeocodeFeature[] = [];
 
   public routeForm = new FormGroup({
