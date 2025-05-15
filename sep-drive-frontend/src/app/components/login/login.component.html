@@ -11,11 +11,9 @@
   <div class="error">
     <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
   </div>
-  <div class="sign_in"></div>
-    @if (errorMessage) {
-        <span>{{ errorMessage }}</span>
-    }
+  <div class="sign_in">
   <button (click)="onSignIn()"  id="sign_in_button">Sign in</button>
+  </div>
   <div class="register">
     <button (click)="toRegister()" id="register_button">Noch nicht registriert?</button>
   </div>
