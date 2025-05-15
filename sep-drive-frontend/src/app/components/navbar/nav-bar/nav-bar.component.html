@@ -12,9 +12,11 @@
                 </li>
 
                 <!-- Link zur Social-Seite -->
-                <li>
-                    <a routerLink="/social" routerLinkActive="active">Social</a>
-                </li>
+                @if (isLoggedIn$ | async) {
+                    <li>
+                        <a routerLink="/social" routerLinkActive="active">Social</a>
+                    </li>
+                }
             </ul>
         </div>
         <div id="innerNavbar-right">
