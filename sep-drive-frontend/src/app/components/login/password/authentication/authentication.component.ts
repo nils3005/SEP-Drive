@@ -16,6 +16,7 @@ export class AuthenticationComponent {
   private auth = inject(AuthService);
   private router: Router = inject(Router);
   errorMessage = '';
+  resendMessage: string = '';
 
   code: string = '';
   username: string = history.state.username;
@@ -39,4 +40,17 @@ export class AuthenticationComponent {
     this.router.navigate(['/password']);
   }
 
+  onResend(){
+    this.auth.login({username: this.username, password: this.password})
+      .subscribe({
+        next: _ => {
+          this.resendMessage = 'Bestätigungs-Code wurde erneut per E-Mail versendet.';
+        },
+        error: err => {
+          this.errorMessage = 'E-Mail konnte nicht gesendet werden.';
+        }
+      });
+  }
 }
+
+
