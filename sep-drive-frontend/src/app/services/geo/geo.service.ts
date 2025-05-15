@@ -50,7 +50,7 @@ export class GeoService {
   public updateStart(start: GeocodeFeature): void
   {
     let tempWaypoints = this.waypoints.getValue();
-    tempWaypoints.splice(0, 0, start);
+    tempWaypoints[0] = start;
     this.waypoints.next(tempWaypoints);
     this.currentPoint.next(start);
   }
@@ -58,7 +58,10 @@ export class GeoService {
   public updateDestination(destination: GeocodeFeature): void
   {
     let tempWaypoints = this.waypoints.getValue();
-    tempWaypoints.splice(tempWaypoints.length, 0, destination);
+    if (tempWaypoints.length <= 1) {
+      tempWaypoints[1] = destination;
+    }
+    tempWaypoints[tempWaypoints.length - 1] = destination;
     this.waypoints.next(tempWaypoints);
     this.currentPoint.next(destination);
   }
