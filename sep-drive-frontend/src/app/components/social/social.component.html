@@ -1,41 +1,56 @@
-<div class="search-container">
-    <input
-            type="text"
-            placeholder="Username"
-            [ngModel]="searchTerm()"
-            (ngModelChange)="searchTerm.set($event)"
-            class="search-input"
-    />
-</div>
-
-@if (filteredUsers().length === 0) {
-    <div class="no-result">
-        Es wurde kein Benutzer mit diesem Namen gefunden.
+@if (isLoggedIn$ | async) {
+    <div class="search-container">
+        <input
+                type="text"
+                placeholder="Username"
+                [ngModel]="searchTerm()"
+                (ngModelChange)="searchTerm.set($event)"
+                class="search-input"
+        />
     </div>
 }
 
-<div class="user-list">
-    @for(user of filteredUsers(); track user.id) {
-        <div class="user-card">
-            <div class="user-card-avatar">
-                @if (user.profilePicture) {
-                    <img
-                            [src]="'data:image/png;base64,' + user.profilePicture"
-                            alt="Profilbild {{ user.username }}"
-                            class="avatar-img"
-                    />
-                } @else {
-                    <i class="fa fa-user"></i>
-                }
-            </div>
-            <div>
-                <span class="user-card-name">{{ user.username }}</span>
-            </div>
-            <div class="user-card-action">
-                <a [routerLink]="['/social/user', user.id]">
-                    <i class="fa fa-chevron-right"></i>
-                </a>
-            </div>
+@if (filteredUsers().length === 0) {
+    @if (isLoggedIn$ | async) {
+        <div class="no-result">
+            Es wurde kein Benutzer mit diesem Namen gefunden.
         </div>
+        }
     }
-</div>
+
+@if (isLoggedIn$ | async) {
+    <div class="user-list">
+        @for(user of filteredUsers(); track user.id) {
+            <div class="user-card">
+                <a [routerLink]="['/social/user', user.id]">
+                    <div class="user-card-avatar">
+                        @if (user.profilePicture) {
+                            <img
+                                    [src]="'data:image/png;base64,' + user.profilePicture"
+                                    alt="Profilbild {{ user.username }}"
+                                    class="avatar-img"
+                            />
+                        } @else {
+                            <i class="fa fa-user"></i>
+                        }
+                    </div>
+                </a>
+                    <div class="user-card-name-container">
+                        <a [routerLink]="['/social/user', user.id]">
+                        <span class="user-card-name">{{ user.username }}</span>
+                        </a>
+                    </div>
+                <div class="user-card-action">
+                    <a [routerLink]="['/social/user', user.id]">
+                        <i class="fa fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+} @else {
+    <div class="not-logged-in">
+        Logge dich ein, um das Socialboard zu sehen.
+    </div>
+}
+

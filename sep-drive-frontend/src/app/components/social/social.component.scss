@@ -14,7 +14,7 @@
   background-color: #f0f0f0;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
-  gap: 1rem;
+  gap: 1.25rem;
   max-width: 500px;
   min-width: 500px;
 }
@@ -42,6 +42,16 @@
   font-family: Roboto, 'sans-serif';
   font-size: 1rem;
   color: #222;
+}
+
+.user-card-name-container {
+  display: inline-flex;
+  align-items: center;
+}
+
+.name-link {
+  text-decoration: none;
+  color: inherit;
 }
 
 .user-card-action a {
@@ -81,4 +91,14 @@
 .no-result {
   font-family: Roboto, 'sans-serif';
   text-align: center;
+}
+
+.not-logged-in {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-top: 200px;
+  font-size: 1.25rem;
+  color: #555;
 }
