@@ -65,7 +65,7 @@ export class RegistrierungComponent {
     }
   }
   onSubmit() {
-    const regex = /.*@.*\..*/;
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     // @ts-ignore
     const email :string= this.registrierungsUser.email;
