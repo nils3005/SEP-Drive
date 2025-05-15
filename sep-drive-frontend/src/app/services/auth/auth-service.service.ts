@@ -4,7 +4,7 @@ import {BehaviorSubject, Observable, map, tap, catchError, throwError, switchMap
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {User} from "../../types";
 import {Router} from "@angular/router";
-import {UserServiceService} from "../user/user-service.service";
+import {UserService} from "../user/user.service";
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -14,7 +14,7 @@ export class AuthService {
   private api: string = 'http://localhost:8080/auth';
   private userAPI: string = 'http://localhost:8080/users/username';
   private router: Router = inject(Router);
-  private userService: UserServiceService = inject(UserServiceService);
+  private userService: UserService = inject(UserService);
   public token = signal<string | null>(localStorage.getItem('jwt'));
   /** Gibt true zurück, wenn userSubject aktuell einen Wert ≠ null hat */
   public isLoggedIn$: Observable<boolean> = this.user$.pipe(map(u => !!u));

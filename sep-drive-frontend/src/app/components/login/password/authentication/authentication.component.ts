@@ -22,7 +22,6 @@ export class AuthenticationComponent {
   password: string = history.state.password;
 
   onVerify() {
-    console.log('Hello from authentication component ', this.username, this.password, this.code);
     this.auth
         .verify(this.username, this.code)
         .subscribe({

@@ -8,7 +8,7 @@ import {GeoService} from "../../services/geo/geo.service";
 import {RideRequestSummary} from "../../types";
 import {ErrorService} from "../../services/error/error.service";
 import {BehaviorSubject} from "rxjs";
-import {UserServiceService} from "../../services/user/user-service.service";
+import {UserService} from "../../services/user/user.service";
 import {jwtDecode} from "jwt-decode";
 
 @Component({
@@ -26,7 +26,7 @@ export class HomePageComponent implements OnInit {
   constructor(
       public rideRequestService: RideRequestService,
       public geoService: GeoService,
-      private userService: UserServiceService
+      private userService: UserService
   ) {}
 
   public showOnlyMap = true;

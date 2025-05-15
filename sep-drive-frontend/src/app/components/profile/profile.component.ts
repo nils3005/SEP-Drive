@@ -1,6 +1,6 @@
 import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
-import {UserServiceService} from "../../services/user/user-service.service";
+import {UserService} from "../../services/user/user.service";
 import {FormsModule} from "@angular/forms";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {User} from "../../types";
@@ -16,7 +16,7 @@ import {User} from "../../types";
 })
 export class ProfileComponent implements OnInit{
   private route = inject(ActivatedRoute);
-  private userService = inject(UserServiceService);
+  private userService = inject(UserService);
 
   user = signal<User | null>(null);
 

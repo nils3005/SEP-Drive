@@ -1,5 +1,5 @@
 import {Component, computed, inject, OnInit, signal} from '@angular/core';
-import {UserServiceService} from "../../services/user/user-service.service";
+import {UserService} from "../../services/user/user.service";
 import {FormsModule} from "@angular/forms";
 import {RouterLink} from "@angular/router";
 import {User} from "../../types";
@@ -14,7 +14,7 @@ import {User} from "../../types";
   styleUrl: './social.component.scss'
 })
 export class SocialComponent implements OnInit {
-  private userService = inject(UserServiceService);
+  private userService = inject(UserService);
   users = signal<User[]>([]);
   searchTerm = signal<string>('');
 
