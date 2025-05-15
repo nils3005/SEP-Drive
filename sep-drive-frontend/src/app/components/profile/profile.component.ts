@@ -1,9 +1,10 @@
-import {Component, computed, inject, OnInit, signal} from '@angular/core';
+import {Component, computed, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {UserService} from "../../services/user/user.service";
 import {FormsModule} from "@angular/forms";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {User} from "../../types";
+import {Subject, switchMap, takeUntil} from "rxjs";
 
 @Component({
   selector: 'app-profile',
@@ -14,11 +15,32 @@ import {User} from "../../types";
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
-export class ProfileComponent implements OnInit{
+export class ProfileComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private userService = inject(UserService);
+  private destroy = new Subject<void>();
 
   user = signal<User | null>(null);
+
+  ngOnInit(): void {
+    this.route.paramMap
+        .pipe(
+            takeUntil(this.destroy),
+            switchMap(params => {
+              const id = Number(params.get('id'));
+              return this.userService.getUserById(id);
+            })
+        )
+        .subscribe({
+          next: u => this.user.set(u),
+          error: err => console.error('Fehler beim Laden des Profils:', err)
+        });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy.next();
+    this.destroy.complete();
+  }
 
   averageRating = computed(() => {
     const u = this.user();
@@ -39,12 +61,4 @@ export class ProfileComponent implements OnInit{
     }
   }
 
-  ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.userService.getUserById(id).subscribe(u => {
-      if (u) {
-        this.user.set(u);
-      }
-    });
-  }
 }
