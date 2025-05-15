@@ -28,12 +28,14 @@ public class JwtService {
     public String generateToken(String username) {
         User user = userService.findByUsername(username);
         String tokenId = user==null ? "-1" : Integer.toString(user.getTokenId());
+        String role = user==null ? "" : user.getRole().toString();
         Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis()+expirationTime))
-                .id(tokenId)
+                .claim("tokenId", tokenId)
+                .claim("role", role)
                 .signWith(key)
                 .compact();
     }
@@ -58,6 +60,6 @@ public class JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        return tokenId.equals(jwtParser.getId()) && !jwtParser.getExpiration().before(new Date());
+        return tokenId.equals(jwtParser.get("tokenId")) && !jwtParser.getExpiration().before(new Date());
     }
 }

@@ -94,7 +94,7 @@ public class AuthService {
     public void incrementTokenId() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
-        if(user == null) {throw new RuntimeException("Username already logged out!");}
+        if(user == null) {throw new RuntimeException("No user to log out!");}
         int newTokenId = user.getTokenId()+1;
         user.setTokenId(newTokenId);
         userService.save(user);
