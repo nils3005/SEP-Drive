@@ -16,7 +16,7 @@ export class JwtInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     const url = request.url;
 
-    if (url.startsWith('http://localhost') && !url.includes('auth')) {
+    if (url.startsWith('http://localhost') && (!url.includes('auth')) || url.includes('logout')){
       const jwt = localStorage.getItem('jwt');
       if (jwt) {
         //klont die anfrage und schickt dem server den token
