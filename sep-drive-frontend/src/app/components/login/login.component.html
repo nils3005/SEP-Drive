@@ -8,10 +8,9 @@
     <h1>Wie lautet dein Benutzername?</h1>
   </div>
     <input id="username" type="text" (keydown.enter)="onSignIn()" [(ngModel)]="username" placeholder="Benutzername">
-  <div class="sign_in"></div>
-    @if (errorMessage) {
-        <span>{{ errorMessage }}</span>
-    }
+  <div class="error">
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+  </div>
   <button (click)="onSignIn()"  id="sign_in_button">Sign in</button>
   <div class="register">
     <button (click)="toRegister()" id="register_button">Noch nicht registriert?</button>

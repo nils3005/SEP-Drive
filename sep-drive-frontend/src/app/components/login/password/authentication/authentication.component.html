@@ -8,16 +8,17 @@
     <h1>Willkommen zurück, {{ username }}!</h1>
   </div>
   <div id="input_code">
-    <input id="code" type="text" (keydown.enter)="onVerify()" [(ngModel)]="code">
+    <input id="code" type="text" (keydown.enter)="onVerify()" [maxlength]="4" [(ngModel)]="code">
   </div>
-  <div class="error">
+  <div class="message">
     <p *ngIf="errorMessage" class="errorMessage">{{ errorMessage }}</p>
+    <p *ngIf="resendMessage" class="errorMessage">{{ resendMessage }}</p>
   </div>
   <div class="tip">
     <p>Tipp: Überprüfe deinen Posteingang und deinen Spam-Ordner</p>
   </div>
   <div class="resend">
-   <button id="resend">Code erneut versenden</button>
+   <button id="resend" (click)="onResend()">Code erneut versenden</button>
   </div>
   <div class="supercode">
     <button id="supercode" (click)="toSuperCode()">Stadtdessen Super-Code eingeben</button>
