@@ -53,6 +53,8 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (WrongCredentialsException e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (EmailFailureException e){
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body("Login successful, but couldnt send email!");
         } catch (RuntimeException e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
         }

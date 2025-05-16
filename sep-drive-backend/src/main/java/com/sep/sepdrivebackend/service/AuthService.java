@@ -43,7 +43,11 @@ public class AuthService {
         if(!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {throw new WrongCredentialsException("Wrong password!");}
         user.setVerificationCode(generateCode());
         userService.save(user);
-        emailService.sendVerificationEmail(user.getEmail(), user.getVerificationCode());
+        try{
+            emailService.sendVerificationEmail(user.getEmail(), user.getVerificationCode());
+        } catch(Exception e) {
+            throw new EmailFailureException("Failure when trying to send an email");
+        }
     }
 
     public void registerUser(RegisterDto registerDto) {
