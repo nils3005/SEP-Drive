@@ -20,7 +20,7 @@ export class SupercodeComponent {
   auth: AuthService = inject(AuthService);
 
   backToAuthentication(){
-    this.router.navigate(['/authentication']);
+    this.router.navigate(['/authentication'], {state: {username: this.username, password: this.password}});
   }
 
   onVerify() {

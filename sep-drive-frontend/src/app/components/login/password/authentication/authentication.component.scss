@@ -94,33 +94,6 @@
   font-weight: bold;
 }
 
-#supercode {
-  display: flex;
-  padding: var(--t--spacing-1, 4px) var(--t--spacing-2, 8px);
-  justify-content: center;
-  align-items: center;
-  gap: var(--t--spacing-2, 8px);
-  border: none;
-  border-radius: var(--t--borders-radius-rounded-full, 9999px);
-  background: #F3F4F6;
-  /* text */
-  color: var(--d--colors-base-base-content, #1F2937);
-  /* 🌼 DaisyUI/text-xs */
-  font-family: Roboto, sans-serif;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 16px; /* 133.333% */
-}
-
-#supercode:hover{
-  background: lightslategray;
-  color: var(--d--colors-base-base-content, #FFF);
-}
-
-#supercode:active{
-  font-weight: bold;
-}
 
 #back{
   width: 40px;

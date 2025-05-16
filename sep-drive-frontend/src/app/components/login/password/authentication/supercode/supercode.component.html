@@ -5,7 +5,7 @@
       <h1>Bitte gib den Supercode ein.</h1>
     </div>
     <div id="input_code">
-      <input id="code" type="text" [maxlength]="4" [(ngModel)]="code">
+      <input id="code" type="text" [maxlength]="4" [(ngModel)]="code" autofocus>
     </div>
     <div class="error">
       <p *ngIf="errorMessage" class="errorMessage">{{ errorMessage }}</p>

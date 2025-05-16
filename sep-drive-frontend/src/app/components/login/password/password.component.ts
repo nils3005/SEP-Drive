@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, inject, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormsModule} from '@angular/forms';
 import {HttpClient} from '@angular/common/http';
@@ -12,10 +12,11 @@ import {AuthService} from "../../../services/auth/auth-service.service";
   templateUrl: './password.component.html',
   styleUrl: './password.component.scss'
 })
-export class PasswordComponent {
+export class PasswordComponent implements AfterViewInit{
   username: string = history.state.username;
   password: string = '';
   errorMessage: string = '';
+  @ViewChild('passwordInput') passwordInput!: ElementRef<HTMLInputElement>;
   router: Router = inject(Router);
   auth: AuthService = inject(AuthService);
 
@@ -35,5 +36,10 @@ export class PasswordComponent {
           }
         });
   }
+
+  ngAfterViewInit() {
+    this.passwordInput.nativeElement.focus();
+  }
+
 
 }

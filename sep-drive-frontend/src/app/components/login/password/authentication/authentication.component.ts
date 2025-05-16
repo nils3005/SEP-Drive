@@ -1,4 +1,4 @@
-import {Component, inject, signal} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, inject, signal, ViewChild} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
@@ -12,9 +12,10 @@ import {AuthService} from "../../../../services/auth/auth-service.service";
   templateUrl: './authentication.component.html',
   styleUrl: './authentication.component.scss'
 })
-export class AuthenticationComponent {
+export class AuthenticationComponent implements AfterViewInit{
   private auth = inject(AuthService);
   private router: Router = inject(Router);
+  @ViewChild('codeInput') codeInput!: ElementRef<HTMLInputElement>;
   errorMessage = '';
   resendMessage: string = '';
 
@@ -50,6 +51,10 @@ export class AuthenticationComponent {
           this.errorMessage = 'E-Mail konnte nicht gesendet werden.';
         }
       });
+  }
+
+  ngAfterViewInit() {
+    this.codeInput.nativeElement.focus();
   }
 }
 
