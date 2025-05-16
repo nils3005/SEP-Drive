@@ -34,7 +34,7 @@
 
             @if (user()?.carType) {
                 <label>Autoklasse</label>
-                <input type="text" [value]="user()?.carType">
+                <input type="text" [value]="user()!.carType">
             }
         </div>
     </div>
@@ -43,7 +43,7 @@
         @if (user()?.profilePicture) {
             <img
                     [src]="'data:image/png;base64,' + user()!.profilePicture"
-                    alt="Profilbild {{ user()?.username }}"
+                    alt="Profilbild {{ user()!.username }}"
                     class="avatar-img"
             />
         } @else {

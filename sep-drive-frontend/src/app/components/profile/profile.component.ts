@@ -3,8 +3,8 @@ import {ActivatedRoute} from "@angular/router";
 import {UserService} from "../../services/user/user.service";
 import {FormsModule} from "@angular/forms";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
-import {User} from "../../types";
-import {Subject, switchMap, takeUntil} from "rxjs";
+import {switchMap} from "rxjs";
+import {toSignal} from "@angular/core/rxjs-interop";
 
 @Component({
   selector: 'app-profile',
@@ -15,33 +15,26 @@ import {Subject, switchMap, takeUntil} from "rxjs";
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
-export class ProfileComponent implements OnInit, OnDestroy {
+export class ProfileComponent {
   private route = inject(ActivatedRoute);
   private userService = inject(UserService);
-  private destroy = new Subject<void>();
 
-  user = signal<User | null>(null);
+  // Macht aus dem RxJS-Observable ein Angular Signal
+  user = toSignal(
+      this.route.paramMap.pipe(
+          switchMap(params => this.userService.getUserById(
+              // Wandelt die Pathvariable id von social/user/{id} in type number um
+              +params.get('id')!
+          ))
+      ),
+      { initialValue: null }
+  );
 
-  ngOnInit(): void {
-    this.route.paramMap
-        .pipe(
-            takeUntil(this.destroy),
-            switchMap(params => {
-              const id = Number(params.get('id'));
-              return this.userService.getUserById(id);
-            })
-        )
-        .subscribe({
-          next: u => this.user.set(u),
-          error: err => console.error('Fehler beim Laden des Profils:', err)
-        });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy.next();
-    this.destroy.complete();
-  }
-
+  /**
+   * @brief berechnet den Durchschnitt aller Ratings.
+   *
+   * @return signal vom Durchschnitt.
+   */
   averageRating = computed(() => {
     const u = this.user();
     if (!u || !u.ratings?.length) {
@@ -51,6 +44,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return sum / u.ratings.length;
   });
 
+  /**
+   * @brief Gibt die CSS Klasse für den entsprechenden Durchschnitt zurück.
+   *
+   * @param rating - der Durchschnitt aller Ratings.
+   * @param star - der Index des Sterns, dem eine CSS Klasse zugeordnet werden soll.
+   *
+   * @return die CSS Klasse von Fontawesome.
+   */
   averageClass(rating: number, star: number): string {
     if (rating >= star) {
       return 'fas fa-star';                 // voller Stern
