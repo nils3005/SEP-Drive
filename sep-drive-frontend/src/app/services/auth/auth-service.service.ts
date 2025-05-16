@@ -116,6 +116,42 @@ export class AuthService {
     }
 
     /**
+     * @brief Sendet eine Register Request an den AuthController.
+     *
+     * @param username
+     * @param firstName
+     * @param lastName
+     * @param email
+     * @param rolle
+     * @param password
+     * @param birthDate
+     * @param profilePicture
+     * @param carType
+     *
+     * @return Observable
+     */
+    register(username: string, firstName: string, lastName: string, email: string,
+             rolle: string, password: string, birthDate: string, profilePicture: string,
+             carType: string): Observable<string> {
+        return this.http.post(`${this.api}/register`,
+            {
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                password: password,
+                username: username,
+                birthDate: birthDate,
+                profilePicture: profilePicture,
+                carType: carType,
+                role: rolle
+            },
+            {
+                responseType: 'text'
+            }
+        )
+    }
+
+    /**
      * @brief Sendet eine Request an den AuthController, um zu prüfen, ob der username existiert.
      *
      * @param username - der username des eingeloggten Users

@@ -5,6 +5,7 @@ import {DriveUser} from '../../types';
 import {NgIf} from '@angular/common';
 import {Router} from '@angular/router';
 import {ErrorService} from "../../services/error/error.service";
+import {AuthService} from "../../services/auth/auth-service.service";
 
 @Component({
   selector: 'app-registrierung',
@@ -31,13 +32,8 @@ export class RegistrierungComponent {
   @Input() carType: any;
 
   private errorMessage = inject(ErrorService);
-
-  private http = inject(HttpClient);
+  private auth: AuthService = inject(AuthService);
   registrierungsUser: DriveUser;
-
-
-
-
 
   constructor(private router: Router) {
     this.registrierungsUser = {
@@ -80,39 +76,27 @@ export class RegistrierungComponent {
       this.errorMessage.showError ('Die eingegebenen Passwörter stimmen nicht überein!');
     }
     else{
-      this.http.post('http://localhost:8080/auth/register',
-        {
-          username: this.registrierungsUser.username,
-          firstName: this.registrierungsUser.firstName,
-          lastName: this.registrierungsUser.lastName,
-          email: this.registrierungsUser.email,
-          role: this.registrierungsUser.rolle,
-          birthDate: this.registrierungsUser.birthDate,
-          password: this.registrierungsUser.password,
-          profilePicture: this.registrierungsUser.profilePicture,
-          carType: this.registrierungsUser.carType
-        },
-        {
-          //headers: new HttpHeaders({"Content-Type": "application/json"}),
-          responseType: 'text'
-        }
-      ).subscribe({
-        next: () => {
-          console.log("Registrierung erfolgreich")
-          this.router.navigate(['/login'])
-        },
-        error: (error) => {
-          console.log(error);
-          this.errorMessage.showError (error.error);
-        }
-      });
-
-
-
-
-
-
     }
+    this.auth.register(
+        this.registrierungsUser.username,
+        this.registrierungsUser.firstName,
+        this.registrierungsUser.lastName,
+        this.registrierungsUser.email,
+        this.registrierungsUser.rolle,
+        this.registrierungsUser.password,
+        this.registrierungsUser.birthDate,
+        this.registrierungsUser.profilePicture,
+        this.registrierungsUser.carType
+    ).subscribe({
+      next: () => {
+        console.log("Registrierung erfolgreich")
+        this.router.navigate(['/login'])
+      },
+      error: (error) => {
+        console.log(error);
+        this.errorMessage.showError (error.error);
+      }
+    });
   }
 
 }
