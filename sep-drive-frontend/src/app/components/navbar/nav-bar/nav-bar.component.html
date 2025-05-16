@@ -12,7 +12,7 @@
                 </li>
 
                 <!-- Link zur Social-Seite -->
-                @if (isLoggedIn$ | async) {
+                @if (isLoggedIn()) {
                     <li>
                         <a routerLink="/social" routerLinkActive="active">Social</a>
                     </li>
@@ -22,7 +22,7 @@
         <div id="innerNavbar-right">
             <ul class="navItems">
                 <!-- Login-Link (nur wenn nicht eingeloggt) -->
-                @if (!(isLoggedIn$ | async)){
+                @if (!(isLoggedIn())){
                     <li>
                         <a routerLink="/login" routerLinkActive="active">Login</a>
                     </li>
@@ -32,16 +32,16 @@
                     </li>
                 }
 
-                @if (user$ | async; as user) {
+                @if (user()) {
                     <li>
                         <a
-                                [routerLink]="['/social/user', user.id]"
+                                [routerLink]="['/social/user', user()!.id]"
                                 routerLinkActive="active"
                                 class="profile-link"
                         >
-                            @if (user.profilePicture) {
+                            @if (user()!.profilePicture) {
                                 <img
-                                        [src]="'data:image/png;base64,' + user.profilePicture"
+                                        [src]="'data:image/png;base64,' + user()!.profilePicture"
                                         alt="Profilbild"
                                         class="profile-img"
                                 />

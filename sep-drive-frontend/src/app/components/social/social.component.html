@@ -1,4 +1,4 @@
-@if (isLoggedIn$ | async) {
+@if (isLoggedIn()) {
     <div class="search-container">
         <input
                 type="text"
@@ -11,14 +11,14 @@
 }
 
 @if (filteredUsers().length === 0) {
-    @if (isLoggedIn$ | async) {
+    @if (isLoggedIn()) {
         <div class="no-result">
             Es wurde kein Benutzer mit diesem Namen gefunden.
         </div>
         }
     }
 
-@if (isLoggedIn$ | async) {
+@if (isLoggedIn()) {
     <div class="user-list">
         @for(user of filteredUsers(); track user.id) {
             <div class="user-card">

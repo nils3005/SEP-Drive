@@ -12,11 +12,12 @@ import {AuthService} from "../../services/auth/auth-service.service";
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
-  username: string ='';
-  errorMessage: string='';
-  router: Router = inject(Router);
-  http: HttpClient = inject(HttpClient);
-  auth: AuthService = inject(AuthService);
+    router: Router = inject(Router);
+    http: HttpClient = inject(HttpClient);
+    auth: AuthService = inject(AuthService);
+
+    username: string ='';
+    errorMessage: string='';
 
     onSignIn() {
         this.auth.checkUsername(this.username).subscribe({
