@@ -1,26 +1,22 @@
 import {Component, inject} from '@angular/core';
 import {NavLogoComponent} from '../nav-logo/nav-logo.component';
 import {RouterLink, RouterLinkActive} from "@angular/router";
-import {Observable} from "rxjs";
 import {AuthService} from "../../../services/auth/auth-service.service";
-import {AsyncPipe} from "@angular/common";
-import {User} from "../../../types";
 
 @Component({
   selector: 'app-nav-bar',
   imports: [
     NavLogoComponent,
     RouterLinkActive,
-    RouterLink,
-    AsyncPipe
+    RouterLink
   ],
   templateUrl: './nav-bar.component.html',
   styleUrl: './nav-bar.component.scss'
 })
 export class NavBarComponent {
   auth: AuthService = inject(AuthService);
-  isLoggedIn$ = this.auth.isLoggedIn$;
-  user$ = this.auth.user$;
+  isLoggedIn = this.auth.isLoggedIn;
+  user = this.auth.user;
 
   logout(): void {
     this.auth.logout();

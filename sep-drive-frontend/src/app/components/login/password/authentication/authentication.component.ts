@@ -15,8 +15,8 @@ import {AuthService} from "../../../../services/auth/auth-service.service";
 export class AuthenticationComponent {
   private auth = inject(AuthService);
   private router: Router = inject(Router);
-  errorMessage = '';
 
+  errorMessage = '';
   code: string = '';
   username: string = history.state.username;
   password: string = history.state.password;
