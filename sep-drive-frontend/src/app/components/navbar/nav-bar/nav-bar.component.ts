@@ -1,12 +1,10 @@
 import {Component, inject} from '@angular/core';
-import {NavLogoComponent} from '../nav-logo/nav-logo.component';
 import {RouterLink, RouterLinkActive} from "@angular/router";
 import {AuthService} from "../../../services/auth/auth-service.service";
 
 @Component({
   selector: 'app-nav-bar',
   imports: [
-    NavLogoComponent,
     RouterLinkActive,
     RouterLink
   ],
