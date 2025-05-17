@@ -14,7 +14,7 @@ import {AuthService} from "../../../services/auth/auth-service.service";
 })
 export class PasswordComponent implements AfterViewInit{
   username: string = history.state.username;
-  password: string = '';
+  password: string = history.state.password;
   errorMessage: string = '';
   @ViewChild('passwordInput') passwordInput!: ElementRef<HTMLInputElement>;
   router: Router = inject(Router);

@@ -33,12 +33,12 @@ export class AuthenticationComponent implements AfterViewInit{
         });
   }
 
-  toSuperCode() {
-    this.router.navigate(['/supercode'], {state: {username: this.username, password: this.password}});
-  }
-
   toPassword() {
-    this.router.navigate(['/password']);
+    this.router.navigate(['/password'],{
+        state: {
+            username: this.username,
+        }
+    });
   }
 
   onResend(){
