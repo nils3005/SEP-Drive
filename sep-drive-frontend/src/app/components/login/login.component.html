@@ -7,7 +7,7 @@
   <div class="question">
     <h1>Wie lautet dein Benutzername?</h1>
   </div>
-    <input id="username" type="text" (keydown.enter)="onSignIn()" [(ngModel)]="username" placeholder="Benutzername">
+    <input  #usernameInput id="username" type="text" (keydown.enter)="onSignIn()" [(ngModel)]="username" placeholder="Benutzername">
   <div class="error">
     <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
   </div>

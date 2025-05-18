@@ -1,19 +1,17 @@
 import {Component, inject} from '@angular/core';
-import {NavLogoComponent} from '../nav-logo/nav-logo.component';
 import {RouterLink, RouterLinkActive} from "@angular/router";
-import {AuthService} from "../../../services/auth/auth-service.service";
+import {AuthService} from "../../services/auth/auth-service.service";
 
 @Component({
   selector: 'app-nav-bar',
   imports: [
-    NavLogoComponent,
     RouterLinkActive,
     RouterLink
   ],
-  templateUrl: './nav-bar.component.html',
-  styleUrl: './nav-bar.component.scss'
+  templateUrl: './navbar.component.html',
+  styleUrl: './navbar.component.scss'
 })
-export class NavBarComponent {
+export class NavbarComponent {
   auth: AuthService = inject(AuthService);
   isLoggedIn = this.auth.isLoggedIn;
   user = this.auth.user;

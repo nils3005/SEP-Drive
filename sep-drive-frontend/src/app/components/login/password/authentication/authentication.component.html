@@ -8,7 +8,7 @@
     <h1>Willkommen zurück, {{ username }}!</h1>
   </div>
   <div id="input_code">
-    <input id="code" type="text" (keydown.enter)="onVerify()" [maxlength]="4" [(ngModel)]="code">
+    <input #codeInput id="code" type="text" (keydown.enter)="onVerify()" [maxlength]="4" [(ngModel)]="code" autofocus>
   </div>
   <div class="message">
     <p *ngIf="errorMessage" class="errorMessage">{{ errorMessage }}</p>
@@ -19,9 +19,6 @@
   </div>
   <div class="resend">
    <button id="resend" (click)="onResend()">Code erneut versenden</button>
-  </div>
-  <div class="supercode">
-    <button id="supercode" (click)="toSuperCode()">Stadtdessen Super-Code eingeben</button>
   </div>
   <div class="button_group">
     <button id="back" (click)="toPassword()"><i class="fa-solid fa-arrow-left" style="color: #000000;"></i></button>
