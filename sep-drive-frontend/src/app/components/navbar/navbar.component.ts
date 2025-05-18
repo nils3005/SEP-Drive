@@ -1,6 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {RouterLink, RouterLinkActive} from "@angular/router";
-import {AuthService} from "../../../services/auth/auth-service.service";
+import {AuthService} from "../../services/auth/auth-service.service";
 
 @Component({
   selector: 'app-nav-bar',
@@ -8,10 +8,10 @@ import {AuthService} from "../../../services/auth/auth-service.service";
     RouterLinkActive,
     RouterLink
   ],
-  templateUrl: './nav-bar.component.html',
-  styleUrl: './nav-bar.component.scss'
+  templateUrl: './navbar.component.html',
+  styleUrl: './navbar.component.scss'
 })
-export class NavBarComponent {
+export class NavbarComponent {
   auth: AuthService = inject(AuthService);
   isLoggedIn = this.auth.isLoggedIn;
   user = this.auth.user;
