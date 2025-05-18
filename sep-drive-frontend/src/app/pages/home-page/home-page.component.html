@@ -4,7 +4,7 @@
           @if (geoService.showInput.getValue()) {
               <app-route-input class="routeInput" />
           } @else {
-              <app-ride-request-summary class="rideRequestSummary" [isSubmitted]="isSubmitted"/>
+              <app-ride-request-summary class="rideRequestSummary" />
           }
         }
         <app-map class="map" />

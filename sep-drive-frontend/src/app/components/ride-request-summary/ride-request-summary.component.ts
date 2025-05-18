@@ -18,12 +18,11 @@ import {Util} from "leaflet";
 export class RideRequestSummaryComponent {
 
   summaryData: RideRequestSummary | null = null;
-  @Input() isSubmitted = false;
 
   constructor(
       private mapService: MapService,
       private rideRequestService: RideRequestService,
-      private geoService: GeoService,
+      public geoService: GeoService,
       private errorService: ErrorService,
       private router: Router,
   ) {
@@ -59,7 +58,7 @@ export class RideRequestSummaryComponent {
           carType.toUpperCase()
       ).subscribe({
         next: () => {
-          this.isSubmitted = true;
+          this.geoService.isSubmitted.next(true);
           this.geoService.flyMapTo(this.geoService.waypoints.getValue()[0].geometry.coordinates[1], this.geoService.waypoints.getValue()[0].geometry.coordinates[0], 16, 1)
         },
         error: (error) => {
@@ -83,7 +82,7 @@ export class RideRequestSummaryComponent {
   onCancel() {
     this.rideRequestService.cancelRide().subscribe({
       next: () => {
-        this.isSubmitted = false;
+        this.geoService.isSubmitted.next(false);
         this.summaryData = null;
         this.geoService.rideRequestSummaryData.next(null);
         this.rideRequestService.rideRequest.next(null);

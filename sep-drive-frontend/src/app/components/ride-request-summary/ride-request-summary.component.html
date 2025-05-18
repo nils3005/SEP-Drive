@@ -62,7 +62,7 @@
         <div class="infoText">{{ summaryData?.carType }}</div>
       </div>
     </div>
-    @if (!isSubmitted) {
+    @if (!geoService.isSubmitted.getValue()) {
         <div class="buttonRow">
             <div class="buttonContainer">
                 <button class="cancelButton" (click)="onBack()">

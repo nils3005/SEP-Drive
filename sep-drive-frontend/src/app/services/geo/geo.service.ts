@@ -21,6 +21,8 @@ export class GeoService {
 
   public map: L.Map | undefined;
 
+  public isSubmitted: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
   constructor(private openRouteServiceService: OpenRouteServiceService, private errorService: ErrorService) {}
 
   public getCoordinateArray(geoCodes: GeocodeFeature[]): number[][]

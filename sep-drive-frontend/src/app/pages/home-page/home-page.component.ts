@@ -30,7 +30,6 @@ export class HomePageComponent implements OnInit {
   ) {}
 
   public showOnlyMap = false;
-  public isSubmitted = true;
 
   ngOnInit(): void {
     const jwt = localStorage.getItem("jwt");
@@ -51,6 +50,7 @@ export class HomePageComponent implements OnInit {
         if (response.status === 200) {
           this.rideRequestService.getRideRequestSummaryFromRideRequest(response.body).then((summary) => {
             this.geoService.rideRequestSummaryData.next(summary);
+            this.geoService.isSubmitted.next(true);
           })
         }
       },
@@ -58,11 +58,11 @@ export class HomePageComponent implements OnInit {
         if (error.status === 403 || error.status === 401) {
           // this.errorService.showError(error.message);
           this.geoService.showInput.next(true)
-          this.isSubmitted = false;
+          this.geoService.isSubmitted.next(false);
           return
         }
         if (error.status === 404) {
-          this.isSubmitted = false;
+          this.geoService.isSubmitted.next(false);
           this.geoService.showInput.next(true)
         }
         return
