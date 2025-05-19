@@ -110,7 +110,7 @@ export class AuthService {
      * den eingeloggten user auf null. Navigiert abschließend zur Login Component.
      */
     logout(): void {
-        this.http.post<void>(`${this.api}/logout`, null).subscribe();
+        this.http.post(`${this.api}/logout`, null, {responseType: 'text'}).subscribe();
         this.clearSession();
         this.router.navigate(['/login']);
     }
