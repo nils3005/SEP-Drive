@@ -1,5 +1,6 @@
 package com.sep.sepdrivebackend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,6 +31,7 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @JsonIgnore
     @Column (nullable = false)
     private String password;
 
@@ -47,7 +49,6 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private LocalDate birthdate;
 
-    //@Lob
     @Column(name = "profile_picture", columnDefinition = "bytea")
     private byte[] profilePicture;
 
@@ -63,10 +64,11 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private CarType carType;
 
-
+    @JsonIgnore
     private String verificationCode;
 
     //Token id matched to jwt for validation, increments with every logout
+    @JsonIgnore
     private int tokenId;
 
     public float getAvgRating() {
@@ -134,21 +136,25 @@ public class User implements UserDetails {
         return List.of(new SimpleGrantedAuthority("ROLE_"+getRole().toString()));
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;
