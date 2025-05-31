@@ -11,13 +11,13 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor @AllArgsConstructor
-public class Fahrthistorie {
+public class History {
 
     //no setter needed
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long fahrthistorieId;
+    private Long historyId;
 
     @Column(nullable = false)
     private LocalDate finishDate;

@@ -1,10 +1,9 @@
 package com.sep.sepdrivebackend.controller;
 
-import com.sep.sepdrivebackend.dto.HistoryDto;
-import com.sep.sepdrivebackend.entities.Fahrthistorie;
+import com.sep.sepdrivebackend.entities.History;
 import com.sep.sepdrivebackend.entities.Role;
 import com.sep.sepdrivebackend.entities.User;
-import com.sep.sepdrivebackend.service.FahrthistorienService;
+import com.sep.sepdrivebackend.service.HistoryService;
 import com.sep.sepdrivebackend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,20 +14,20 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
-public class FahrthistorienController {
+public class HistoryController {
 
-    private final FahrthistorienService fahrthistorienService;
+    private final HistoryService historyService;
     private final UserService userService;
 
-    public FahrthistorienController(FahrthistorienService fahrthistorienService, UserService userService) {
-        this.fahrthistorienService = fahrthistorienService;
+    public HistoryController(HistoryService historyService, UserService userService) {
+        this.historyService = historyService;
         this.userService = userService;
     }
 
     @GetMapping("/history")
-    public ResponseEntity<List<Fahrthistorie>> getHistorien() {
-        List<Fahrthistorie> fahrthistorien = this.fahrthistorienService.findAllHistorien();
-        return ResponseEntity.ok(fahrthistorien);
+    public ResponseEntity<List<History>> getHistory() {
+        List<History> history = this.historyService.findAllHistory();
+        return ResponseEntity.ok(history);
     }
 /*
     @PostMapping("/history/sorted")
@@ -39,9 +38,9 @@ public class FahrthistorienController {
     }
 */
     @PostMapping("/history/{driverID}/{customerID}")
-    public ResponseEntity<Long> addFahrthistorie(@PathVariable Long driverID, @PathVariable Long customerID, @RequestBody Fahrthistorie fahrthistorie) {
-        if ( null == fahrthistorie) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fahrthistorie not found.", null);
+    public ResponseEntity<Long> addHistory(@PathVariable Long driverID, @PathVariable Long customerID, @RequestBody History history) {
+        if ( null == history) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "History not found.", null);
         }
         User driver = userService.findByUserId(driverID);
         if (null == driver) {
@@ -57,9 +56,18 @@ public class FahrthistorienController {
         if (Role.CUSTOMER != customer.getRole()) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Customer is not a Customer", null);
         }
-        fahrthistorie.setDriver(driver);
-        fahrthistorie.setCustomer(customer);
-        fahrthistorienService.save(fahrthistorie);
-        return ResponseEntity.ok(fahrthistorie.getFahrthistorieId());
+        history.setDriver(driver);
+        history.setCustomer(customer);
+        historyService.save(history);
+        return ResponseEntity.ok(history.getHistoryId());
+    }
+
+    @GetMapping(path = "/history/history{ID}")
+    public History findByHistoryId(@PathVariable Long historyID) {
+        History history = historyService.findByHistoryId(historyID);
+        if ( null == history ) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "HistoryID not found.", null);
+        }
+        return history;
     }
 }
