@@ -6,8 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface HistoryRepository extends JpaRepository<History, Long> {
-/*
-    @Query("SELECT h FROM Fahrthistorie h ORDER BY :sortBy")
-    List<Fahrthistorie> findAllSorted(String sortBy, String sortOrder);
-*/
 }

@@ -3,6 +3,7 @@ package com.sep.sepdrivebackend.service;
 import com.sep.sepdrivebackend.entities.History;
 import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.repository.HistoryRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,4 +33,7 @@ public class HistoryService {
         historyRepository.save(history);
     }
 
+    public List<History> findAllHistory(Sort sort) {
+        return historyRepository.findAll(sort);
+    }
 }

@@ -5,6 +5,8 @@ import com.sep.sepdrivebackend.entities.Role;
 import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.service.HistoryService;
 import com.sep.sepdrivebackend.service.UserService;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,14 +31,25 @@ public class HistoryController {
         List<History> history = this.historyService.findAllHistory();
         return ResponseEntity.ok(history);
     }
-/*
-    @PostMapping("/history/sorted")
-    public ResponseEntity<List<Fahrthistorie>> getSortedHistorien(@RequestBody HistoryDto historyDto) {
 
-        List<Fahrthistorie> fahrthistorien = this.fahrthistorienService.findAllHistorien(historyDto.getSortBy(), historyDto.getSortOrder());
-        return ResponseEntity.ok(fahrthistorien);
+    @GetMapping("/history/sort/{type}/by/{column}")
+    public ResponseEntity<List<History>> getSortedHistory(@PathVariable String type, @PathVariable String column) {
+        if ( type == null || column == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parameter missing.", null);
+        }
+        if (!type.equals("ASC") && !type.equals("DESC")) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Sort Order must be ASC or DESC.", null);
+        }
+        Sort.Direction direction = Sort.Direction.fromString(type);
+        Sort sort = Sort.by(direction, column);
+        try {
+            List<History> history = this.historyService.findAllHistory(sort);
+            return ResponseEntity.ok(history);
+        } catch (PropertyReferenceException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Something went wrong, likely column name", e);
+        }
     }
-*/
+
     @PostMapping("/history/{driverID}/{customerID}")
     public ResponseEntity<Long> addHistory(@PathVariable Long driverID, @PathVariable Long customerID, @RequestBody History history) {
         if ( null == history) {
@@ -62,7 +75,7 @@ public class HistoryController {
         return ResponseEntity.ok(history.getHistoryId());
     }
 
-    @GetMapping(path = "/history/history{ID}")
+    @GetMapping(path = "/history/{historyID}")
     public History findByHistoryId(@PathVariable Long historyID) {
         History history = historyService.findByHistoryId(historyID);
         if ( null == history ) {
