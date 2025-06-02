@@ -5,6 +5,7 @@ import {FormsModule} from "@angular/forms";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {switchMap} from "rxjs";
 import {toSignal} from "@angular/core/rxjs-interop";
+import {AuthService} from "../../services/auth/auth-service.service";
 
 @Component({
   selector: 'app-profile',
@@ -18,6 +19,7 @@ import {toSignal} from "@angular/core/rxjs-interop";
 export class ProfileComponent {
   private route = inject(ActivatedRoute);
   private userService = inject(UserService);
+  auth = inject(AuthService);
 
   // Macht aus dem RxJS-Observable ein Angular Signal
   user = toSignal(
@@ -25,6 +27,7 @@ export class ProfileComponent {
           switchMap(params => this.userService.getUserById(
               // Wandelt die Pathvariable id von social/user/{id} in type number um
               +params.get('id')!
+
           ))
       ),
       { initialValue: null }
@@ -52,10 +55,10 @@ export class ProfileComponent {
    *
    * @return die CSS Klasse von Fontawesome.
    */
-  averageClass(rating: number, star: number): string {
-    if (rating >= star) {
+  averageClass(star: number): string {
+    if (this.averageRating() >= star) {
       return 'fas fa-star';                 // voller Stern
-    } else if (rating >= star - 0.5) {
+    } else if (this.averageRating() >= star - 0.5) {
       return 'fas fa-star-half-alt';        // halber Stern
     } else {
       return 'far fa-star';                 // leerer Stern

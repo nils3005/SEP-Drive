@@ -1,55 +1,60 @@
 <div class="profile-container">
-    <div class="profile-form">
-        <div class="form-grid">
-            <h2>Benutzerprofil</h2>
-            <h2></h2> <!-- Wichtig, damit das Grid stimmt -->
+    @if (this.auth.isLoggedIn()) {
+        <div class="profile-form">
 
-            <label>Benutzername</label>
-            <input type="text" [value]="user()?.username" readonly />
+            <div class="form-grid">
+                <h2>Benutzerprofil</h2>
+                <h2></h2> <!-- Wichtig, damit das Grid stimmt -->
 
-            <label>Rolle</label>
-            <input type="text" [value]="user()?.role" readonly />
+                <label>Benutzername</label>
+                <input type="text" [value]="user()?.username" readonly />
 
-            <label>Vorname</label>
-            <input type="text" [value]="user()?.firstName" readonly />
+                <label>Rolle</label>
+                <input type="text" [value]="user()?.role" readonly />
 
-            <label>Nachname</label>
-            <input type="text" [value]="user()?.lastName" readonly />
+                <label>Vorname</label>
+                <input type="text" [value]="user()?.firstName" readonly />
 
-            <label>E-Mail-Adresse</label>
-            <input type="text" [value]="user()?.email" readonly />
+                <label>Nachname</label>
+                <input type="text" [value]="user()?.lastName" readonly />
 
-            <label>Geburtsdatum</label>
-            <input type="text" [value]="user()?.birthdate" readonly />
+                <label>E-Mail-Adresse</label>
+                <input type="text" [value]="user()?.email" readonly />
 
-            <label>Gesamtzahl der Fahrten</label>
-            <input type="text" [value]="user()?.numberOfRides" readonly />
+                <label>Geburtsdatum</label>
+                <input type="text" [value]="user()?.birthdate" readonly />
 
-            <label>Rating</label>
-            <div class="stars">
-                @for (star of [1, 2, 3, 4, 5]; track star) {
-                    <i [class]="averageClass(averageRating(), star)"></i>
+                <label>Gesamtzahl der Fahrten</label>
+                <input type="text" [value]="user()?.numberOfRides" readonly />
+
+                <label>Rating</label>
+                <div class="stars">
+                    @for (star of [1, 2, 3, 4, 5]; track star) {
+                        <i [class]="averageClass(star)"></i>
+                    }
+                </div>
+
+                @if (user()?.carType) {
+                    <label>Autoklasse</label>
+                    <input type="text" [value]="user()!.carType">
                 }
             </div>
+        </div>
 
-            @if (user()?.carType) {
-                <label>Autoklasse</label>
-                <input type="text" [value]="user()!.carType">
+        <div class="profile-avatar">
+            @if (user()?.profilePicture) {
+                <img
+                        [src]="'data:image/png;base64,' + user()!.profilePicture"
+                        alt="Profilbild {{ user()!.username }}"
+                        class="avatar-img"
+                />
+            } @else {
+                <div class="avatar-circle">
+                    Profilbild
+                </div>
             }
         </div>
-    </div>
-
-    <div class="profile-avatar">
-        @if (user()?.profilePicture) {
-            <img
-                    [src]="'data:image/png;base64,' + user()!.profilePicture"
-                    alt="Profilbild {{ user()!.username }}"
-                    class="avatar-img"
-            />
-        } @else {
-            <div class="avatar-circle">
-                Profilbild
-            </div>
-        }
-    </div>
+    } @else {
+        <div class="not-logged-in">Logge dich ein, um die User zu sehen.</div>
+    }
 </div>
