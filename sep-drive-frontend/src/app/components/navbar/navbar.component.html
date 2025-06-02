@@ -6,13 +6,25 @@
                     <p id="project-name">SEP Drive</p>
                 </li>
 
-                <!-- Link zur Startseite -->
+                <!-- Link zur Startseite
+                Navigiere zu "/"
+                Füge die Klasse "active" hinzu, wenn wir auf der Route sind
+                Füge die Klasse nur hinzu, wenn exakt "/" (ansonten würde Home immer fett sein, weil
+                alle Routen mit "/" anfangen).
+                -->
                 <li>
-                    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+                    <a routerLink="/"
+                       routerLinkActive="active"
+                       [routerLinkActiveOptions]="{ exact: true }">Home
+                    </a>
                 </li>
 
-                <!-- Link zur Social-Seite -->
-                @if (isLoggedIn()) {
+                <!-- Link zur Social-Seite
+                Sobald der Wert von isLoggedIn true ist, wird der Code im if-statement ausgeführt.
+                Link zu "/social" mit Klasse "active", wenn auf der URL - wenn man ein Userprofil
+                anschaut ist Social auch fett, weil /social/user/...
+                -->
+                @if (this.auth.isLoggedIn()) {
                     <li>
                         <a routerLink="/social" routerLinkActive="active">Social</a>
                     </li>
@@ -22,7 +34,7 @@
         <div id="innerNavbar-right">
             <ul class="navItems">
                 <!-- Login-Link (nur wenn nicht eingeloggt) -->
-                @if (!(isLoggedIn())){
+                @if (!(this.auth.isLoggedIn())){
                     <li>
                         <a routerLink="/login" routerLinkActive="active">Login</a>
                     </li>
@@ -32,16 +44,16 @@
                     </li>
                 }
 
-                @if (user()) {
+                @if (this.auth.user()) {
                     <li>
                         <a
-                                [routerLink]="['/social/user', user()!.id]"
+                                [routerLink]="['/social/user', this.auth.user()!.id]"
                                 routerLinkActive="active"
                                 class="profile-link"
                         >
-                            @if (user()!.profilePicture) {
+                            @if (this.auth.user()!.profilePicture) {
                                 <img
-                                        [src]="'data:image/png;base64,' + user()!.profilePicture"
+                                        [src]="'data:image/png;base64,' + this.auth.user()!.profilePicture"
                                         alt="Profilbild"
                                         class="profile-img"
                                 />
