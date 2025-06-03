@@ -1,12 +1,17 @@
 package com.sep.sepdrivebackend.controller;
 
+import com.sep.sepdrivebackend.dto.BankAccountDto;
+import com.sep.sepdrivebackend.dto.CreditCardDto;
+import com.sep.sepdrivebackend.entities.Role;
 import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -64,4 +69,59 @@ public class UserController {
         }
         return user;
     }
+
+    //Geldkonten
+    @PostMapping (path = "/users/addcreditcard")
+    public String addCreditCard(@RequestBody CreditCardDto creditCardDto){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByUsername(username);
+        if ( null == user ) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.", null);
+        }
+        if(user.getRole()!= Role.CUSTOMER){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User is no customer.", null);
+        }
+        if (16 != creditCardDto.getCardNumber().length()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Card number wrong.", null);
+        }
+        LocalDate now = LocalDate.now();
+        int nowInt = now.getYear() * 100 + now.getMonth().getValue();
+        if (creditCardDto.getExpiryDate() < nowInt) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Expiry Date exceeded.", null);
+        }
+        if(3 != creditCardDto.getCvc().length()){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "CVC wrong.", null);
+        }
+
+        user.setCreditCardNumber(creditCardDto.getCardNumber());
+        user.setExpirationDate(creditCardDto.getExpiryDate());
+        user.setCvc(creditCardDto.getCvc());
+        userService.save(user);
+
+        return "Payment info created.";
+    }
+
+    @PostMapping (path = "/users/addbankaccount")
+    public String addBankAccount(@RequestBody BankAccountDto bankAccountDto){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByUsername(username);
+        if ( null == user ) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.", null);
+        }
+        if(user.getRole()!= Role.DRIVER){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User is no driver.", null);
+        }
+        if (22 != bankAccountDto.getIban().length()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "IBAN wrong.", null);
+        }
+
+        user.setIban(bankAccountDto.getIban());
+        userService.save(user);
+
+        return "Payment info created.";
+    }
+
+    // TODO: Einzahlen
+    // TODO: Auszahlen
+    // TODO: Ueberweisen
 }
