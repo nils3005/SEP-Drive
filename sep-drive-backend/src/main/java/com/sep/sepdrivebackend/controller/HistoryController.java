@@ -29,7 +29,7 @@ public class HistoryController {
     @GetMapping("/history")
     public ResponseEntity<List<History>> getHistory() {
         List<History> history = this.historyService.findAllHistory();
-        return ResponseEntity.ok(history);
+        return new ResponseEntity<>(history, HttpStatus.OK);
     }
 
     @GetMapping("/history/sort/{type}/by/{column}")

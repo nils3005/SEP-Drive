@@ -6,6 +6,7 @@ import {HomePageComponent} from './pages/home-page/home-page.component';
 import {SocialComponent} from './components/social/social.component';
 import {ProfileComponent} from './components/profile/profile.component';
 import { RegistrierungComponent } from './components/registrierung/registrierung.component';
+import {DrivinghistoryComponent} from './components/drivinghistory/drivinghistory.component';
 
 export const routes: Routes = [{ path: 'login', component: LoginComponent },
   { path: 'password', component: PasswordComponent },
@@ -14,4 +15,5 @@ export const routes: Routes = [{ path: 'login', component: LoginComponent },
   { path: '', component: HomePageComponent },
   { path: 'social', component: SocialComponent },
   { path: 'social/user/:id', component: ProfileComponent },
+  { path: 'history', component: DrivinghistoryComponent },
   { path: '**', redirectTo: '' }];

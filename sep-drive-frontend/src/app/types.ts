@@ -94,3 +94,15 @@ export type DriveUser = {
   wdhpasswort: string,
   carType: string
 }
+
+export interface fahrt {
+  historyId: number;
+  finishDate: string;
+  drivenDistance: string;
+  drivenTime: string;
+  price: string;
+  ratingCustomer: number;
+  ratingDriver: number;
+  customer: string;
+  driver: string;
+}
