@@ -94,3 +94,26 @@ export type DriveUser = {
   wdhpasswort: string,
   carType: string
 }
+
+export type Ride = {
+  id: number
+  route: string | undefined
+  rideSettings: RideSettings
+  start: Coordinates
+  end: Coordinates
+}
+
+type CoordinateTime = {
+  coordinates: Coordinates
+  duration: number
+}
+
+export type RideSettings = {
+  position: Coordinates
+  paused: boolean
+  resuming: boolean
+  speed: number
+  coordinates: [CoordinateTime] | undefined
+  customer: User | undefined
+  driver: User | undefined
+}

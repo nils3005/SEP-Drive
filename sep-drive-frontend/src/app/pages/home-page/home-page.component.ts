@@ -10,13 +10,15 @@ import {ErrorService} from "../../services/error/error.service";
 import {BehaviorSubject} from "rxjs";
 import {UserService} from "../../services/user/user.service";
 import {jwtDecode} from "jwt-decode";
+import {RideSimulationComponent} from '../../components/ride-simulation/ride-simulation.component';
 
 @Component({
   selector: 'app-home-page',
   imports: [
     RouteInputComponent,
     MapComponent,
-    RideRequestSummaryComponent
+    RideRequestSummaryComponent,
+    RideSimulationComponent
   ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'
@@ -29,6 +31,7 @@ export class HomePageComponent implements OnInit {
       private userService: UserService
   ) {}
 
+  public isAccepted: boolean = true;
   public showOnlyMap = false;
 
   ngOnInit(): void {
@@ -45,28 +48,30 @@ export class HomePageComponent implements OnInit {
         })
       }
     }
-    this.rideRequestService.getActiveRide().subscribe({
-      next: (response)=> {
-        if (response.status === 200) {
-          this.rideRequestService.getRideRequestSummaryFromRideRequest(response.body).then((summary) => {
-            this.geoService.rideRequestSummaryData.next(summary);
-            this.geoService.isSubmitted.next(true);
-          })
-        }
-      },
-      error: (error)=> {
-        if (error.status === 403 || error.status === 401) {
-          // this.errorService.showError(error.message);
-          this.geoService.showInput.next(true)
-          this.geoService.isSubmitted.next(false);
+    if (!this.isAccepted) {
+      this.rideRequestService.getActiveRide().subscribe({
+        next: (response)=> {
+          if (response.status === 200) {
+            this.rideRequestService.getRideRequestSummaryFromRideRequest(response.body).then((summary) => {
+              this.geoService.rideRequestSummaryData.next(summary);
+              this.geoService.isSubmitted.next(true);
+            })
+          }
+        },
+        error: (error)=> {
+          if (error.status === 403 || error.status === 401) {
+            // this.errorService.showError(error.message);
+            this.geoService.showInput.next(true)
+            this.geoService.isSubmitted.next(false);
+            return
+          }
+          if (error.status === 404) {
+            this.geoService.isSubmitted.next(false);
+            this.geoService.showInput.next(true)
+          }
           return
         }
-        if (error.status === 404) {
-          this.geoService.isSubmitted.next(false);
-          this.geoService.showInput.next(true)
-        }
-        return
-      }
-    })
+      })
+    }
   }
 }

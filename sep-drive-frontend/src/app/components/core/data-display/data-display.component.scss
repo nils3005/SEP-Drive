@@ -1,0 +1,39 @@
+.infoLabel {
+  padding: 6px 10px;
+  background: #F3F4F6;
+  overflow: hidden;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  display: flex
+}
+
+.infoData {
+  padding: 6px 10px;
+  background: white;
+  overflow: hidden;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  display: flex
+}
+
+.infoField {
+  overflow: hidden;
+  border-radius: 8px;
+  outline: 1px #D1D5DB solid;
+  outline-offset: -1px;
+  justify-content: flex-start;
+  width: fit-content;
+  align-items: center;
+  display: flex
+}
+
+.infoText {
+  color: black;
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
+  font-weight: 400;
+  line-height: 20px;
+  word-wrap: break-word
+}

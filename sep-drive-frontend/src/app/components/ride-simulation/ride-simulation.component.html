@@ -1,0 +1,36 @@
+<div class="rideSettingsContainer">
+  <p class="headline">Ride Simulation</p>
+  <div class="dataContainer">
+    <app-data-display [label]="'Start'" [data]="rideSimulationStore.start()"/>
+    <app-data-display [label]="'Ziel'" [data]="rideSimulationStore.destination()"/>
+  </div>
+  <div class="sliderRow">
+    <p>3 sek</p>
+    <input
+      type="range"
+      class="slider"
+      min="3"
+      max="30"
+      [value]="speedValue"
+      (input)="onSpeedChange($event)"
+      [style.--value.%]="getPercentage(speedValue, 3, 30)"
+      (change)="onSpeedBlur()"
+    >
+    <p>30 sek</p>
+  </div>
+  <div class="buttonRow">
+    @if (true) {
+      <div class="buttonContainer">
+        <button class="resumeBtn">
+          Fortsetzen
+        </button>
+      </div>
+    } @else {
+      <div class="buttonContainer">
+        <button class="pauseBtn">
+          Pausieren
+        </button>
+      </div>
+    }
+  </div>
+</div>
