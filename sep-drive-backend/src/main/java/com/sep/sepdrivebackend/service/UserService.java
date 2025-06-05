@@ -34,4 +34,8 @@ public class UserService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username).orElse(null);
     }
+
+    public void increaseBalance(Long id, Double amount) {}
+
+    public void decreaseBalance(Long id, Double amount) {}
 }
