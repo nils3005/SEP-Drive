@@ -29,7 +29,7 @@ public class History {
     private double price;
 
     @Column(nullable = false)
-    private int drivenTime; //in Minuten
+    private float drivenTime; //in Minuten
 
     //Assoziationen
     @Getter(AccessLevel.NONE)

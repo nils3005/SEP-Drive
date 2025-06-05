@@ -1,4 +1,4 @@
-package com.sep.sepdrivebackend.component;
+/*package com.sep.sepdrivebackend.component;
 
 import com.sep.sepdrivebackend.controller.RideWebSocketController;
 import com.sep.sepdrivebackend.entities.Ride;
@@ -52,10 +52,10 @@ public class SimulationScheduler {
     /*public void updateSpeed(Ride ride, double speed) {
         pauseSimulation(ride);
         ride.setSpeed(speed);
-    }*/
+    }
 
     private void cancel(Long id ){
         rides.get(id).cancel(false);
         rides.remove(id);
     }
-}
+}*/

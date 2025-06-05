@@ -19,12 +19,16 @@ public class Ride {
     private User driver;
     @OneToOne
     private User customer;
-    private double speed;
+    private float speed;
     /*private Rating driverRating;
     private Rating customerRating;*/
-    private double price;
+    private float price;
+    private float distance;
+    private float duration;
     private RideStatus status;
-    private String coords;
+    /*@ElementCollection
+    private double[] coords;*/
+    private int coordsIndex;
     @Lob
     private String geoJson;
 }

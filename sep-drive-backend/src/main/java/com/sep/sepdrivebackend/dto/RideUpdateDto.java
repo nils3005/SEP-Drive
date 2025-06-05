@@ -13,6 +13,8 @@ public class RideUpdateDto {
     private boolean paused;
     private boolean resuming;
     private boolean completed;
-    private double speed;
-    private String coords;
+    private float speed;
+    //private String coords;
+    private int coordsIndex;
+    private Long historyId;
 }
