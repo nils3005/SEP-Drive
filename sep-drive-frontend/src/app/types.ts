@@ -71,6 +71,29 @@ export type RideRequest = {
   active: boolean
 }
 
+export type RideOffer = {
+  offerId: number;
+  driverId: number;
+  driverName: string;
+  rating: number;
+  totalRides: number;
+  totalDistance: number;
+  priceInCents: number;
+  createdAt: string; // ISO-Datumsstring, z. B. "2025-06-01T12:34:56Z"
+}
+
+export type RideOfferNotification = {
+  offerId: number;
+  rideRequestId: number;
+  driverId: number;
+  driverName: string;
+  driverRating: number;
+  driverTotalRides: number;
+  driverTotalDistance: number;
+  priceInCents: number;
+  createdAt: string; // ISO-String
+}
+
 export type RideRequestSummary = {
   start: string
   stops: GeocodeFeature[]
