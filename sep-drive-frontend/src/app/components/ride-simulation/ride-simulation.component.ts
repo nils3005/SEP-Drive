@@ -14,7 +14,7 @@ import {firstValueFrom} from 'rxjs';
   templateUrl: './ride-simulation.component.html',
   styleUrl: './ride-simulation.component.scss',
 })
-export class RideSimulationComponent implements AfterViewInit {
+export class RideSimulationComponent implements OnInit {
   public speedValue = 15;
 
   constructor(
@@ -26,7 +26,7 @@ export class RideSimulationComponent implements AfterViewInit {
     ) {
   }
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     this.mapService.clearMap()
     this.rideService.getActiveRide().subscribe((ride: Ride | null) => {
       this.rideSimulationStore.ride.next(ride);
