@@ -1,13 +1,12 @@
-import {Component, inject, signal, ViewChild, OnInit} from '@angular/core';
+import {Component, inject, signal, ViewChild, OnInit, AfterViewInit, effect} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
-import {MatSort, MatSortHeader, Sort} from '@angular/material/sort';
+import {MatSort, MatSortHeader, MatSortModule, Sort} from '@angular/material/sort';
 import { MatIconModule } from '@angular/material/icon';
 import {Router} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {AuthService} from "../../services/auth/auth-service.service";
 import {LiveAnnouncer} from '@angular/cdk/a11y';
-import {fahrt} from "../../types"
 import {HistoryService} from '../../services/history/history.service';
 import {HistoryDataSource} from '../../services/history/history.dataSource';
 
@@ -22,7 +21,8 @@ import {HistoryDataSource} from '../../services/history/history.dataSource';
     ReactiveFormsModule,
     FormsModule,
     MatSortHeader,
-    MatSort
+    MatSort,
+    MatSortModule
   ],
   templateUrl: './drivinghistory.component.html',
   styleUrl: './drivinghistory.component.scss'
@@ -30,14 +30,18 @@ import {HistoryDataSource} from '../../services/history/history.dataSource';
 
 
 
-export class DrivinghistoryComponent implements OnInit {
+export class DrivinghistoryComponent implements OnInit, AfterViewInit  {
 
 
   displayedColumns: string[] = ['historyId', 'finishDate', 'drivenDistance', 'price', 'drivenTime',
     'ratingCustomer', 'ratingDriver', 'customer', 'driver'];
   dataSource!: HistoryDataSource;
 
-  constructor(private router: Router, private historyService: HistoryService) {}
+  constructor(private router: Router, private historyService: HistoryService) {
+    effect(() => {
+      this.dataSource.filter$.next(this.searchTerm());
+    });
+  }
 
   private _liveAnnouncer = inject(LiveAnnouncer);
   private auth: AuthService = inject(AuthService);
@@ -48,19 +52,21 @@ export class DrivinghistoryComponent implements OnInit {
   ngOnInit(): void {
     this.dataSource = new HistoryDataSource(this.historyService);
     // @ts-ignore
-    this.dataSource.loadHistory();
+    this.dataSource.loadHistory()
   }
 
-
-
-
-
-
-  @ViewChild(MatSort) sort: MatSort | undefined;
-
+  @ViewChild('sort') sort!: MatSort;
     ngAfterViewInit() {
-      // @ts-ignore
-      this.dataSource.sort = this.sort;
+      if (this.sort) {
+        setTimeout(() => {
+          this.sort!.active = 'historyId';
+          this.sort!.direction = 'desc';
+          this.sort!.sortChange.emit({ active: 'historyId', direction: 'desc' });
+          this.dataSource.sort = this.sort!;
+        });
+      } else {
+        console.warn('MatSort nicht initialisiert.');
+      }
     }
 
 

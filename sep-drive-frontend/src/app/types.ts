@@ -103,6 +103,10 @@ export interface fahrt {
   price: string;
   ratingCustomer: number;
   ratingDriver: number;
-  customer: string;
-  driver: string;
+  usernameCustomer: string;
+  lastNameCustomer: string;
+  firstNameCustomer: string;
+  usernameDriver: string;
+  lastNameDriver: string;
+  firstNameDriver: string
 }
