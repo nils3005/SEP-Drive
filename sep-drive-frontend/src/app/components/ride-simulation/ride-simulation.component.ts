@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {DataDisplayComponent} from '../core/data-display/data-display.component';
 import {MapService} from '../../services/map/map.service';
 import {RideService} from '../../services/ride/ride.service';
@@ -6,7 +6,7 @@ import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-s
 import {Ride} from '../../types';
 import {OpenRouteServiceService} from '../../services/openroute/open-route-service.service';
 import {GeoService} from '../../services/geo/geo.service';
-import {firstValueFrom} from 'rxjs';
+import {WebsocketService} from '../../services/websocket/web-socket.service';
 
 @Component({
   selector: 'app-ride-simulation',
@@ -22,9 +22,9 @@ export class RideSimulationComponent implements OnInit {
     private rideService: RideService,
     public rideSimulationStore: RideSimulationStore,
     private openRouteService: OpenRouteServiceService,
-    private geoService: GeoService
-    ) {
-  }
+    private geoService: GeoService,
+    private webSocketService: WebsocketService
+    ) {}
 
   ngOnInit(): void {
     this.mapService.clearMap()
@@ -49,9 +49,9 @@ export class RideSimulationComponent implements OnInit {
             }
           }
         });
-
       }
     });
+    // this.webSocketService.subscribe('/topic/ride/')
   }
 
   onSpeedBlur() {
