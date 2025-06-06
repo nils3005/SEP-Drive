@@ -28,12 +28,6 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     public void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain) throws IOException, ServletException {
-        String path = request.getServletPath();
-        if (path.startsWith("/ws")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
         String username=null;
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {

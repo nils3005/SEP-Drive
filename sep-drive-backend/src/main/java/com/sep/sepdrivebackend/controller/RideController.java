@@ -39,11 +39,6 @@ public class RideController {
         }
     }
 
-    /*@PostMapping("/delete/{id}")
-    public void deleteRide(@PathVariable Long id) {
-        rideService.deleteRide(id);
-    }*/
-
     @PostMapping("/add")
     public ResponseEntity<String> addRide(@RequestBody Ride ride) {
         try{

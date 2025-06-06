@@ -9,7 +9,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class RideUpdateDto {
     private Long rideId;
-    //private RideStatus status;
     private boolean paused;
     private boolean resuming;
     private boolean completed;

@@ -12,12 +12,15 @@ import com.sep.sepdrivebackend.exception.RideNotFoundException;
 import com.sep.sepdrivebackend.exception.UserHasRideExcpetion;
 import com.sep.sepdrivebackend.repository.RideRepository;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class RideService {
     private final RideRepository rideRepository;
@@ -34,19 +37,14 @@ public class RideService {
         this.historyService = historyService;
     }
 
+    @Transactional
     public void addRide(Ride ride) {
-        User driver = ride.getDriver();
-        User customer = ride.getCustomer();
+        User driver = userService.findByUserId(ride.getDriver().getId());
+        User customer = userService.findByUserId(ride.getCustomer().getId());
         if(rideRepository.findRideByUsername(customer.getUsername()).isPresent() || rideRepository.findRideByUsername(driver.getUsername()).isPresent()) {
             throw new UserHasRideExcpetion("One or more users already part of another ride");
         }
         rideRepository.save(ride);
-    }
-
-    public void deleteRide(Long id) {
-        if(rideRepository.findById(id).isPresent()) {
-            rideRepository.deleteById(id);
-        }
     }
 
     public List<Ride> allRides() {
@@ -76,16 +74,16 @@ public class RideService {
             rideRepository.save(ride);
             payment(ride);
             History history = new History();
-            history.setFinishDate(LocalDate.now());
+            history.setFinishDate(LocalDateTime.now());
             history.setPrice(ride.getPrice());
             history.setDrivenDistance(ride.getDistance());
             history.setDrivenTime(ride.getDuration());
             history.setCustomer(ride.getCustomer());
             history.setDriver(ride.getDriver());
             historyService.save(history);
-            rideRepository.delete(ride);
             rideUpdateDTO.setHistoryId(history.getHistoryId());
             rideWebSocketController.sendMessage(rideUpdateDTO);
+            rideRepository.delete(ride);
             return;
         }
         ride.setSpeed(rideUpdateDTO.getSpeed());
@@ -99,9 +97,5 @@ public class RideService {
         User driver = ride.getDriver();
         userService.decreaseBalance(customer.getId(), ride.getPrice());
         userService.increaseBalance(driver.getId(), ride.getPrice());
-    }
-
-    public void updateSpeed() {
-
     }
 }

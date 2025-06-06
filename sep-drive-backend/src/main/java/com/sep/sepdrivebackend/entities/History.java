@@ -5,6 +5,7 @@ import lombok.*;
 
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "drive_history")
@@ -20,7 +21,7 @@ public class History {
     private Long historyId;
 
     @Column(nullable = false)
-    private LocalDate finishDate;
+    private LocalDateTime finishDate;
 
     @Column(nullable = false)
     private double drivenDistance;

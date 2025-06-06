@@ -20,8 +20,6 @@ public class Ride {
     @OneToOne
     private User customer;
     private float speed;
-    /*private Rating driverRating;
-    private Rating customerRating;*/
     private float price;
     private float distance;
     private float duration;

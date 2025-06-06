@@ -14,7 +14,7 @@ public class RideWebSocketController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    public void sendMessage(RideUpdateDto rideDTO) {
-        messagingTemplate.convertAndSend("/topic/ride/"+rideDTO.getRideId(),rideDTO);
+    public void sendMessage(RideUpdateDto rideDto) {
+        messagingTemplate.convertAndSend("/topic/ride/"+rideDto.getRideId(),rideDto);
     }
 }

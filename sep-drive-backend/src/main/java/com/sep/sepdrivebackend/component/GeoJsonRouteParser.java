@@ -35,14 +35,6 @@ public class GeoJsonRouteParser {
         return list;
     }
 
-    public double totalDistance(List<double[]> coordinates) {
-        double sum = 0;
-        for(int i = 0; i<coordinates.size()-1; i++) {
-            sum += distanceOfTwoCoords(coordinates.get(i), coordinates.get(i+1));
-        }
-        return sum;
-    }
-
     /*public double distanceOfTwoCoords(double[] firstCoord, double[] secondCoord) {
         double x = (secondCoord[1] - firstCoord[1]) * 111.32 *Math.cos(Math.toRadians(firstCoord[0]+secondCoord[0]/2));
         double y = (firstCoord[0] - secondCoord[0]) * 110.574;
@@ -66,12 +58,5 @@ public class GeoJsonRouteParser {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return 1000*R * c;
     }
-
-
-    /*public double[] getCoordAtProgress(String geoJson, double progress) {
-        List<double[]> coords = extractCoordinates(geoJson);
-        int index = Math.min((int)(progress / 100 * (coords.size() - 1)), coords.size() - 1);
-        return coords.get(index);
-    }*/
 }
 
