@@ -6,6 +6,7 @@ import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-s
 import {Ride} from '../../types';
 import {OpenRouteServiceService} from '../../services/openroute/open-route-service.service';
 import {GeoService} from '../../services/geo/geo.service';
+import {firstValueFrom} from 'rxjs';
 
 @Component({
   selector: 'app-ride-simulation',
@@ -34,25 +35,21 @@ export class RideSimulationComponent implements AfterViewInit {
           next: data => {
             if (data.body) {
               this.rideSimulationStore.start.set(data.body.features[0].properties.label)
-              this.geoService.updateStart(data.body.features[0])
+              this.geoService.updateStart(data.body.features[0], false)
+              this.openRouteService.getGeocodeFeatureByCoordinates(ride.end).subscribe({
+                next: data => {
+                  if (data.body) {
+                    this.rideSimulationStore.destination.set(data.body.features[0].properties.label)
+                    this.geoService.updateDestination(data.body.features[0], false)
+                    this.geoService.calculateRoute()
+                    this.rideService.simulateRide()
+                  }
+                }
+              })
             }
           }
         });
-        this.openRouteService.getGeocodeFeatureByCoordinates(ride.end).subscribe({
-          next: data => {
-            if (data.body) {
-              this.rideSimulationStore.destination.set(data.body.features[0].properties.label)
-              this.geoService.updateDestination(data.body.features[0])
-            }
-          }
-        })
-        this.openRouteService.getRouteFromPointArray([[12, 50], [10, 50]]).subscribe(
-          route => {
-            if (route) {
-              this.geoService.route.next(route.body);
-            }
-          }
-        )
+
       }
     });
   }

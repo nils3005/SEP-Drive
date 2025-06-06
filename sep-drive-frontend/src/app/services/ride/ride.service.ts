@@ -4,6 +4,9 @@ import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-s
 import {Ride} from '../../types';
 import {ErrorService} from '../error/error.service';
 import {Observable, of} from 'rxjs';
+import * as L from 'leaflet';
+import 'leaflet.motion/dist/leaflet.motion.js'
+import {GeoService} from '../geo/geo.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +18,22 @@ export class RideService {
 
   constructor(
     private rideSimulationStore: RideSimulationStore,
-    private errorService: ErrorService
+    private errorService: ErrorService,
+    private geoService: GeoService
   ) {
+  }
+
+  simulateRide(){
+    (L as any).motion.polyline([[50,12], [50,10]], {
+      color: "transparent"
+    }, {
+      auto: true,
+      duration: 8000,
+    }, {
+      removeOnEnd: false,
+      showMarker: true,
+      icon: L.divIcon({html: "<i class='fa fa-car fa-2x' aria-hidden='true'></i>", iconSize: L.point(27.5, 24)})
+    }).addTo(this.geoService.map);
   }
 
   getActiveRide(): Observable<Ride>
