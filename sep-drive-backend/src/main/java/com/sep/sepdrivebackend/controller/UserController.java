@@ -73,11 +73,7 @@ public class UserController {
     //Geldkonten
     @PostMapping (path = "/users/addcreditcard")
     public String addCreditCard(@RequestBody CreditCardDto creditCardDto){
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.findByUsername(username);
-        if ( null == user ) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.", null);
-        }
+        User user = getCurrentUser();
         if(user.getRole()!= Role.CUSTOMER){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User is no customer.", null);
         }
@@ -103,11 +99,7 @@ public class UserController {
 
     @PostMapping (path = "/users/addbankaccount")
     public String addBankAccount(@RequestBody BankAccountDto bankAccountDto){
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.findByUsername(username);
-        if ( null == user ) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.", null);
-        }
+        User user = getCurrentUser();
         if(user.getRole()!= Role.DRIVER){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User is no driver.", null);
         }
@@ -123,11 +115,7 @@ public class UserController {
 
     @PostMapping (path = "/users/deposit/{amount}")
     public String deposit(@PathVariable double amount){
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.findByUsername(username);
-        if ( null == user ) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.", null);
-        }
+        User user = getCurrentUser();
         if(user.getRole()!= Role.CUSTOMER) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User is no customer.", null);
         }
@@ -153,11 +141,7 @@ public class UserController {
 
     @PostMapping (path = "/users/disburse/{amount}")
     public String disburse(@PathVariable double amount){
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.findByUsername(username);
-        if ( null == user ) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.", null);
-        }
+        User user = getCurrentUser();
         if(user.getRole()!= Role.DRIVER) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User is no driver.", null);
         }
@@ -177,11 +161,7 @@ public class UserController {
 
     @PostMapping (path = "/users/transfer/{amount}/{payedTo}")
     public String transfer(@PathVariable double amount, @PathVariable String payedTo){
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User sender = userService.findByUsername(username);
-        if ( null == sender ) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.", null);
-        }
+        User sender = getCurrentUser();
         if(sender.getRole()!= Role.CUSTOMER) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User is no customer.", null);
         }
@@ -207,5 +187,18 @@ public class UserController {
         userService.save(sender);
         userService.save(receiver);
         return "Payment successful.";
+    }
+
+    private User getCurrentUser(){
+        String username = getCurrentUserName();
+        User user = userService.findByUsername(username);
+        if ( null == user ) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.", null);
+        }
+        return user;
+    }
+
+    protected String getCurrentUserName() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }
