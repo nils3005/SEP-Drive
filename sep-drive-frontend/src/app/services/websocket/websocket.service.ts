@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Client, IMessage, Frame } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 import { Observable } from 'rxjs';
+import {Client, Frame, IMessage} from "@stomp/stompjs";
+import SockJS from 'sockjs-client';
 
 @Injectable({
   providedIn: 'root'
@@ -14,11 +14,11 @@ export class WebsocketService implements OnDestroy {
     // STOMP-Client konfigurieren
     this.client = new Client({
       // webSocketFactory verwendet SockJS, damit Spring-Boot automatisch SockJS "upgraden" kann
-      webSocketFactory: () => new SockJS('/ws-offers'),
+      webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
       reconnectDelay: 5000,
       heartbeatIncoming: 0,
       heartbeatOutgoing: 20_000,
-      debug: (str) => {
+      debug: (str: string) => {
         // Debug-Log für STOMP (kann im Prod auskommentiert werden)
         console.debug('[STOMP]', str);
       }

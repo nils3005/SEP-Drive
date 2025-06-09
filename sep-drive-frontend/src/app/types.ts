@@ -88,10 +88,6 @@ export type RideOfferNotification = {
   driverId: number;
   driverName: string;
   driverRating: number;
-  driverTotalRides: number;
-  driverTotalDistance: number;
-  priceInCents: number;
-  createdAt: string; // ISO-String
 }
 
 export type RideRequestSummary = {

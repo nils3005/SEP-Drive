@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -118,13 +119,13 @@ public class RideOfferController {
     }
 
     private Long getCurrentDriverId() {
-        // TODO
-        return 1L;
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userService.findByUsername(username).getId();
     }
 
     private Long getCurrentCustomerId() {
-        // TODO
-        return 1L;
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userService.findByUsername(username).getId();
     }
 
     @Data

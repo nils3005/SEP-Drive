@@ -1,12 +1,33 @@
 <main>
     <div class="routeContainer">
-        @if (!showOnlyMap) {
-          @if (geoService.showInput.getValue()) {
-              <app-route-input class="routeInput" />
-          } @else {
-              <app-ride-request-summary class="rideRequestSummary" />
-          }
+        @if (showOnlyMap) { <!-- Kunde ist Driver -->
+            <div class="left-container">
+                <app-map class="map" />
+            </div>
+        } @else if (geoService.showInput.getValue()) { <!--  -->
+            <div class="left-container">
+                <app-route-input class="routeInput" />
+            </div>
+            <div class="right-container">
+                <app-map class="map" />
+            </div>
+        } @else if (!geoService.showInput.getValue() && !geoService.isSubmitted.getValue()) { <!-- User hat Koordinaten eingegeben und noch nicht bestätigt -->
+            <div class="left-container">
+                <app-ride-request-summary class="rideRequestSummary" />
+            </div>
+            <div class="right-container">
+                <app-map class="map" />
+            </div>
+        } @else { <!-- User hat die Fahrt bestätigt -->
+            <div class="left-container">
+                <app-rideoffers class="rideRequestOffers"/>
+            </div>
+            <div class="right-container">
+                <div class="right-container-splitted">
+                    <app-ride-request-summary class="rideRequestSummary" />
+                    <app-map class="map" />
+                </div>
+            </div>
         }
-        <app-map class="map" />
     </div>
 </main>
