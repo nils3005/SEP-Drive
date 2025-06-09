@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -18,7 +18,7 @@ import static org.mockito.BDDMockito.given;
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
     static class PartialUserController extends UserController {
