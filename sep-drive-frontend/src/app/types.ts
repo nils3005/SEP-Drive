@@ -130,3 +130,5 @@ export type RideUpdateDTO = {
   coordsIndex: number
   historyId: number | null
 }
+
+export type Coord = [number, number]

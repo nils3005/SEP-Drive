@@ -1,9 +1,9 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient, HttpResponse} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
-import {Ride, RideResponse, RideUpdateDTO} from '../../types';
+import {Coord, RideResponse, RideUpdateDTO} from '../../types';
 import {ErrorService} from '../error/error.service';
-import {Observable, of} from 'rxjs';
+import {Observable} from 'rxjs';
 import * as L from 'leaflet';
 import 'leaflet.motion/dist/leaflet.motion.js'
 import {GeoService} from '../geo/geo.service';
@@ -26,11 +26,8 @@ export class RideService {
   async simulateRide() {
     const ride = this.rideSimulationStore.ride.getValue();
     if (ride) {
-      // const total = ride.speeds.reduce((sum, val) => sum + val, 0);
       const speed = ride.ride.speed
-      // console.log(speed);
-      // console.log(ride.ride.distance)
-      this.rideSimulationStore.motionPolyLine = (L as any).motion.polyline(ride.coords, {
+      this.rideSimulationStore.motionPolyLine = (L as any).motion.polyline(ride.coords.slice(this.rideSimulationStore.rideData.getValue().coordsIndex), {
         color: "transparent"
       }, {
         auto: false,
@@ -42,7 +39,6 @@ export class RideService {
           iconSize: L.point(27.5, 24)
         })
       });
-
       this.rideSimulationStore.motionPolyLine.addTo(this.geoService.map);
       this.checkUpdates()
     }
@@ -53,7 +49,7 @@ export class RideService {
       let rideData: RideUpdateDTO = this.rideSimulationStore.rideData.getValue();
       rideData.completed = true;
       this.rideSimulationStore.rideData.next(rideData);
-      this.updateRide()
+      this.updateRide(rideData)
     });
   }
 
@@ -64,17 +60,37 @@ export class RideService {
     )
   }
 
-  updateRide(): void
+  updateRide(rideData: RideUpdateDTO): void
   {
     this.httpClient.post(
       'http://localhost:8080/ride/updateRide',
-      this.rideSimulationStore.rideData.getValue(),
+      rideData,
       {responseType: "text"}
     ).subscribe((response) => {
       if (response != "Ride updated") {
         this.errorService.showError(response)
       }
     })
+  }
+
+  updateRideData(paused: boolean | null, resuming: boolean | null, speed: number | null, completed: boolean |null): void
+  {
+    let rideData: RideUpdateDTO = this.rideSimulationStore.rideData.getValue();
+    rideData.completed = completed ?? rideData.completed;
+    rideData.paused = paused ?? rideData.paused;
+    rideData.resuming = resuming?? rideData.resuming;
+    rideData.speed = speed ?? rideData.speed;
+    rideData.coordsIndex = this.getCoordsIndex() != -1 ? this.getCoordsIndex() : rideData.coordsIndex;
+    this.rideSimulationStore.rideData.next(rideData);
+    this.updateRide(rideData)
+  }
+
+  getCoordsIndex(): number {
+    const ride = this.rideSimulationStore.ride.getValue();
+    if (ride) {
+      return this.findClosestCoordinateIndex(ride.coords, [this.rideSimulationStore.motionPolyLine.__marker.getLatLng().lat, this.rideSimulationStore.motionPolyLine.__marker.getLatLng().lng])
+    }
+    return -1;
   }
 
   calculateKmh(meters: number, seconds: number): number {
@@ -85,5 +101,41 @@ export class RideService {
     const hours = seconds / 3600;
     const kmh = km / hours;
     return kmh;
+  }
+
+  findClosestCoordinateIndex(coords: Coord[], target: Coord): number {
+    let closestIndex = -1;
+    let minDistance = Infinity;
+
+    for (let i = 0; i < coords.length; i++) {
+      const dist = this.haversineDistance(coords[i], target);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestIndex = i;
+      }
+    }
+
+    return closestIndex;
+  }
+
+  haversineDistance(coord1: Coord, coord2: Coord): number {
+    const toRad = (x: number) => x * Math.PI / 180;
+
+    const [lat1, lon1] = [coord1[1], coord1[0]];
+    const [lat2, lon2] = [coord2[1], coord2[0]];
+
+    const R = 6371e3; // Earth radius in meters
+    const lat1Rad = toRad(lat1);
+    const lat2Rad = toRad(lat2);
+    const deltaLat = toRad(lat2 - lat1);
+    const deltaLon = toRad(lon2 - lon1);
+
+    const a = Math.sin(deltaLat / 2) ** 2 +
+      Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+      Math.sin(deltaLon / 2) ** 2;
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
   }
 }
