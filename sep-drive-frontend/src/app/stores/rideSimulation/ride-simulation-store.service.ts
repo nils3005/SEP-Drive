@@ -1,6 +1,7 @@
 import {Injectable, signal, Signal} from '@angular/core';
 import {Ride, RideResponse, RideUpdateDTO} from '../../types';
 import {BehaviorSubject} from 'rxjs';
+import * as L from 'leaflet';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,8 @@ export class RideSimulationStore {
   public motionPolyLine: any
 
   public started: boolean = false;
+
+  public simulationLayer = L.layerGroup();
 
   public rideData : BehaviorSubject<RideUpdateDTO> = new BehaviorSubject<RideUpdateDTO>({
     rideId: this.ride.getValue()?.ride.rideId ?? -1,
@@ -26,5 +29,6 @@ export class RideSimulationStore {
   public start = signal<string>('');
   public destination = signal<string>('');
 
-  constructor() { }
+  constructor() {
+  }
 }

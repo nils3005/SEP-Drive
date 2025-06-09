@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpResponse} from '@angular/common/http';
 import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
 import {Ride, RideResponse, RideUpdateDTO} from '../../types';
 import {ErrorService} from '../error/error.service';
@@ -59,7 +59,7 @@ export class RideService {
 
   getActiveRide(): Observable<RideResponse>
   {
-    return this.httpClient.get<RideResponse>(
+    return this.httpClient.get<any>(
       'http://localhost:8080/ride/active'
     )
   }
