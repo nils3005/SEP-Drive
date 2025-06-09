@@ -6,18 +6,13 @@ import com.sep.sepdrivebackend.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(UserController.class)
@@ -25,21 +20,6 @@ public class UserControllerTest {
 
     @MockBean
     private UserService userService;
-
-    /*
-    @Autowired
-    private MockMvc mvc;
-
-    @Test
-    public void disburse_negativeAmount() throws Exception {
-
-        mvc.perform(post("/users/disburse/2")
-                .param("amount", "-1")
-                .content(""))
-            .andExpect(status().isConflict())
-            .andExpect(status().reason("Amount too small"));
-    }
-     */
 
     static class PartialUserController extends UserController {
 
