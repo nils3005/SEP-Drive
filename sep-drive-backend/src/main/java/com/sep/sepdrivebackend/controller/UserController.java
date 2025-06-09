@@ -121,7 +121,91 @@ public class UserController {
         return "Payment info created.";
     }
 
-    // TODO: Einzahlen
-    // TODO: Auszahlen
-    // TODO: Ueberweisen
+    @PostMapping (path = "/users/deposit/{amount}")
+    public String deposit(@PathVariable double amount){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByUsername(username);
+        if ( null == user ) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.", null);
+        }
+        if(user.getRole()!= Role.CUSTOMER) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User is no customer.", null);
+        }
+        if(user.getCreditCardNumber() == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Credit card number not set.", null);
+        }
+        LocalDate now = LocalDate.now();
+        int nowInt = now.getYear() * 100 + now.getMonth().getValue();
+        if (user.getExpirationDate() < nowInt) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Expiry Date exceeded.", null);
+        }
+        if (amount <= 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Amount too small.", null);
+        }
+        Double balance = user.getBalance();
+        if (balance == null) {
+            balance = new Double(0.0);
+        }
+        user.setBalance(balance + amount);
+        userService.save(user);
+        return "Payment deposited succesfully.";
+    }
+
+    @PostMapping (path = "/users/disburse/{amount}")
+    public String disburse(@PathVariable double amount){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByUsername(username);
+        if ( null == user ) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.", null);
+        }
+        if(user.getRole()!= Role.DRIVER) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User is no driver.", null);
+        }
+        if(user.getIban() == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "IBAN not set.", null);
+        }
+        if (amount <= 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Amount too small.", null);
+        }
+        if (amount > user.getBalance()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Amount too big, Balance too small.", null);
+        }
+        user.setBalance(user.getBalance() - amount);
+        userService.save(user);
+        return "Payment disbursed succesfully.";
+    }
+
+    @PostMapping (path = "/users/transfer/{amount}/{payedTo}")
+    public String transfer(@PathVariable double amount, @PathVariable String payedTo){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User sender = userService.findByUsername(username);
+        if ( null == sender ) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.", null);
+        }
+        if(sender.getRole()!= Role.CUSTOMER) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User is no customer.", null);
+        }
+        if (amount <= 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Amount too small.", null);
+        }
+        if (sender.getBalance() == null || amount > sender.getBalance()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Amount too big, Balance too small.", null);
+        }
+        User receiver = userService.findByUsername(payedTo);
+        if (receiver == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username receiver not found.", null);
+        }
+        if (receiver.getRole() != Role.DRIVER) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User is no driver, User can not be payed.", null);
+        }
+        sender.setBalance(sender.getBalance() - amount);
+        Double balance = receiver.getBalance();
+        if (balance == null) {
+            balance = new Double(0.0);
+        }
+        receiver.setBalance(balance + amount);
+        userService.save(sender);
+        userService.save(receiver);
+        return "Payment successful.";
+    }
 }
