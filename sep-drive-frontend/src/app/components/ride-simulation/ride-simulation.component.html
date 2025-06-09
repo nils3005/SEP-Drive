@@ -19,16 +19,16 @@
     <p>30 sek</p>
   </div>
   <div class="buttonRow">
-    @if (true) {
+    @if (rideSimulationStore.started) {
       <div class="buttonContainer">
-        <button class="resumeBtn">
-          Fortsetzen
+        <button [className]="rideSimulationStore.rideData.getValue().paused ? 'resumeBtn' : 'pauseBtn'" (click)="toggleRideStatus()">
+          {{ rideSimulationStore.rideData.getValue().paused ? "Fortsetzen" : "Pausieren" }}
         </button>
       </div>
     } @else {
       <div class="buttonContainer">
-        <button class="pauseBtn">
-          Pausieren
+        <button class="resumeBtn" (click)="toggleRideStatus()">
+          Start
         </button>
       </div>
     }

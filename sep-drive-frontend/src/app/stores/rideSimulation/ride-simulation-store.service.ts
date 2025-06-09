@@ -1,5 +1,5 @@
 import {Injectable, signal, Signal} from '@angular/core';
-import {Ride} from '../../types';
+import {Ride, RideResponse, RideUpdateDTO} from '../../types';
 import {BehaviorSubject} from 'rxjs';
 
 @Injectable({
@@ -7,7 +7,21 @@ import {BehaviorSubject} from 'rxjs';
 })
 export class RideSimulationStore {
 
-  public ride: BehaviorSubject<Ride | null> = new BehaviorSubject<Ride | null>(null);
+  public ride: BehaviorSubject<RideResponse | null> = new BehaviorSubject<RideResponse | null>(null);
+
+  public motionPolyLine: any
+
+  public started: boolean = false;
+
+  public rideData : BehaviorSubject<RideUpdateDTO> = new BehaviorSubject<RideUpdateDTO>({
+    rideId: this.ride.getValue()?.ride.rideId ?? -1,
+    paused: true,
+    resuming: false,
+    completed: false,
+    speed: 15,
+    coordsIndex: 0,
+    historyId: null
+  });
 
   public start = signal<string>('');
   public destination = signal<string>('');

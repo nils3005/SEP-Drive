@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Client, IMessage, Frame } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { Observable } from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 export class WebsocketService implements OnDestroy {
 
   private client: Client;
+  public isConnected: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor() {
     // STOMP-Client konfigurieren
@@ -27,6 +28,7 @@ export class WebsocketService implements OnDestroy {
     // onConnect-Callback: hier kann man initial Subscriptions setzen, wenn nötig
     this.client.onConnect = (frame: Frame) => {
       console.log('STOMP verbunden:', frame.headers);
+      this.isConnected.next(true);
       // Beispiel: automatisch auf /topic/ride-offers subscriben
       // this.subscribe('/topic/ride-offers').subscribe(msg => console.log(msg));
     };

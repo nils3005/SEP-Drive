@@ -41,6 +41,7 @@ export class GeoService {
     this.openRouteServiceService.getRouteFromPointArray(coordinates).subscribe({
       next: response => {
         this.route.next(response.body);
+        console.log(response.body);
         this.showInput.next(false);
       },
       error: error => {
@@ -69,7 +70,8 @@ export class GeoService {
     this.waypoints.next(tempWaypoints);
     if (zoom) {
       this.currentPoint.next(destination);
-    }  }
+    }
+  }
 
   public addStop(stop: GeocodeFeature): void
   {
