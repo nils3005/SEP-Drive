@@ -1,113 +1,108 @@
-import {Component, OnInit, OnDestroy, ViewChild, inject} from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import {Component, OnInit, OnDestroy, inject, signal} from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RideofferService } from '../../services/rideoffer/rideoffer.service';
 import {RideOffer, RideOfferNotification} from '../../types';
 
-import { MatTableModule } from '@angular/material/table';
-import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
-import { MatButtonModule } from '@angular/material/button';
-import { MatTableDataSource } from '@angular/material/table';
-import { Subscription } from 'rxjs';
 import {WebsocketService} from "../../services/websocket/websocket.service";
-import {MatSnackBar} from "@angular/material/snack-bar";
-import {RideRequestSummaryComponent} from "../ride-request-summary/ride-request-summary.component";
-import {MapComponent} from "../map/map.component";
+import {RideRequestService} from "../../services/riderequest/ride-request.service";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-rideoffers',
   standalone: true,
   imports: [
-    CommonModule,      // für ngIf, *ngFor, DecimalPipe, etc.
-    DecimalPipe,       // für Formatierung in der Template (falls benötigt)
-    MatTableModule,    // <table mat-table>
-    MatSortModule,     // mat-sort-header, MatSort
-    MatButtonModule,
-    RideRequestSummaryComponent,
-    MapComponent
+    CommonModule
   ],
   templateUrl: './ride-offers.component.html',
   styleUrls: ['./ride-offers.component.scss']
 })
 export class RideOffersComponent implements OnInit, OnDestroy {
-  private route = inject(ActivatedRoute);
   private rideOfferService = inject(RideofferService);
   private webSocketService = inject(WebsocketService);
-  private snackBar: MatSnackBar = inject(MatSnackBar);
+  private rideRequestService: RideRequestService = inject(RideRequestService);
 
-  rideRequestId!: number;
-  displayedColumns: string[] = [
-    'driverName',
-    'rating',
-    'totalRides',
-    'totalDistance',
-    'price',
-    'createdAt',
-    'actions'
-  ];
-  dataSource = new MatTableDataSource<RideOffer>([]);
+  /** Aktuelle Liste, vom Websocket-Stream befüllt */
+  offers = signal<RideOffer[]>([]);
 
-  @ViewChild(MatSort) sort!: MatSort;
+  /** Aktueller Sort-State */
+  private currentSort: SortParams = { field: 'rating', direction: 'desc' };
+
+  // Signal für Banner-Anzeige
+  notificationDriverName = signal("");
+
+  private rideRequestId: number = -1;
 
   // Subscription für paramMap (wird in ngOnDestroy unsubscribet)
-  private routeSub?: Subscription;
+  private sub?: Subscription;
 
   ngOnInit(): void {
-    // URL-Parameter auslesen (z.B. /ride-request/123/offers)
-    this.routeSub = this.route.paramMap.subscribe(params => {
-      this.rideRequestId = Number(params.get('rideRequestId'));
-      this.loadOffers(); // erste Initialisierung
+    // active RideRequest holen
+    this.rideRequestService.getActiveRide().subscribe({
+      next: ({ body }) => {
+        this.rideRequestId = body.id;
+
+        // Initial per HTTP laden
+        this.loadOffers();
+
+        // Erst jetzt auf den richtigen Topic subscriben
+        this.sub = this.webSocketService
+            .subscribe<RideOfferNotification>(`/topic/ride-requests/${this.rideRequestId}/offers`)
+            .subscribe({
+              next: (notification) => {
+                console.log("WebSocket Notification erhalten:", notification);
+                this.loadOffers(); // Das löst den HTTP-Call aus
+                this.notificationDriverName.set(notification.driverName);
+                setTimeout(() => this.notificationDriverName.set(""), 8000);
+              },
+              error: (err) => {
+                console.error("WebSocket Fehler:", err);
+              }
+            });
+      },
+      error: err => {
+        console.error('Fehler beim Laden der RideRequest:', err);
+      }
     });
   }
 
   ngOnDestroy(): void {
     // Bei Verlassen der Komponente Subscription abbrechen
-    this.routeSub?.unsubscribe();
+    this.sub?.unsubscribe();
   }
 
-  /**
-   * Lädt die Angebote vom Server (Backend-Sortierung).
-   *
-   * @param sortBy Feld, nach dem sortiert wird (z.B. 'rating')
-   * @param direction 'asc' | 'desc'
-   */
-  loadOffers(sortBy: string = 'rating', direction: string = 'desc'): void {
-    this.rideOfferService.getOffersForRequest(this.rideRequestId, sortBy, direction)
+  private loadOffers() {
+    this.rideOfferService
+        .getOffersForRequest(
+            this.rideRequestId,
+            this.currentSort.field,
+            this.currentSort.direction
+        )
         .subscribe({
-          next: (offers: RideOffer[]) => {
-            this.dataSource.data = offers;
+          next: (list) => {
+            console.log("Offer Liste erhalten:", list);
+            this.offers.set(list);
           },
           error: (err) => {
-            console.log('Fehler beim Laden der Angebote: ' +  err.message);
+            console.error("Fehler beim Laden der Offers:", err);
           }
         });
   }
 
-  /**
-   * Abonniert das STOMP-Topic "/topic/offers.{rideRequestId}", um
-   * in Echtzeit informiert zu werden, sobald ein Fahrer ein neues Angebot sendet.
-   */
-  private subscribeToOfferNotifications(): void {
-    if (this.routeSub) {
-      this.routeSub.unsubscribe();
+  arrow(field: SortParams['field']): string {
+    if (this.currentSort.field !== field) {
+      return '↕';
     }
+    return this.currentSort.direction === 'asc' ? '↑' : '↓';
+  }
 
-    const topic = `/topic/offers.${this.rideRequestId}`;
-    this.routeSub = this.webSocketService.subscribe<RideOfferNotification>(topic).subscribe({
-      next: (notification) => {
-        // Snackbar / Notification anzeigen
-        this.snackBar.open(
-            `Neues Angebot von ${notification.driverName} (${notification.driverRating.toFixed(1)} ★)`,
-            'OK',
-            { duration: 5000 }
-        );
-        // Tabelle neu laden
-        this.loadOffers();
-      },
-      error: (err) => {
-        console.error('WebSocket-Fehler:', err);
-      }
-    });
+  sortBy(field: SortParams['field']) {
+    const dir: SortParams['direction'] =
+        this.currentSort.field === field
+            ? (this.currentSort.direction === 'asc' ? 'desc' : 'asc')
+            : 'desc';
+
+    this.currentSort = { field, direction: dir };
+    this.loadOffers();
   }
 
   /**
@@ -117,13 +112,11 @@ export class RideOffersComponent implements OnInit, OnDestroy {
     if (confirm('Möchtest du dieses Angebot annehmen?')) {
       this.rideOfferService.acceptOffer(offerId).subscribe({
         next: () => {
-          console.log('Angebot angenommen. Alle anderen Angebote wurden abgelehnt.'); // Debug
-          this.snackBar.open('Angebot angenommen. Alle anderen Angebote wurden abgelehnt.', 'OK', { duration: 5000 });
+          console.log('Angebot angenommen. Alle anderen Angebote wurden abgelehnt.'); // TODO Debug
           this.loadOffers();
         },
         error: (err) => {
-          console.log('Fehler beim Annehmen: ' + err.message); // Debug
-          this.snackBar.open(`Fehler: ${err.error.message}`, 'OK', { duration: 5000 });
+          console.log('Fehler beim Annehmen: ' + err.message); // TODO Debug
         }
       });
     }
@@ -137,25 +130,13 @@ export class RideOffersComponent implements OnInit, OnDestroy {
       this.rideOfferService.rejectOffer(offerId).subscribe({
         next: () => {
           console.log('Angebot abgelehnt.');
-          this.snackBar.open('Angebot abgelehnt.', 'OK', { duration: 3000 });
           this.loadOffers();
         },
         error: (err) => {
           console.log('Fehler beim Ablehnen: ' + err.message);
-          this.snackBar.open(`Fehler: ${err.message}`, 'OK', { duration: 5000 });
         }
       });
     }
-  }
-
-  /**
-   * Reagiert auf Sort-Änderungen in der UI.
-   */
-  onSortChange(sortState: Sort): void {
-    if (!sortState.active || sortState.direction === '') {
-      return;
-    }
-    this.loadOffers(sortState.active, sortState.direction);
   }
 
   /**
@@ -175,4 +156,9 @@ export class RideOffersComponent implements OnInit, OnDestroy {
       return 'far fa-star';                 // leerer Stern
     }
   }
+}
+
+export interface SortParams {
+  field: 'rating' | 'totalRides' | 'distance';
+  direction: 'asc' | 'desc';
 }

@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
-import {Client, Frame, IMessage} from "@stomp/stompjs";
+import {Client, Frame, IMessage, StompSubscription} from "@stomp/stompjs";
 import SockJS from 'sockjs-client';
 
 @Injectable({
@@ -9,6 +9,10 @@ import SockJS from 'sockjs-client';
 export class WebsocketService implements OnDestroy {
 
   private client: Client;
+  private pendingSubscriptions: {
+    topic: string;
+    observer: any;
+  }[] = [];
 
   constructor() {
     // STOMP-Client konfigurieren
@@ -27,8 +31,8 @@ export class WebsocketService implements OnDestroy {
     // onConnect-Callback: hier kann man initial Subscriptions setzen, wenn nötig
     this.client.onConnect = (frame: Frame) => {
       console.log('STOMP verbunden:', frame.headers);
-      // Beispiel: automatisch auf /topic/ride-offers subscriben
-      // this.subscribe('/topic/ride-offers').subscribe(msg => console.log(msg));
+      this.pendingSubscriptions.forEach(ps => this._doSubscribe(ps.topic, ps.observer));
+      this.pendingSubscriptions = [];
     };
 
     this.client.onStompError = (frame: Frame) => {
@@ -49,20 +53,33 @@ export class WebsocketService implements OnDestroy {
   public subscribe<T>(topic: string): Observable<T> {
     return new Observable<T>((observer) => {
       // Sobald verbunden, subscriben
-      const subscription = this.client.subscribe(topic, (message: IMessage) => {
-        try {
-          const payload = JSON.parse(message.body) as T;
-          observer.next(payload);
-        } catch (e) {
-          observer.error(e);
-        }
-      });
-
-      // Cleanup: beim Unsubscribe
+      if (this.client.connected) {
+        const sub = this._doSubscribe(topic, observer);
+        return () => sub.unsubscribe();
+      }
+      // sonst merke Dir Topic und Observer und subscribe später
+      this.pendingSubscriptions.push({ topic, observer });
+      // Cleanup: entferne aus pending und unsubscriben falls schon da
       return () => {
-        subscription.unsubscribe();
+        // Entferne aus noch nicht ausgeführten Subscriptions
+        this.pendingSubscriptions = this.pendingSubscriptions.filter(
+            ps => !(ps.topic === topic && ps.observer === observer)
+        );
       };
     });
+  }
+
+  /** Internes: führt das echte STOMP subscribe aus */
+  private _doSubscribe<T>(topic: string, observer: any): StompSubscription {
+    const sub = this.client.subscribe(topic, (msg: IMessage) => {
+      try {
+        observer.next(JSON.parse(msg.body) as T);
+      } catch (e) {
+        observer.error(e);
+      }
+    });
+    // wenn der Observer unsubscribet, wird automatisch sub.unsubscribe() aufgerufen
+    return sub;
   }
 
   /**

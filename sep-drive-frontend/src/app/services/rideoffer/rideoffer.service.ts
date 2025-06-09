@@ -7,18 +7,14 @@ import {Observable} from "rxjs";
   providedIn: 'root'
 })
 export class RideofferService {
-  private baseUrl = '/api';
+  private baseUrl = 'http://localhost:8080/api';
   private http: HttpClient = inject(HttpClient);
 
   /**
    * Neue Angebot erstellen (als Fahrer).
    */
-  createOffer(rideRequestId: number, priceInCents: number): Observable<RideOffer> {
-    const body = {
-      rideRequestId,
-      priceInCents
-    };
-    return this.http.post<RideOffer>(`${this.baseUrl}/offers`, body);
+  createOffer(rideRequestId: number): Observable<RideOffer> {
+        return this.http.post<RideOffer>(`${this.baseUrl}/offers/${rideRequestId}`, {});
   }
 
   /**
@@ -32,11 +28,11 @@ export class RideofferService {
    * Alle PENDING-Angebote für eine Fahranfrage (als Kunde),
    * mit optionaler Sortierung.
    */
-  getOffersForRequest(rideRequestId: number, sortBy: string = 'rating', direction: string = 'desc'): Observable<RideOffer[]> {
+  getOffersForRequest(rideRequestId: number, sortBy: string = 'rating', direction: string = 'desc'): Observable<any[]> {
     let params = new HttpParams()
         .set('sortBy', sortBy)
         .set('direction', direction);
-    return this.http.get<RideOffer[]>(`${this.baseUrl}/ride-requests/${rideRequestId}/offers`, { params });
+    return this.http.get<any[]>(`${this.baseUrl}/ride-requests/${rideRequestId}/offers`, { params });
   }
 
   /**

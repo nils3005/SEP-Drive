@@ -1,73 +1,61 @@
-/**
- * Flex-Layout mit zwei Spalten
- */
-.offer-container {
-  display: flex;
-  flex-direction: row;
-  gap: 16px;             // Abstand zwischen linkem und rechtem Bereich
-  padding: 16px;
-}
+.ride-table {
+  width: 100%;
+  border-collapse: collapse;
 
-/**
- * Linke Hälfte (Angebotsliste)
- */
-.offer-left {
-  flex: 1 1 0;           // wächst, nimmt verfügbaren Platz ein
-  background: #fff;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  thead {
+    background: #f8dcdc;
+    th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      cursor: pointer;
+      user-select: none;
 
-  h3 {
-    margin-top: 0;
-    margin-bottom: 16px;
-    font-size: 1.25rem;
+      .arrow {
+        font-size: 0.8rem;
+        opacity: 0.7;
+      }
+    }
   }
 
-  table {
-    width: 100%;
-  }
+  tbody {
+    tr {
+      border-bottom: 1px solid #ddd;
+    }
+    td {
+      padding: 0.5rem 1rem;
+      vertical-align: middle;
+    }
+    .rating {
+      color: #a02;
 
-  .no-offers-text {
-    margin-top: 16px;
-    font-style: italic;
-    color: #666;
-    text-align: center;
-  }
-
-  /* Stern-Icons (Material Icons) */
-  mat-icon {
-    color: #d32f2f;  // dunkles Rot für Stern
-    vertical-align: middle;
-  }
-}
-
-/**
- * Rechte Hälfte (RideRequestSummary + Map)
- */
-.offer-right {
-  flex: 0 0 400px;       // bleibt bei 400px Breite (oder passe an deine Bedürfnisse an)
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-
-  h3 {
-    margin-top: 0;
-    margin-bottom: 8px;
-    font-size: 1.25rem;
-  }
-
-  /* Die Summary‐Komponente soll sich automatisch in der Breite anpassen */
-  app-ride-request-summary {
-    display: block;
-  }
-
-  /* Map: volle Breite und fixierte Höhe, damit es optisch passt */
-  app-map {
-    flex: 1 1 auto;
-    min-height: 300px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      .star {
+        font-size: 1.2rem;
+      }
+    }
+    .actions {
+      button {
+        cursor: pointer;
+        margin-right: 0.5rem;
+        padding: 0.4rem 0.8rem;
+        border: none;
+        border-radius: 0.25rem;
+        font-size: 0.9rem;
+        &.accept { background: #4caf50; color: white; }
+        &.decline { background: #f44336; color: white; }
+      }
+    }
   }
 }
+
+.notification {
+  margin-top: 0.5rem;
+  background: #fff4e5;
+  color: #663c00;
+  border: 1px solid #ffd27f;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  text-align: center;
+}
+

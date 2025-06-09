@@ -41,6 +41,11 @@ public class RideOfferService {
             throw new ResponseStatusException(BAD_REQUEST, "Du hast bereits ein offenes Angebot. Fahrer dürfen nur ein Angebot gleichzeitig haben.");
         }
 
+        // Prüfen, ob Auto des Fahrer auch das gewünschte des Kunden ist
+        if(driver.getCarType() != rideRequest.getCarType()) {
+            throw new ResponseStatusException(BAD_REQUEST, "Kunde hat CarType " + rideRequest.getCarType() + " bestellt, aber driver hat " + driver.getCarType());
+        }
+
         // Fahrer darf nicht bereits auf dieselbe Request PENDING bieten (wird bereits durch unique constraint abgefangen, aber hier um sicher zu sein).
         rideOfferRepository.findByDriverAndRideRequestAndStatus(driver, rideRequest, RideOfferStatus.PENDING)
                 .ifPresent(o -> {
@@ -64,18 +69,13 @@ public class RideOfferService {
         double totalDistance = 0.0; //TODO: wie bekommen wir das? Als attribut für jeden user -> dann immer wieder update nach fahrt oder wird der wert immer neu berechnet?
 
         RideOfferNotificationDto notification = RideOfferNotificationDto.builder()
-                .offerId(savedOffer.getId())
+                .rideOfferId(savedOffer.getId())
                 .rideRequestId(rideRequestId)
                 .driverId(driverId)
                 .driverName(driver.getUsername())
-                .driverRating(rating)
-                .driverTotalRides(totalRides)
-                .driverTotalDistance(totalDistance)
-                .createdAt(OffsetDateTime.now().toString())
                 .build();
 
-        // "/topic/offers.{rideRequestId}" nur Clients, die genau diese Request-ID abonnieren, bekommen die Nachricht
-        String destination = "/topic/offers." + rideRequestId;
+        String destination = "/topic/ride-requests/" + rideRequestId + "/offers";
         messagingTemplate.convertAndSend(destination, notification);
 
         return savedOffer;
@@ -96,6 +96,8 @@ public class RideOfferService {
         if (RideOffer.getStatus() != RideOfferStatus.PENDING) {
             throw new ResponseStatusException(BAD_REQUEST, "Nur PENDING-Angebote können zurückgezogen werden");
         }
+
+        // TODO Kunden WebSocket info
 
         RideOffer.setStatus(RideOfferStatus.WITHDRAWN);
         rideOfferRepository.save(RideOffer);
@@ -180,14 +182,10 @@ public class RideOfferService {
     @Data
     @Builder
     public static class RideOfferNotificationDto {
-        private Long offerId;
+        private Long rideOfferId;
         private Long rideRequestId;
         private Long driverId;
         private String driverName;
-        private double driverRating;
-        private long driverTotalRides;
-        private double driverTotalDistance;
-        private String createdAt;
     }
 
 

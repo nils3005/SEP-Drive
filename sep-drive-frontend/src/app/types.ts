@@ -78,16 +78,13 @@ export type RideOffer = {
   rating: number;
   totalRides: number;
   totalDistance: number;
-  priceInCents: number;
-  createdAt: string; // ISO-Datumsstring, z. B. "2025-06-01T12:34:56Z"
 }
 
 export type RideOfferNotification = {
-  offerId: number;
+  rideOfferId: number;
   rideRequestId: number;
   driverId: number;
   driverName: string;
-  driverRating: number;
 }
 
 export type RideRequestSummary = {
