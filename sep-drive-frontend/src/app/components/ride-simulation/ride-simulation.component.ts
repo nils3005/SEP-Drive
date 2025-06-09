@@ -7,7 +7,6 @@ import {Coordinates, RideResponse, RideUpdateDTO} from '../../types';
 import {OpenRouteServiceService} from '../../services/openroute/open-route-service.service';
 import {GeoService} from '../../services/geo/geo.service';
 import {WebsocketService} from '../../services/websocket/web-socket.service';
-import {shareReplay, take} from 'rxjs';
 
 @Component({
   selector: 'app-ride-simulation',
@@ -18,7 +17,7 @@ import {shareReplay, take} from 'rxjs';
 export class RideSimulationComponent implements OnInit {
   public speedValue = 15;
 
-  private speedChange: boolean = false;
+  private started: number = 0;
 
   constructor(
     private mapService: MapService,
@@ -111,15 +110,15 @@ export class RideSimulationComponent implements OnInit {
         } else {
           this.rideSimulationStore.motionPolyLine.motionResume()
         }
+        this.started += 1;
       }
-      if (this.speedChange) {
+      if (this.started > 1) {
         const ride = this.rideSimulationStore.ride.getValue();
         if (this.rideSimulationStore.motionPolyLine && ride) {
           // console.log(ride.ride.distance)
           // console.log(rideData.speed)
           const speed = this.rideService.calculateKmh(ride.ride.distance, rideData.speed)
           this.rideSimulationStore.motionPolyLine.motionSpeed(speed)
-          this.speedChange = false;
         }
       }
     })
@@ -129,7 +128,6 @@ export class RideSimulationComponent implements OnInit {
     // console.log('Speed input changed:', this.speedValue);
     let rideData = this.rideSimulationStore.rideData.getValue();
     rideData.speed = this.speedValue;
-    this.speedChange = true;
     this.rideSimulationStore.rideData.next(rideData);
     this.rideService.updateRide()
     // console.log(this.rideSimulationStore.rideData.getValue())
