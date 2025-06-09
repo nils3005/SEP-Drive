@@ -13,33 +13,31 @@ public class GeoJsonRouteParser {
 
     public List<double[]> extractCoordinates(String route) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(route);
+            List<double[]> coordinates = new ArrayList<>();
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode root = objectMapper.readTree(route);
             JsonNode coords = root.at("/features/0/geometry/coordinates");
-            List<double[]> list = new ArrayList<>();
             for (JsonNode coord : coords) {
-                list.add(new double[]{coord.get(1).asDouble(), coord.get(0).asDouble()});
+                coordinates.add(new double[]{coord.get(1).asDouble(), coord.get(0).asDouble()});
             }
-            return list;
+            return coordinates;
         } catch (Exception e) {
-            throw new GeoJsonParsingException("GeoJSON parsing failed");
+            throw new GeoJsonParsingException("GeoJson parsing failed");
         }
     }
 
     public List<Double> percentageOfRoute(List<double[]> coordinates, double totalDistance) {
-        List<Double> list = new ArrayList<>();
+        List<Double> percentages = new ArrayList<>();
         for(int i = 0; i<coordinates.size()-1; i++) {
             double percent = distanceOfTwoCoords(coordinates.get(i), coordinates.get(i+1))/totalDistance;
-            list.add(percent);
+            percentages.add(percent);
         }
-        return list;
+        return percentages;
     }
 
-    /*public double distanceOfTwoCoords(double[] firstCoord, double[] secondCoord) {
-        double x = (secondCoord[1] - firstCoord[1]) * 111.32 *Math.cos(Math.toRadians(firstCoord[0]+secondCoord[0]/2));
-        double y = (firstCoord[0] - secondCoord[0]) * 110.574;
-        return 1000*Math.sqrt(x * x + y * y);
-    }*/
+    //Haversine-Formula
+    //Author: Harpal Singh
+    //Website: https://www.baeldung.com/java-find-distance-between-points
     public double distanceOfTwoCoords(double[] firstCoord, double[] secondCoord) {
         final int R = 6371;
 
@@ -56,7 +54,7 @@ public class GeoJsonRouteParser {
                 * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return 1000*R * c;
+        return 1000 * R * c;
     }
 }
 

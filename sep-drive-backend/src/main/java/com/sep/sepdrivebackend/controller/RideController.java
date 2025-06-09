@@ -19,6 +19,7 @@ public class RideController {
         this.rideService = rideService;
     }
 
+    //Methode nur zum testen
     @GetMapping("/all")
     public ResponseEntity<?> getAllRides() {
         try{

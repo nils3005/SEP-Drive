@@ -1,6 +1,5 @@
 package com.sep.sepdrivebackend.controller;
 
-//import com.sep.sepdrivebackend.dto.RideDTO;
 import com.sep.sepdrivebackend.dto.RideUpdateDto;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;

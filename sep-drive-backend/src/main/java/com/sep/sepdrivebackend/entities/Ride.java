@@ -24,8 +24,6 @@ public class Ride {
     private float distance;
     private float duration;
     private RideStatus status;
-    /*@ElementCollection
-    private double[] coords;*/
     private int coordsIndex;
     @Lob
     private String geoJson;
