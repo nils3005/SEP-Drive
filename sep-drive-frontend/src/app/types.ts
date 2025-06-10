@@ -1,6 +1,5 @@
 import {RideRequestStatus} from "./enums/ride-request-status";
 import {CarType} from "./enums/car-type";
-import {RideStatus} from './enums/ride-status';
 
 export type NavLink = {
   id: number,
@@ -56,6 +55,14 @@ export type User = {
   ratings: number[];
   carType: string;
   profilePicture: string;
+  creditCardNumber: string | null;
+  expiryDate: string | null;
+  cvc: string | null;
+  iban: string | null;
+  balance: number;
+  lastFourIban: number | null;
+  lastFourCreditCardNumber: number | null;
+
 }
 
 export type Coordinates = {
@@ -96,6 +103,24 @@ export type DriveUser = {
   carType: string
 }
 
+export type paymentMethodDriver ={
+  firstName: string,
+  lastName: string,
+  iban: string,
+}
+
+export type paymentMethodCustomer = {
+  firstName: string,
+  lastName: string,
+  creditCardNumber: string,
+  expiryDate: string,
+  cvc: string
+}
+
+export type Balance = {
+  balance: number
+}
+
 export interface fahrt {
   historyId: number;
   finishDate: string;
@@ -111,6 +136,7 @@ export interface fahrt {
   lastNameDriver: string;
   firstNameDriver: string
 }
+
 
 export type RideResponse = {
   ride: Ride

@@ -39,4 +39,37 @@ export class UserService {
     return this.http.get<User>(this.url + '/username/' + name);
   }
 
+  addCreditCard(data: {
+    cardNumber: string;
+    expiryDate: number;
+    cvc: string;
+  }): Observable<string> {
+    return this.http.post('http://localhost:8080/users/addcreditcard', data, {
+      responseType: 'text'
+    });
+  }
+
+  addBankAccount(data: {
+    iban: string;
+  }): Observable<string> {
+    return this.http.post('http://localhost:8080/users/addbankaccount', data, {
+      responseType: 'text'
+    });
+  }
+
+  deposit(amount: number): Observable<string> {
+    return this.http.post(`http://localhost:8080/users/deposit/${amount}`, null, {
+      responseType: 'text'
+    });
+  }
+
+  disburse(amount: number): Observable<string> {
+    return this.http.post(`http://localhost:8080/users/disburse/${amount}`, null, {
+      responseType: 'text'
+    });
+  }
+
+
+
+
 }
