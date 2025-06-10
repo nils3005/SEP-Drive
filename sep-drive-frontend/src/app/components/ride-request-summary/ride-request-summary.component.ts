@@ -59,7 +59,6 @@ export class RideRequestSummaryComponent {
       ).subscribe({
         next: () => {
           this.geoService.isSubmitted.next(true);
-          this.geoService.flyMapTo(this.geoService.waypoints.getValue()[0].geometry.coordinates[1], this.geoService.waypoints.getValue()[0].geometry.coordinates[0], 16, 1)
         },
         error: (error) => {
           if (error.status === 400) {
