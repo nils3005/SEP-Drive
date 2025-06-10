@@ -49,8 +49,8 @@ export class MapComponent implements AfterViewInit {
         }
     );
     tiles.addTo(this.geoService.map);
-    this.routeLayer = this.routeLayer.addTo(this.geoService.map)
-    this.markerLayer = this.markerLayer.addTo(this.geoService.map)
+    this.routeLayer = this.routeLayer.addTo(this.geoService.map);
+    this.markerLayer = this.markerLayer.addTo(this.geoService.map);
   }
 
   ngAfterViewInit(): void {
