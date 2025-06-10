@@ -33,7 +33,6 @@ public class SecurityConfig {
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/api/ride-requests/**").hasRole("CUSTOMER")
-                        .requestMatchers("/api/offers/**").hasRole("DRIVER")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session

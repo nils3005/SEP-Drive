@@ -58,7 +58,7 @@ public class User implements UserDetails {
     //@ElementCollection
     //private List<Integer> ratings;
 
-    private int numberOfRides;
+    private Long numberOfRides = 0L; // TODO
 
     @Setter(AccessLevel.NONE)
     @Enumerated(EnumType.STRING)

@@ -53,17 +53,22 @@ export class HomePageComponent implements OnInit {
           this.rideRequestService.getRideRequestSummaryFromRideRequest(response.body).then((summary) => {
             this.geoService.rideRequestSummaryData.next(summary);
             this.geoService.isSubmitted.next(true);
+            this.geoService.showInput.next(false);
           })
         }
       },
       error: (error)=> {
         if (error.status === 403 || error.status === 401) {
           // this.errorService.showError(error.message);
-          this.geoService.showInput.next(true)
+          console.log("403 ERROR AUS HOMECOMPONENT:",error);
+          if (!this.geoService.rideRequestSummaryData.getValue()) {
+            this.geoService.showInput.next(true);
+          }
           this.geoService.isSubmitted.next(false);
           return
         }
         if (error.status === 404) {
+          console.log("404 ERROR AUS HOMECOMPONENT:",error);
           this.geoService.isSubmitted.next(false);
           this.geoService.showInput.next(true)
         }

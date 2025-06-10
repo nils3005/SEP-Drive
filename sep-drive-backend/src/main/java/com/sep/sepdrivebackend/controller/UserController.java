@@ -1,6 +1,7 @@
 package com.sep.sepdrivebackend.controller;
 
 import com.sep.sepdrivebackend.entities.User;
+import com.sep.sepdrivebackend.dto.UserDto;
 import com.sep.sepdrivebackend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,20 +49,22 @@ public class UserController {
 
     // muss leider so heißen sonst: Ambiguous handler methods mapped for '/users/user'
     @GetMapping("/users/username/{username}")
-    public User findByUsername(@PathVariable String username) {
+    public UserDto findByUsername(@PathVariable String username) {
         User user = userService.findByUsername(username);
+
         if ( null == user ) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.", null);
         }
-        return user;
+
+        return UserDto.fromEntity(user);
     }
 
     @GetMapping(path = "/users/{userID}")
-    public User findByUserId(@PathVariable Long userID) {
+    public UserDto findByUserId(@PathVariable Long userID) {
         User user = userService.findByUserId(userID);
         if ( null == user ) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "UserId not found.", null);
         }
-        return user;
+        return UserDto.fromEntity(user);
     }
 }

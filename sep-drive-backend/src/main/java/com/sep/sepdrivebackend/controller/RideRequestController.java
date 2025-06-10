@@ -1,5 +1,6 @@
 package com.sep.sepdrivebackend.controller;
 
+import com.sep.sepdrivebackend.dto.RideRequestDto;
 import com.sep.sepdrivebackend.entities.RideRequest;
 import com.sep.sepdrivebackend.service.RideRequestService;
 
@@ -28,12 +29,14 @@ public class RideRequestController {
     }
 
     @GetMapping("/active")
-    public ResponseEntity<?> getActive() {
+    public ResponseEntity<RideRequestDto> getActive() {
         RideRequest activeRide = rideRequestService.getActiveRide();
+
         if (activeRide == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "No active ride request found"));
+            return ResponseEntity.badRequest().build();
+        } else {
+            return ResponseEntity.ok(RideRequestDto.fromEntity(activeRide));
         }
-        return ResponseEntity.ok(activeRide);
     }
 
     @DeleteMapping("/cancel")

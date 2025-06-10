@@ -1,5 +1,6 @@
 package com.sep.sepdrivebackend.controller;
 
+import com.sep.sepdrivebackend.entities.Rating;
 import com.sep.sepdrivebackend.entities.RideOffer;
 import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.service.RideOfferService;
@@ -68,7 +69,7 @@ public class RideOfferController {
                 .map(offer -> {
                     User driver = offer.getDriver();
                     // Hole Bewertung, Gesamtfahrten, Gesamtstrecke von Driver
-                    double rating = driver.getAvgRating();
+                    double rating = driver.getRatings().stream().mapToDouble(Rating::getRating).average().orElse(0.0);
                     long totalRides = driver.getNumberOfRides();
                     double totalDistance = 0.0; // TODO
                     return RideOfferForCustomerDto.builder()

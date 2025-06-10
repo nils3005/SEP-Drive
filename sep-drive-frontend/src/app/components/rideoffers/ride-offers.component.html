@@ -18,9 +18,9 @@
     <tr *ngFor="let offer of offers()">
         <!-- Sterne für Bewertung -->
         <td class="rating">
-            <ng-container *ngFor="let star of [1,2,3,4,5]; let i = index">
-              <i [class]="this.averageClass(star, offer.rating)"></i>
-            </ng-container>
+            @for (star of [1,2,3,4,5]; track star) {
+                <i [class]="this.averageClass(star, offer.rating)"></i>
+            }
         </td>
         <td>{{ offer.totalRides }}</td>
         <td>{{ offer.totalDistance.toFixed(1) }} km</td>

@@ -52,7 +52,7 @@ export type User = {
   email: string;
   birthdate: string;
   numberOfRides: number;
-  ratings: number[];
+  rating: number;
   carType: string;
   profilePicture: string;
 }

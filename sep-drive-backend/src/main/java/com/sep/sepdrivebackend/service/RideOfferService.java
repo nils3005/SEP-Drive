@@ -31,7 +31,10 @@ public class RideOfferService {
     @Transactional
     public RideOffer createOffer(Long driverId, Long rideRequestId) {
         User driver = userService.findByUserId(driverId);
-                //.orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Fahrer nicht gefunden"));
+        if(driver == null) {
+            throw new ResponseStatusException(NOT_FOUND, "Fahrer nicht gefunden");
+        }
+
         RideRequest rideRequest = rideRequestService.findById(rideRequestId)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Fahranfrage nicht gefunden"));
 
