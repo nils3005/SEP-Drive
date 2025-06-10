@@ -38,10 +38,26 @@
                     <label>Autoklasse</label>
                     <input type="text" [value]="user()!.carType">
                 }
+              <ng-container *ngIf="ownProfile()">
+                <label>Zahlungsmethode</label>
+                <div>
+                  <div *ngIf="user()?.role === 'CUSTOMER' && user()?.lastFourCreditCardNumber">
+                    <input type="text" class="w-300"[value]="'Kreditkarte: **** **** **** ' + user()?.lastFourCreditCardNumber" readonly />
+                  </div>
+                  <div *ngIf="user()?.role === 'DRIVER' && user()?.iban">
+                    <input type="text" class="w-300" [value]="'IBAN: **** ' + user()?.lastFourIban" readonly />
+                  </div>
+                  <div *ngIf="(user()?.role === 'CUSTOMER' && !user()?.lastFourCreditCardNumber) || (user()?.role === 'DRIVER' && !user()?.lastFourIban)">
+                    <input type="text" class="w-300" value="Keine Zahlungsmethode hinterlegt." readonly />
+                  </div>
+                </div>
+                <label>Guthaben</label>
+                <input type="text" class="w-300" [value]= user()?.balance readonly />
+              </ng-container>
             </div>
         </div>
 
-        <div class="profile-avatar">
+        <div class="profile-avatar flex flex-col items-center space-y-6">
             @if (user()?.profilePicture) {
                 <img
                         [src]="'data:image/png;base64,' + user()!.profilePicture"
@@ -53,7 +69,18 @@
                     Profilbild
                 </div>
             }
+          @if (ownProfile()) {
+            <div class="flex flex-col space-y-4 mt-8">
+              <button (click)="paymentMethod()" class="bg-[#914141] text-white hover:bg-[#733C3C] rounded h-13 px-4 py-2">
+                Zahlungsdaten hinzufügen/ändern
+              </button>
+              <button (click)="balance()" class="bg-[#914141] text-white hover:bg-[#733C3C] rounded h-13 px-4 py-2">
+                Guthaben aufladen/abbuchen
+              </button>
+            </div>
+          }
         </div>
+
     } @else {
         <div class="not-logged-in">Logge dich ein, um die User zu sehen.</div>
     }

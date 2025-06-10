@@ -1,17 +1,19 @@
 import {Component, computed, inject} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {UserService} from "../../services/user/user.service";
 import {FormsModule} from "@angular/forms";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {switchMap} from "rxjs";
 import {toSignal} from "@angular/core/rxjs-interop";
 import {AuthService} from "../../services/auth/auth-service.service";
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-profile',
   imports: [
     FormsModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    NgIf
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
@@ -19,6 +21,7 @@ import {AuthService} from "../../services/auth/auth-service.service";
 export class ProfileComponent {
   private route = inject(ActivatedRoute);
   private userService = inject(UserService);
+  private router: Router = inject(Router)
   auth = inject(AuthService);
 
   // Macht aus dem RxJS-Observable ein Angular Signal
@@ -32,7 +35,14 @@ export class ProfileComponent {
       ),
       { initialValue: null }
   );
+  ownProfile = computed(() => {
+    const current = this.auth.user();
+    const profile = this.user();
 
+
+
+    return !!current && !!profile && current.id === profile.id;
+  });
   /**
    * @brief berechnet den Durchschnitt aller Ratings.
    *
@@ -64,5 +74,11 @@ export class ProfileComponent {
       return 'far fa-star';                 // leerer Stern
     }
   }
+  paymentMethod(): void {
+    this.router.navigate(['/payment-method']);
+  }
 
+  balance() {
+    this.router.navigate(['/balance']);
+  }
 }
