@@ -10,13 +10,15 @@ import {ErrorService} from "../../services/error/error.service";
 import {BehaviorSubject} from "rxjs";
 import {UserService} from "../../services/user/user.service";
 import {jwtDecode} from "jwt-decode";
+import {RideRequestListComponent} from '../../ride-request-list/ride-request-list.component';
 
 @Component({
   selector: 'app-home-page',
   imports: [
     RouteInputComponent,
     MapComponent,
-    RideRequestSummaryComponent
+    RideRequestSummaryComponent,
+    RideRequestListComponent
   ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'
