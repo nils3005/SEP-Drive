@@ -1,7 +1,9 @@
 package com.sep.sepdrivebackend.controller;
 
+import com.sep.sepdrivebackend.entities.Financials;
 import com.sep.sepdrivebackend.entities.Role;
 import com.sep.sepdrivebackend.entities.User;
+import com.sep.sepdrivebackend.service.FinancialsService;
 import com.sep.sepdrivebackend.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,64 +18,33 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(UserController.class)
-public class UserControllerTest {
+public class FinancialsControllerTest {
+
+    @MockitoBean
+    private FinancialsService financialsService;
 
     @MockitoBean
     private UserService userService;
 
-    static class PartialUserController extends UserController {
-
-        private final String currentUser;
-
-        public PartialUserController(UserService userService, String currentUser) {
-            super(userService);
-
-            this.currentUser = currentUser;
-        }
-
-        protected String getCurrentUserName() {
-            return currentUser;
-        }
-    }
-
-    @Test
-    public void disburse_unknownUser() throws Exception {
-
-        UserController userController = new PartialUserController(
-                userService,
-                "sheldon_cooper");
-
-        try {
-
-            userController.disburse(10);
-            Assertions.fail();
-
-        } catch (Throwable t) {
-
-            Assertions.assertInstanceOf(ResponseStatusException.class, t);
-            ResponseStatusException e = (ResponseStatusException) t;
-            Assertions.assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
-            Assertions.assertEquals("Username not found.", e.getReason());
-        }
-    }
-
     @Test
     public void disburse_notDriver() throws Exception {
 
-        UserController userController = new PartialUserController(
-                userService,
-                "sheldon_cooper");
+        Financials financials = new Financials();
+        financials.setBalance(100.0);
+        financials.setIban("DE12345678901234567890");
 
         User user = new User();
         user.setUsername("sheldon_cooper");
-        user.setBalance(100.0);
-        user.setIban("DE12345678901234567890");
         user.setRole(Role.CUSTOMER);
+        user.setFinancials(financials);
 
-        given(userService.findByUsername("sheldon_cooper")).willReturn(user);
+        given(userService.getCurrentUser()).willReturn(user);
+
+        FinancialsController financialsController = new FinancialsController(userService, financialsService);
+
         try {
 
-            userController.disburse(10);
+            financialsController.disburse(10);
             Assertions.fail();
 
         } catch (Throwable t) {
@@ -88,19 +59,22 @@ public class UserControllerTest {
     @Test
     public void disburse_noIBAN() throws Exception {
 
-        UserController userController = new PartialUserController(
-                userService,
-                "sheldon_cooper");
+        Financials financials = new Financials();
+        financials.setBalance(100.0);
+        financials.setIban(null);
 
         User user = new User();
         user.setUsername("sheldon_cooper");
-        user.setBalance(100.0);
         user.setRole(Role.DRIVER);
+        user.setFinancials(financials);
 
-        given(userService.findByUsername("sheldon_cooper")).willReturn(user);
+        given(userService.getCurrentUser()).willReturn(user);
+
+        FinancialsController financialsController = new FinancialsController(userService, financialsService);
+
         try {
 
-            userController.disburse(10);
+            financialsController.disburse(10);
             Assertions.fail();
 
         } catch (Throwable t) {
@@ -115,20 +89,22 @@ public class UserControllerTest {
     @Test
     public void disburse_negativeAmount() throws Exception {
 
-        UserController userController = new PartialUserController(
-                userService,
-                "sheldon_cooper");
+        Financials financials = new Financials();
+        financials.setBalance(100.0);
+        financials.setIban("DE12345678901234567890");
 
         User user = new User();
         user.setUsername("sheldon_cooper");
-        user.setBalance(100.0);
-        user.setIban("DE12345678901234567890");
         user.setRole(Role.DRIVER);
+        user.setFinancials(financials);
 
-        given(userService.findByUsername("sheldon_cooper")).willReturn(user);
+        given(userService.getCurrentUser()).willReturn(user);
+
+        FinancialsController financialsController = new FinancialsController(userService, financialsService);
+
         try {
 
-            userController.disburse(-10);
+            financialsController.disburse(-10);
             Assertions.fail();
 
         } catch (Throwable t) {
@@ -143,20 +119,22 @@ public class UserControllerTest {
     @Test
     public void disburse_noBalance() throws Exception {
 
-        UserController userController = new PartialUserController(
-                userService,
-                "sheldon_cooper");
+        Financials financials = new Financials();
+        financials.setBalance(100.0);
+        financials.setIban("DE12345678901234567890");
 
         User user = new User();
         user.setUsername("sheldon_cooper");
-        user.setBalance(100.0);
-        user.setIban("DE12345678901234567890");
         user.setRole(Role.DRIVER);
+        user.setFinancials(financials);
 
-        given(userService.findByUsername("sheldon_cooper")).willReturn(user);
+        given(userService.getCurrentUser()).willReturn(user);
+
+        FinancialsController financialsController = new FinancialsController(userService, financialsService);
+
         try {
 
-            userController.disburse(100.1);
+            financialsController.disburse(100.1);
             Assertions.fail();
 
         } catch (Throwable t) {
@@ -171,19 +149,21 @@ public class UserControllerTest {
     @Test
     public void disburse_vanilla() throws Exception {
 
-        UserController userController = new PartialUserController(
-                userService,
-                "sheldon_cooper");
+        Financials financials = new Financials();
+        financials.setBalance(100.0);
+        financials.setIban("DE12345678901234567890");
 
         User user = new User();
         user.setUsername("sheldon_cooper");
-        user.setIban("DE12345678901234567890");
-        user.setBalance(100.0);
         user.setRole(Role.DRIVER);
+        user.setFinancials(financials);
 
-        given(userService.findByUsername("sheldon_cooper")).willReturn(user);
-        String result = userController.disburse(10);
-        Assertions.assertEquals("Payment disbursed succesfully.", result);
-        Assertions.assertEquals(90.0, user.getBalance());
+        given(userService.getCurrentUser()).willReturn(user);
+
+        FinancialsController financialsController = new FinancialsController(userService, financialsService);
+
+        String result = financialsController.disburse(10);
+        Assertions.assertEquals("Payment disbursed successfully.", result);
+        Assertions.assertEquals(90.0, financials.getBalance());
     }
 }

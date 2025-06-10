@@ -55,10 +55,10 @@ public class User implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     private List<Rating> ratings;
 
-    //@ElementCollection
-    //private List<Integer> ratings;
-
     private int numberOfRides;
+
+    @OneToOne (cascade = CascadeType.ALL, orphanRemoval = true, optional = true)
+    private Financials financials;
 
     @Setter(AccessLevel.NONE)
     @Enumerated(EnumType.STRING)
@@ -71,42 +71,6 @@ public class User implements UserDetails {
     @JsonIgnore
     private int tokenId;
 
-    //Geldkonten
-
-    @Column(nullable = true)
-    private Double balance;
-
-    @JsonIgnore
-    @Column(nullable = true)
-    private String iban; // nur deutsche Konten also keine BIC
-
-    @JsonIgnore
-    @Column(nullable = true)
-    private String creditCardNumber;
-
-    @JsonIgnore
-    @Column(nullable = true)
-    private String cvc;
-
-    // YYYYmm
-    @Column(nullable = true)
-    private Integer expirationDate;
-
-    public String getLastFourIban(){
-        if(null == iban) {
-            return null;
-        }
-        return iban.substring(iban.length()-4, iban.length());
-
-    }
-
-    public String getLastFourCreditCardNumber(){
-        if(creditCardNumber == null){
-            return null;
-        }
-        return creditCardNumber.substring(creditCardNumber.length()-4, creditCardNumber.length());
-    }
-    //Ende Geldkonten
 
     public float getAvgRating() {
         int count = ratings.size();
@@ -198,4 +162,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
 }
