@@ -33,7 +33,7 @@ public class RideRequestController {
         RideRequest activeRide = rideRequestService.getActiveRide();
 
         if (activeRide == null) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
             return ResponseEntity.ok(RideRequestDto.fromEntity(activeRide));
         }

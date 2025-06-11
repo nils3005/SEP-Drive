@@ -9,10 +9,23 @@ main {
 .left-container {
   //border: 5px solid green;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
+}
+
+.left-container h1 {
+  width: 100%;
+  font-size: 3rem;
+}
+
+.left-container a {
+  color: #a02;
+  text-decoration: underline;
+  width: 100%;
+  font-size: 2rem;
 }
 
 .right-container {

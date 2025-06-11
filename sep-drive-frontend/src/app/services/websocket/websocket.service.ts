@@ -22,10 +22,7 @@ export class WebsocketService implements OnDestroy {
       reconnectDelay: 5000,
       heartbeatIncoming: 0,
       heartbeatOutgoing: 20_000,
-      debug: (str: string) => {
-        // Debug-Log für STOMP (kann im Prod auskommentiert werden)
-        console.debug('[STOMP]', str);
-      }
+      //debug: (str: string) => { console.debug('[STOMP]', str) }
     });
 
     // onConnect-Callback: hier kann man initial Subscriptions setzen, wenn nötig

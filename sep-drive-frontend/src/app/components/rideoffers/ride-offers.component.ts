@@ -51,8 +51,10 @@ export class RideOffersComponent implements OnInit, OnDestroy {
               next: (notification) => {
                 console.log("WebSocket Notification erhalten:", notification);
                 this.loadOffers(); // Das löst den HTTP-Call aus
-                this.notificationDriverName.set(notification.driverName);
-                setTimeout(() => this.notificationDriverName.set(""), 8000);
+                if (notification.description === "NEW_OFFER") {
+                  this.notificationDriverName.set(notification.driverName);
+                  setTimeout(() => this.notificationDriverName.set(""), 8000);
+                }
               },
               error: (err) => {
                 console.error("WebSocket Fehler:", err);
@@ -90,9 +92,9 @@ export class RideOffersComponent implements OnInit, OnDestroy {
 
   arrow(field: SortParams['field']): string {
     if (this.currentSort.field !== field) {
-      return '↕';
+      return '↕'; // TODO fontawesome
     }
-    return this.currentSort.direction === 'asc' ? '↑' : '↓';
+    return this.currentSort.direction === 'asc' ? '↑' : '↓'; // TODO fontawesome
   }
 
   sortBy(field: SortParams['field']) {
@@ -129,7 +131,7 @@ export class RideOffersComponent implements OnInit, OnDestroy {
     if (confirm('Möchtest du dieses Angebot ablehnen?')) {
       this.rideOfferService.rejectOffer(offerId).subscribe({
         next: () => {
-          console.log('Angebot abgelehnt.');
+          console.log('Angebot abgelehnt.', offerId);
           this.loadOffers();
         },
         error: (err) => {

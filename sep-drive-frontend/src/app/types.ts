@@ -85,6 +85,7 @@ export type RideOfferNotification = {
   rideRequestId: number;
   driverId: number;
   driverName: string;
+  description: string;
 }
 
 export type RideRequestSummary = {

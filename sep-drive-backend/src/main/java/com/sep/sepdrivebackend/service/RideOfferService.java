@@ -1,9 +1,6 @@
 package com.sep.sepdrivebackend.service;
 
-import com.sep.sepdrivebackend.entities.RideOffer;
-import com.sep.sepdrivebackend.entities.RideOfferStatus;
-import com.sep.sepdrivebackend.entities.RideRequest;
-import com.sep.sepdrivebackend.entities.User;
+import com.sep.sepdrivebackend.entities.*;
 import com.sep.sepdrivebackend.repository.RideOfferRepository;
 import lombok.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -11,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.*;
@@ -67,7 +63,7 @@ public class RideOfferService {
         // Alle nötigen Infos in OfferNotificationDto
 
         // Fahrerstatistiken holen (Rating, totalRides, totalDistance)
-        double rating = driver.getAvgRating();
+        double rating = driver.getRatings().stream().mapToDouble(Rating::getRating).average().orElse(0.0);
         long totalRides = driver.getNumberOfRides();
         double totalDistance = 0.0; //TODO: wie bekommen wir das? Als attribut für jeden user -> dann immer wieder update nach fahrt oder wird der wert immer neu berechnet?
 
@@ -76,6 +72,7 @@ public class RideOfferService {
                 .rideRequestId(rideRequestId)
                 .driverId(driverId)
                 .driverName(driver.getUsername())
+                .description(RideOfferNotificationDescription.NEW_OFFER)
                 .build();
 
         String destination = "/topic/ride-requests/" + rideRequestId + "/offers";
@@ -137,9 +134,9 @@ public class RideOfferService {
         RideOffer offerToAccept = rideOfferRepository.findById(offerId)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Angebot nicht gefunden"));
 
-        RideRequest request = offerToAccept.getRideRequest();
+        RideRequest rideRequest = offerToAccept.getRideRequest();
 
-        if (!request.getCustomer().getId().equals(customerId)) {
+        if (!rideRequest.getCustomer().getId().equals(customerId)) {
             throw new ResponseStatusException(FORBIDDEN, "Du darfst nur Angebote zu deinen eigenen Fahranfragen verarbeiten");
         }
 
@@ -154,14 +151,27 @@ public class RideOfferService {
         // Alle anderen Pending-Angebote für dieselbe Anfrage auf REJECTED setzen
         // count zeigt an, wie viele Records geändert wurden - nur für debugging
         int count = rideOfferRepository.rejectAllOtherOffers(
-                request,
+                rideRequest,
                 offerToAccept.getId(),
                 RideOfferStatus.REJECTED
         );
 
 
         // Notifications an alle betroffenen Fahrer senden,
-        // z.B. via Messaging-Service: den angenommenen Fahrer und die abgelehnten anderen.
+        // Sendet ACCEPTED_OFFER als Beschreibung. Daraus leitet man im Frontend ab, dass ein User ein bestimmtes Angebot angenommen
+        // hat (das Angebot, das auch in der Notification gesetzt ist). Alle anderen Angebote, die nicht gleich der Angebots-Id aus
+        // der Notification sind wissen, dass sie abgelehnt wurden. Analog weiß der eine Fahrer, der angenommen wurde,
+        // dass er die Fahrt startet.
+        RideOfferNotificationDto notification = RideOfferNotificationDto.builder()
+                .rideOfferId(offerToAccept.getId())
+                .rideRequestId(rideRequest.getId())
+                .driverId(offerToAccept.getDriver().getId())
+                .driverName(offerToAccept.getDriver().getUsername())
+                .description(RideOfferNotificationDescription.ACCEPTED_OFFER)
+                .build();
+
+        String destination = "/topic/ride-requests/" + rideRequest.getId() + "/offers";
+        messagingTemplate.convertAndSend(destination, notification);
 
         return saved;
     }
@@ -189,6 +199,11 @@ public class RideOfferService {
         private Long rideRequestId;
         private Long driverId;
         private String driverName;
+        private RideOfferNotificationDescription description;
+    }
+
+    public enum RideOfferNotificationDescription {
+        NEW_OFFER, ACCEPTED_OFFER;
     }
 
 
