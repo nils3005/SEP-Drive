@@ -31,7 +31,6 @@ import {AsyncPipe} from "@angular/common";
 })
 export class HomePageComponent implements OnInit {
   public authService: AuthService = inject(AuthService);
-  public isLoading = true;
 
   constructor(
       public rideRequestService: RideRequestService,
@@ -45,7 +44,6 @@ export class HomePageComponent implements OnInit {
 
     if(!this.authService.isLoggedIn()) {
       console.log("User ist nicht eingeloggt.") // TODO Entfernen für Abgabe
-      this.isLoading = false;
     }
 
     this.rideRequestService.getActiveRide().subscribe({
@@ -55,12 +53,10 @@ export class HomePageComponent implements OnInit {
             this.geoService.rideRequestSummaryData.next(summary);
             this.geoService.isSubmitted.next(true);
             this.geoService.showInput.next(false);
-            this.isLoading = false;
           })
         }
       },
       error: (error)=> {
-        this.isLoading = false;
         if (error.status === 400 || error.status === 401) {
           // this.errorService.showError(error.message);
           console.log("403 ERROR AUS HOMECOMPONENT:",error);

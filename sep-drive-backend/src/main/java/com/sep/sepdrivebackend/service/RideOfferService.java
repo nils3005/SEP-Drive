@@ -125,6 +125,10 @@ public class RideOfferService {
         rideOfferRepository.save(RideOffer);
     }
 
+    public int rejectAllOffersForRideRequest(Long rideRequestId) {
+        return rideOfferRepository.deleteByRideRequestId(rideRequestId);
+    }
+
     /**
      * Kunde nimmt ein bestimmtes Angebot an. Alle anderen PENDING-Angebote
      * derselben Fahranfrage werden automatisch auf REJECTED gesetzt.

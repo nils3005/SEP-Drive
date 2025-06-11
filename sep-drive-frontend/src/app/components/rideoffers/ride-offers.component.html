@@ -25,10 +25,14 @@
         <td>{{ offer.totalRides }}</td>
         <td>{{ offer.totalDistance.toFixed(1) }} km</td>
         <td class="actions">
-            <button class="accept" (click)="acceptOffer(offer.offerId)">Annehmen</button>
+            <button class="accept" (click)="acceptOffer(offer.offerId)">
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </button>
         </td>
         <td class="actions">
-            <button class="decline" (click)="rejectOffer(offer.offerId)">Ablehnen</button>
+            <button class="decline" (click)="rejectOffer(offer.offerId)">
+                <i class="fa fa-ban" aria-hidden="true"></i>
+            </button>
         </td>
     </tr>
     </tbody>
@@ -42,6 +46,6 @@
 
 @if (notificationDriverName()) {
     <div class="notification">
-        🎉 Du hast ein neues Fahrangebot von {{ notificationDriverName() }} erhalten.
+        <p>Du hast ein neues Fahrangebot von {{ notificationDriverName() }} erhalten.</p>
     </div>
 }

@@ -34,6 +34,13 @@ public interface RideOfferRepository extends JpaRepository<RideOffer, Long> {
     List<RideOffer> findByStatus(RideOfferStatus status);
 
     /**
+     * Löscht alle Angebote für eine gegebene Fahranfrage anhand der Request-ID.
+     */
+    @Modifying
+    @Query("DELETE FROM RideOffer o WHERE o.rideRequest.id = :rideRequestId")
+    int deleteByRideRequestId(@Param("rideRequestId") Long rideRequestId);
+
+    /**
      * Setzt den Status aller PENDING-Angebote auf REJECTED,
      * außer demjenigen, das vom Kunden angenommen wurde.
      */

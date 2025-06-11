@@ -2,6 +2,7 @@ package com.sep.sepdrivebackend.controller;
 
 import com.sep.sepdrivebackend.dto.RideRequestDto;
 import com.sep.sepdrivebackend.entities.RideRequest;
+import com.sep.sepdrivebackend.service.RideOfferService;
 import com.sep.sepdrivebackend.service.RideRequestService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ public class RideRequestController {
 
     @Autowired
     private RideRequestService rideRequestService;
+    @Autowired
+    private RideOfferService rideOfferService;
 
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody RideRequest request) {
@@ -41,7 +44,9 @@ public class RideRequestController {
 
     @DeleteMapping("/cancel")
     public ResponseEntity<?> cancel() {
+        Long rideRequestId = rideRequestService.getActiveRide().getId();
         rideRequestService.deleteActiveRide();
-        return ResponseEntity.ok(Map.of("message", "Ride request cancelled"));
+        int deleted = rideOfferService.rejectAllOffersForRideRequest(rideRequestId);
+        return ResponseEntity.ok(Map.of("message", "Ride request cancelled. Number of offers rejected: " + deleted));
     }
 }
