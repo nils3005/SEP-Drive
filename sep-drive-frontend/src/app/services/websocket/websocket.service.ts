@@ -17,7 +17,6 @@ export class WebsocketService implements OnDestroy {
   constructor() {
     // STOMP-Client konfigurieren
     this.client = new Client({
-      // webSocketFactory verwendet SockJS, damit Spring-Boot automatisch SockJS "upgraden" kann
       webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
       reconnectDelay: 5000,
       heartbeatIncoming: 0,
@@ -37,7 +36,6 @@ export class WebsocketService implements OnDestroy {
       console.error('Details:', frame.body);
     };
 
-    // Client aktivieren (öffnet die Verbindung)
     this.client.activate();
   }
 
@@ -54,7 +52,7 @@ export class WebsocketService implements OnDestroy {
         const sub = this._doSubscribe(topic, observer);
         return () => sub.unsubscribe();
       }
-      // sonst merke Dir Topic und Observer und subscribe später
+      // sonst speicher Topic und Observer und subscribe später
       this.pendingSubscriptions.push({ topic, observer });
       // Cleanup: entferne aus pending und unsubscriben falls schon da
       return () => {
@@ -66,7 +64,7 @@ export class WebsocketService implements OnDestroy {
     });
   }
 
-  /** Internes: führt das echte STOMP subscribe aus */
+  /** Führt das echte STOMP subscribe aus */
   private _doSubscribe<T>(topic: string, observer: any): StompSubscription {
     const sub = this.client.subscribe(topic, (msg: IMessage) => {
       try {

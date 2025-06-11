@@ -90,21 +90,30 @@ public class RideOfferService {
      */
     @Transactional
     public void withdrawOffer(Long driverId, Long offerId) {
-        RideOffer RideOffer = rideOfferRepository.findById(offerId)
+        RideOffer rideOffer = rideOfferRepository.findById(offerId)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Angebot nicht gefunden"));
 
-        if (!RideOffer.getDriver().getId().equals(driverId)) {
+        if (!rideOffer.getDriver().getId().equals(driverId)) {
             throw new ResponseStatusException(FORBIDDEN, "Du darfst nur deine eigenen Angebote zurückziehen");
         }
 
-        if (RideOffer.getStatus() != RideOfferStatus.PENDING) {
+        if (rideOffer.getStatus() != RideOfferStatus.PENDING) {
             throw new ResponseStatusException(BAD_REQUEST, "Nur PENDING-Angebote können zurückgezogen werden");
         }
 
-        // TODO Kunden WebSocket info
+        RideOfferNotificationDto notification = RideOfferNotificationDto.builder()
+                .rideOfferId(rideOffer.getId())
+                .rideRequestId(rideOffer.getRideRequest().getId())
+                .driverId(rideOffer.getDriver().getId())
+                .driverName(rideOffer.getDriver().getUsername())
+                .description(RideOfferNotificationDescription.WITHDRAWN_OFFER)
+                .build();
 
-        RideOffer.setStatus(RideOfferStatus.WITHDRAWN);
-        rideOfferRepository.save(RideOffer);
+        String destination = "/topic/ride-requests/" + rideOffer.getRideRequest().getId() + "/offers";
+        messagingTemplate.convertAndSend(destination, notification);
+
+        rideOffer.setStatus(RideOfferStatus.WITHDRAWN);
+        rideOfferRepository.save(rideOffer);
     }
 
     /**
@@ -211,7 +220,7 @@ public class RideOfferService {
     }
 
     public enum RideOfferNotificationDescription {
-        NEW_OFFER, ACCEPTED_OFFER;
+        NEW_OFFER, WITHDRAWN_OFFER, ACCEPTED_OFFER;
     }
 
 

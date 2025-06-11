@@ -47,8 +47,8 @@
     </div>
 }
 
-@if (notificationDriverName()) {
+@if (notification()) {
     <div class="notification">
-        <p>Du hast ein neues Fahrangebot von {{ notificationDriverName() }} erhalten.</p>
+        <p>{{ notification() }}</p>
     </div>
 }

@@ -28,7 +28,7 @@ export class RideOffersComponent implements OnInit, OnDestroy {
   private currentSort: SortParams = { field: 'rating', direction: 'desc' };
 
   // Signal für Banner-Anzeige
-  notificationDriverName = signal("");
+  notification = signal("");
 
   private rideRequestId: number = -1;
 
@@ -51,9 +51,11 @@ export class RideOffersComponent implements OnInit, OnDestroy {
               next: (notification) => {
                 this.loadOffers(); // Das löst den HTTP-Call aus
                 if (notification.description === "NEW_OFFER") {
-                  this.notificationDriverName.set(notification.driverName);
-                  setTimeout(() => this.notificationDriverName.set(""), 8000);
+                  this.notification.set("Du hast ein neues Fahrangebot von " +  notification.driverName + " erhalten.");
+                } else if(notification.description === "WITHDRAWN_OFFER") {
+                  this.notification.set("Das Fahrangebot von " +  notification.driverName + " wurde zurückgezogen.");
                 }
+                setTimeout(() => this.notification.set(""), 8000);
               },
               error: (err) => {
                 console.error("WebSocket Fehler:", err);
@@ -120,11 +122,10 @@ export class RideOffersComponent implements OnInit, OnDestroy {
     if (confirm('Möchtest du dieses Angebot annehmen?')) {
       this.rideOfferService.acceptOffer(offerId).subscribe({
         next: () => {
-          console.log('Angebot angenommen. Alle anderen Angebote wurden abgelehnt.'); // TODO Debug
           this.loadOffers();
         },
         error: (err) => {
-          console.log('Fehler beim Annehmen: ' + err.message); // TODO Debug
+          console.log('Fehler beim Annehmen: ' + err.message);
         }
       });
     }
@@ -137,7 +138,6 @@ export class RideOffersComponent implements OnInit, OnDestroy {
     if (confirm('Möchtest du dieses Angebot ablehnen?')) {
       this.rideOfferService.rejectOffer(offerId).subscribe({
         next: () => {
-          console.log('Angebot abgelehnt.', offerId);
           this.loadOffers();
         },
         error: (err) => {

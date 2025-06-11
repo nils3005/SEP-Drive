@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 public class RideOfferController {
     private final RideOfferService rideOfferService;
     private final UserService userService;
-    private final RideRequestService rideRequestService;
 
     /**
      * Fahrer legt ein neues Angebot an.
@@ -43,7 +42,6 @@ public class RideOfferController {
      */
     @DeleteMapping("/offers/{offerId}")
     public ResponseEntity<Void> withdrawOffer(@PathVariable Long offerId) {
-        // Oder wieder mit JSON mit driverid und offerid
         Long driverId = getCurrentDriverId();
         rideOfferService.withdrawOffer(driverId, offerId);
         return ResponseEntity.ok().build();
