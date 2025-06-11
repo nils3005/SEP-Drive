@@ -34,6 +34,10 @@ public class RideOfferService {
         RideRequest rideRequest = rideRequestService.findById(rideRequestId)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Fahranfrage nicht gefunden"));
 
+        if (!rideRequest.isActive()) {
+            throw new ResponseStatusException(BAD_REQUEST, "Fahranfrage ist nicht mehr aktiv.");
+        }
+
         // Ein Fahrer darf nur genau ein PENDING-Angebot insgesamt haben
         List<RideOffer> existing = rideOfferRepository.findByDriverAndStatus(driver, RideOfferStatus.PENDING);
         if (!existing.isEmpty()) {
@@ -126,7 +130,7 @@ public class RideOfferService {
     }
 
     public int rejectAllOffersForRideRequest(Long rideRequestId) {
-        return rideOfferRepository.deleteByRideRequestId(rideRequestId);
+        return rideOfferRepository.deleteByRideRequest_Id(rideRequestId);
     }
 
     /**

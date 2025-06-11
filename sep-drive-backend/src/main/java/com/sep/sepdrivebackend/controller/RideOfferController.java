@@ -33,8 +33,7 @@ public class RideOfferController {
      */
     @PostMapping("/offers/{requestId}")
     public ResponseEntity<RideOfferDto> createOfferAsDriver(@PathVariable Long requestId) {
-        // ansonsten kann man die driver id auch im json mitgeben
-        Long driverId = getCurrentDriverId(); // TODO aus JWT oder SecurityContext
+        Long driverId = getCurrentDriverId();
         RideOffer offer = rideOfferService.createOffer(driverId, requestId);
         return ResponseEntity.ok(RideOfferDto.fromEntity(offer));
     }

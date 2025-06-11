@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,8 +38,8 @@ public interface RideOfferRepository extends JpaRepository<RideOffer, Long> {
      * Löscht alle Angebote für eine gegebene Fahranfrage anhand der Request-ID.
      */
     @Modifying
-    @Query("DELETE FROM RideOffer o WHERE o.rideRequest.id = :rideRequestId")
-    int deleteByRideRequestId(@Param("rideRequestId") Long rideRequestId);
+    @Transactional
+    int deleteByRideRequest_Id(Long rideRequestId);
 
     /**
      * Setzt den Status aller PENDING-Angebote auf REJECTED,
