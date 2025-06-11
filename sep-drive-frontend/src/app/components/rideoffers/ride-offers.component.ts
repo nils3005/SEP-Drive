@@ -49,7 +49,6 @@ export class RideOffersComponent implements OnInit, OnDestroy {
             .subscribe<RideOfferNotification>(`/topic/ride-requests/${this.rideRequestId}/offers`)
             .subscribe({
               next: (notification) => {
-                console.log("WebSocket Notification erhalten:", notification);
                 this.loadOffers(); // Das löst den HTTP-Call aus
                 if (notification.description === "NEW_OFFER") {
                   this.notificationDriverName.set(notification.driverName);
@@ -81,7 +80,6 @@ export class RideOffersComponent implements OnInit, OnDestroy {
         )
         .subscribe({
           next: (list) => {
-            console.log("Offer Liste erhalten:", list);
             this.offers.set(list);
           },
           error: (err) => {
@@ -90,11 +88,19 @@ export class RideOffersComponent implements OnInit, OnDestroy {
         });
   }
 
-  arrow(field: SortParams['field']): string {
+  /**
+   * Gibt die FontAwesome-Klassen zurück für:
+   *  - fa-sort        (unsortiert)
+   *  - fa-sort-up     (aufsteigend)
+   *  - fa-sort-down   (absteigend)
+   */
+  arrow(field: string): string {
     if (this.currentSort.field !== field) {
-      return '↕'; // TODO fontawesome
+      return 'fas fa-sort';
     }
-    return this.currentSort.direction === 'asc' ? '↑' : '↓'; // TODO fontawesome
+    return this.currentSort.direction === 'asc'
+        ? 'fas fa-sort-up'
+        : 'fas fa-sort-down';
   }
 
   sortBy(field: SortParams['field']) {

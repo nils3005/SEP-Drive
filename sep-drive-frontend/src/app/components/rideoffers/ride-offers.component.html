@@ -2,13 +2,16 @@
     <thead>
     <tr>
         <th (click)="sortBy('rating')">
-            Bewertung Fahrer&nbsp;<span class="arrow">{{ arrow('rating') }}</span>
+            Bewertung Fahrer&nbsp;
+            <i [ngClass]="arrow('rating')" aria-hidden="true"></i>
         </th>
         <th (click)="sortBy('totalRides')">
-            Gesamtanzahl Fahrten&nbsp;<span class="arrow">{{ arrow('totalRides') }}</span>
+            Gesamtanzahl Fahrten&nbsp;
+            <i [ngClass]="arrow('totalRides')" aria-hidden="true"></i>
         </th>
         <th (click)="sortBy('distance')">
-            Distanz (insgesamt)&nbsp;<span class="arrow">{{ arrow('distance') }}</span>
+            Distanz (insgesamt)&nbsp;
+            <i [ngClass]="arrow('distance')" aria-hidden="true"></i>
         </th>
         <th></th> <!-- Aktionen-Spalte -->
         <th></th> <!-- Aktionen-Spalte -->
