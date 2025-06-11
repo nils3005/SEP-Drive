@@ -1,61 +1,181 @@
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatSortModule, MatSort } from '@angular/material/sort';
-import { MatTableModule } from '@angular/material/table';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {MatTableDataSource, MatTableModule} from '@angular/material/table';
+import {MatSort, MatSortModule} from '@angular/material/sort';
+import {RideRequestService} from '../services/riderequest/ride-request.service';
+import {FormGroup, FormControl, ReactiveFormsModule} from '@angular/forms';
+import {GeoService} from '../services/geo/geo.service';
+import {OpenRouteServiceService} from '../services/openroute/open-route-service.service';
+import {ErrorService} from '../services/error/error.service';
 
-export interface rideRequestData {
-  fahrtid: number;
-  zeitpunkt: string;
+export interface RideTableRow {
+  fahrtid: string;
+  zeitpunkt: Date;
   entfernung: number;
-  name: string;
-  bewertung: number;
   klasse: string;
+  name: string;       // Name des Fahrgasts
+  bewertung: number;     // Bewertung (numerisch)
 }
-
-const dummy: rideRequestData[] = [
-  {
-    fahrtid: 1,
-    zeitpunkt: '12.05.2025 12:25',
-    entfernung: 6,
-    name: 'Isabela Mercedes',
-    bewertung: 3,
-    klasse: 'Deluxe'
-  },
-  {
-    fahrtid: 2,
-    zeitpunkt: '12.05.2025 11:23',
-    entfernung: 12,
-    name: 'Max Mustermann',
-    bewertung: 4.5,
-    klasse: 'Small'
-  },
-  {
-    fahrtid: 3,
-    zeitpunkt: '12.05.2025 12:01',
-    entfernung: 30,
-    name: 'Romario Dos Santos',
-    bewertung: 5,
-    klasse: 'Deluxe'
-  },
-];
 
 @Component({
   selector: 'app-ride-request-list',
   standalone: true,
   templateUrl: './ride-request-list.component.html',
   styleUrl: './ride-request-list.component.scss',
-  imports: [FormsModule, CommonModule, MatTableModule, MatSortModule]
+  imports: [FormsModule, CommonModule, MatTableModule, MatSortModule, ReactiveFormsModule]
 })
-export class RideRequestListComponent implements AfterViewInit{
-  displayedColumns: string[] = ['fahrtid', 'zeitpunkt', 'entfernung', 'name', 'bewertung', 'klasse', 'annehmen'];
-  dataSource = new MatTableDataSource<rideRequestData>(dummy);
+export class RideRequestListComponent implements OnInit, AfterViewInit {
+  dataSource = new MatTableDataSource<RideTableRow>();
+  displayedColumns: string[] = ['fahrtid', 'entfernung', 'zeitpunkt', 'klasse', 'name', 'bewertung', 'annehmen'];
 
   @ViewChild(MatSort) sort!: MatSort;
 
-  ngAfterViewInit() {
+  constructor(private rideRequestService: RideRequestService,
+  private geoService: GeoService,
+  private openRouteServiceService: OpenRouteServiceService,
+  private errorService: ErrorService
+  ) {
+  }
+
+  ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
+  }
+
+  // route-input
+  public routeForm = new FormGroup({
+    start: new FormControl(''),
+    startCordLat: new FormControl(''),
+    startCordLon: new FormControl(''),
+  });
+
+  public startSuggestions: any[] = []; // Typ ggf. anpassen, z.B. GeocodeFeature[]
+  public startShowSuggestions = false;
+  public startSuppressAutocomplete = false;
+  public useStartCoordinates = false;
+
+  ngOnInit(): void {
+    // Bestehender Code für RideRequests laden
+    this.rideRequestService.getAllRideRequests().subscribe((requests: any[]) => {
+      const now = new Date();
+      this.dataSource.data = requests.map(req => ({
+        fahrtid: req.id.toString(),
+        zeitpunkt: now,
+        entfernung: this.calculateDistanceKm(
+          {lat: req.startLocation.latitude, lon: req.startLocation.longitude},
+          {lat: req.destination.latitude, lon: req.destination.longitude}
+        ),
+        klasse: req.carType,
+        name: req.customerName ?? 'Unbekannt',
+        bewertung: req.averageRating ?? 0
+      }));
+    });
+
+    // Autocomplete für Start-Input
+    this.routeForm.controls.start.valueChanges.subscribe(value => {
+      if (value && !this.startSuppressAutocomplete) {
+        this.openRouteServiceService.getAutocompleteSuggestions(value).subscribe((suggestions: { features: any[]; }) => {
+          this.startSuggestions = suggestions.features.slice(0, 5);
+          this.startShowSuggestions = true;
+        });
+      } else {
+        this.startSuppressAutocomplete = false;
+      }
+    });
+  }
+
+  onStartSelect(suggestion: any) {
+    this.geoService.updateStart(suggestion);
+    this.startSuppressAutocomplete = true;
+    this.routeForm.controls.start.setValue(suggestion.properties.label);
+    this.startSuggestions = [];
+    this.startShowSuggestions = false;
+  }
+
+  onStartBlur() {
+    setTimeout(() => {
+      this.startShowSuggestions = false;
+    }, 100);
+  }
+
+  onStartFocus() {
+    if (this.startSuggestions.length > 0) {
+      this.startShowSuggestions = true;
+    }
+  }
+
+  getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const coords = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          };
+          this.openRouteServiceService.getGeocodeFeatureByCoordinates(coords).subscribe({
+            next: (response: any) => {
+              if (response.body) {
+                this.onStartSelect(response.body.features[0]);
+              }
+            },
+            error: () => this.errorService.showError('Position konnte nicht gefunden werden'),
+          });
+        },
+        (error) => {
+          // Fehlerbehandlung (kann noch erweitert werden)
+          this.errorService.showError('Standort konnte nicht ermittelt werden.');
+        },
+        {enableHighAccuracy: true, timeout: 10000, maximumAge: 0}
+      );
+    } else {
+      this.errorService.showError('Geolocation wird von diesem Browser nicht unterstützt.');
+    }
+  }
+
+  checkCoordinates() {
+    const lat = this.routeForm.controls.startCordLat.value;
+    const lon = this.routeForm.controls.startCordLon.value;
+    if (lat && lon) {
+      this.openRouteServiceService.getGeocodeFeatureByCoordinates({latitude: lat, longitude: lon}).subscribe({
+        next: (response: any) => {
+          if (response.body) {
+            this.geoService.updateStart(response.body.features[0]);
+            this.geoService.currentPoint.next(response.body.features[0]);
+          }
+        },
+        error: () => this.errorService.showError('Position konnte nicht gefunden werden'),
+      });
+    } else {
+      this.errorService.showError('Alle Felder müssen ausgefüllt sein');
+    }
+  }
+
+  onSubmit() {
+    if (
+      this.geoService.waypoints.getValue()[0] &&
+      this.geoService.waypoints.getValue()[1]
+    ) {
+      this.geoService.calculateRoute();
+    } else {
+      this.errorService.showError('Start- und Zielpunkt müssen gesetzt sein.');
+    }
+  }
+  private calculateDistanceKm(start: { lon: number | string; lat: number | string }, end: {
+    lon: number | string;
+    lat: number | string
+  }): number {
+    // @ts-ignore
+    const toRad = (value: number | string) => value * Math.PI / 180;
+    const R = 6371;
+    // @ts-ignore
+    const dLat = toRad(end.lat - start.lat);
+    // @ts-ignore
+    const dLon = toRad(end.lon - start.lon);
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(start.lat)) * Math.cos(toRad(end.lat)) *
+      Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return Math.round(R * c * 100) / 100; // auf 2 Nachkommastellen runden
   }
 
   getStarClass(rating: number, star: number): string {
@@ -67,7 +187,5 @@ export class RideRequestListComponent implements AfterViewInit{
       return 'far fa-star'; // leerer Stern
     }
   }
-
-
 
 }

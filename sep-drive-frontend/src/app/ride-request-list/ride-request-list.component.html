@@ -1,8 +1,60 @@
-<div class="main_container">
-  <div class="start_input">
-    <input id="startInput" type="text" placeholder="Aktuelle Position">
-    <button id="calculateButton">Berechnen</button>
+<form [formGroup]="routeForm" (ngSubmit)="onSubmit()" class="routeInputForm">
+  <div *ngIf="!useStartCoordinates; else coordinatesInput" class="inputRow">
+    <button class="imageButton" type="button" (click)="useStartCoordinates = !useStartCoordinates">
+      <i class="fa-solid fa-pencil"></i>
+    </button>
+    <div class="textInputContainer">
+      <input
+        type="text"
+        id="route-start"
+        formControlName="start"
+        placeholder="Start"
+        class="textInput"
+        (blur)="onStartBlur()"
+        (focus)="onStartFocus()"
+      />
+      <button type="button" class="imageButton" (click)="getLocation()">
+        <i class="fa-solid fa-location-dot"></i>
+      </button>
+    </div>
+    <ul *ngIf="startShowSuggestions && startSuggestions.length > 0" class="startSuggestions">
+      <li *ngFor="let suggestion of startSuggestions" (mousedown)="onStartSelect(suggestion)">
+        {{ suggestion.properties.label }}
+      </li>
+    </ul>
   </div>
+
+  <ng-template #coordinatesInput>
+    <div class="inputRow">
+      <button class="imageButton" type="button" (click)="useStartCoordinates = !useStartCoordinates">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+      <div class="textInputContainer">
+        <input
+          type="number"
+          id="startLon"
+          formControlName="startCordLon"
+          placeholder="50.000000"
+          class="textInput"
+        />
+      </div>
+      <div class="textInputContainer">
+        <input
+          type="number"
+          id="startLat"
+          formControlName="startCordLat"
+          placeholder="50.000000"
+          class="textInput"
+        />
+      </div>
+      <button class="imageButton" type="button" (click)="checkCoordinates()">
+        <i class="fa-solid fa-check"></i>
+      </button>
+    </div>
+  </ng-template>
+
+  <button type="submit" class="calculateBu">Route berechnen</button>
+</form>
   <div class="table_container">
     <table mat-table [dataSource]="dataSource" matSort class="ride-request-table">
 
@@ -19,7 +71,7 @@
       <!-- Spalte: Zeitpunkt -->
       <ng-container matColumnDef="zeitpunkt">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Zeitpunkt </th>
-        <td mat-cell *matCellDef="let element">{{ element.zeitpunkt}} </td>
+        <td mat-cell *matCellDef="let element">{{ element.zeitpunkt | date:'short' }}</td>
       </ng-container>
 
       <!-- Spalte: Entferung -->
@@ -59,4 +111,3 @@
       </ng-container>
     </table>
   </div>
-</div>
