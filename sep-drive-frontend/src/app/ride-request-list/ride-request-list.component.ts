@@ -242,6 +242,7 @@ export class RideRequestListComponent implements OnInit, AfterViewInit {
 
   unAcceptRideRequest() {
     this.mapService.resetMap()
+    // call to delete rideOffer
     this.accepted = false;
   }
 }
