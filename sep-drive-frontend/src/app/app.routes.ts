@@ -7,7 +7,7 @@ import {SocialComponent} from './components/social/social.component';
 import {ProfileComponent} from './components/profile/profile.component';
 import { RegistrierungComponent } from './components/registrierung/registrierung.component';
 import {DrivinghistoryComponent} from './components/drivinghistory/drivinghistory.component';
-import {RideSimulationComponent} from "./components/ride-simulation/ride-simulation.component";
+import {SimulationPageComponent} from "./pages/simulation-page/simulation-page.component";
 
 export const routes: Routes = [{ path: 'login', component: LoginComponent },
   { path: 'password', component: PasswordComponent },
@@ -17,5 +17,5 @@ export const routes: Routes = [{ path: 'login', component: LoginComponent },
   { path: 'social', component: SocialComponent },
   { path: 'social/user/:id', component: ProfileComponent },
   { path: 'history', component: DrivinghistoryComponent },
-  { path: 'simulation', component: RideSimulationComponent },
+  { path: 'simulation', component: SimulationPageComponent },
   { path: '**', redirectTo: '' }];
