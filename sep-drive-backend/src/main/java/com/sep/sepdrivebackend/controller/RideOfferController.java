@@ -38,10 +38,10 @@ public class RideOfferController {
     /**
      * Fahrer zieht sein Angebot zurück (DELETE).
      */
-    @DeleteMapping("/offers/{offerId}")
-    public ResponseEntity<Void> withdrawOffer(@PathVariable Long offerId) {
+    @DeleteMapping("/offers/{rideRequestId}")
+    public ResponseEntity<Void> withdrawOffer(@PathVariable Long rideRequestId) {
         Long driverId = getUserIdForCurrentRequest();
-        rideOfferService.withdrawOffer(driverId, offerId);
+        rideOfferService.withdrawOfferForRideRequest(driverId, rideRequestId);
         return ResponseEntity.ok().build();
     }
 

@@ -20,7 +20,7 @@ export class RideofferService {
   /**
    * Angebot zurückziehen (als Fahrer).
    */
-  withdrawOffer(offerId: number): Observable<void> {
+  withdrawOfferForRideRequest(offerId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/offers/${offerId}`);
   }
 

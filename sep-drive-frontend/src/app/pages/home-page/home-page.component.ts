@@ -2,19 +2,13 @@ import {Component, inject, OnInit} from '@angular/core';
 import {RouteInputComponent} from "../../components/route-input/route-input.component";
 import {MapComponent} from "../../components/map/map.component";
 import {RideRequestService} from "../../services/riderequest/ride-request.service";
-import {RideRequestStatus} from "../../enums/ride-request-status";
 import {RideRequestSummaryComponent} from "../../components/ride-request-summary/ride-request-summary.component";
 import {GeoService} from "../../services/geo/geo.service";
-import {RideRequestSummary} from "../../types";
-import {ErrorService} from "../../services/error/error.service";
-import {BehaviorSubject} from "rxjs";
-import {UserService} from "../../services/user/user.service";
-import {jwtDecode} from "jwt-decode";
 import {RideOffersComponent} from "../../components/rideoffers/ride-offers.component";
 import {RideRequestListComponent} from "../../components/ride-request-list/ride-request-list.component";
 import {AuthService} from "../../services/auth/auth-service.service";
 import {RouterLink} from "@angular/router";
-import {AsyncPipe} from "@angular/common";
+import {UserService} from "../../services/user/user.service";
 
 @Component({
   selector: 'app-home-page',
@@ -39,13 +33,12 @@ export class HomePageComponent implements OnInit {
   public showOnlyMap = false;
 
   ngOnInit(): void {
+    /*
     console.log("HomePageComponent ngOnInit");
     console.log("showInput:", this.geoService.showInput.getValue());
     console.log("isSubmitted:", this.geoService.isSubmitted.getValue());
 
-    if(!this.authService.isLoggedIn()) {
-      console.log("User ist nicht eingeloggt.") // TODO Entfernen für Abgabe
-    }
+     */
 
     this.rideRequestService.getActiveRide().subscribe({
       next: (response)=> {

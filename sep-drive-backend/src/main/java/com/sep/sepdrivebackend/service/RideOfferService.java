@@ -3,6 +3,8 @@ package com.sep.sepdrivebackend.service;
 import com.sep.sepdrivebackend.entities.*;
 import com.sep.sepdrivebackend.repository.RideOfferRepository;
 import lombok.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,9 +78,10 @@ public class RideOfferService {
      * Fahrer zieht sein eigenes Angebot zurück (nur wenn Status PENDING).
      */
     @Transactional
-    public void withdrawOffer(Long driverId, Long offerId) {
-        RideOffer rideOffer = rideOfferRepository.findById(offerId)
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Angebot nicht gefunden"));
+    public void withdrawOfferForRideRequest(Long driverId, Long rideRequestId) {
+        RideOffer rideOffer = rideOfferRepository.findByDriverAndRideRequestAndStatus(userService.findByUserId(driverId),
+                rideRequestService.getRideRequestById(rideRequestId),
+                        RideOfferStatus.PENDING).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Angebot nicht gefunden"));
 
         if (!rideOffer.getDriver().getId().equals(driverId)) {
             throw new ResponseStatusException(FORBIDDEN, "Du darfst nur deine eigenen Angebote zurückziehen");

@@ -71,6 +71,8 @@ export type RideRequest = {
   carType: CarType
   active: boolean
   createdAt: string
+  username: string
+  userRating: number
 }
 
 export type RideOffer = {

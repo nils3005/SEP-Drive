@@ -1,6 +1,7 @@
 package com.sep.sepdrivebackend.service;
 
 import com.sep.sepdrivebackend.dto.RidePriceDto;
+import com.sep.sepdrivebackend.dto.RideRequestDto;
 import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.repository.RideRequestRepository;
 import com.sep.sepdrivebackend.entities.RideRequest;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import java.time.LocalDateTime;
@@ -22,8 +24,12 @@ public class RideRequestService {
     @Autowired
     private UserService userService;
 
-    public List<RideRequest> getAllRideRequests() {
-        return rideRepo.findAll();
+    public List<RideRequestDto> getAllRideRequests() {
+        List<RideRequestDto> result = new ArrayList<>();
+        rideRepo.findAll().forEach(rideRequest -> {
+            result.add(RideRequestDto.fromEntity(rideRequest));
+        });
+        return result;
     }
 
     public RideRequest getRideRequestById(Long id)
