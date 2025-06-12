@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -16,6 +17,11 @@ public class RideRequestController {
 
     @Autowired
     private RideRequestService rideRequestService;
+
+    @GetMapping("/all")
+    public ResponseEntity<List<RideRequest>> getAllRideRequests() {
+        return new ResponseEntity<>(rideRequestService.getAllRideRequests(), HttpStatus.OK);
+    }
 
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody RideRequest request) {

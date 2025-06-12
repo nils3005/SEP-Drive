@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class RideRequestService {
 
@@ -15,6 +17,10 @@ public class RideRequestService {
 
     @Autowired
     private UserService userService;
+
+    public List<RideRequest> getAllRideRequests() {
+        return rideRepo.findAll();
+    }
 
     public RideRequest createRideRequest(RideRequest rideRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
