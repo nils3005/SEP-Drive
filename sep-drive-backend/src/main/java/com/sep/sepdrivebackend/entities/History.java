@@ -82,6 +82,10 @@ public class History {
         return driver.getLastName();
     }
 
+    public String getNameCustomer() { return customer.getFirstName() + " " + customer.getLastName(); }
+
+    public String getNameDriver() { return driver.getFirstName() + " " + driver.getLastName(); }
+
     public String getUsernameCustomer() {
         return customer.getUsername();
     }
