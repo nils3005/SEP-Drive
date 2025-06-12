@@ -13,8 +13,6 @@ import {AuthService} from "../../services/auth/auth-service.service";
 })
 export class NavbarComponent {
   auth: AuthService = inject(AuthService);
-  isLoggedIn = this.auth.isLoggedIn;
-  user = this.auth.user;
 
   logout(): void {
     this.auth.logout();

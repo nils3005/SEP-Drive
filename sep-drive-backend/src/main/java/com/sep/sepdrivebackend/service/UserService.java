@@ -1,5 +1,6 @@
 package com.sep.sepdrivebackend.service;
 
+import com.sep.sepdrivebackend.entities.Rating;
 import com.sep.sepdrivebackend.repository.UserRepository;
 import com.sep.sepdrivebackend.entities.User;
 import org.springframework.stereotype.Service;
@@ -34,4 +35,16 @@ public class UserService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username).orElse(null);
     }
+
+    /*public void giveRating(User user, float rating){
+        Rating newRating = new Rating();
+        newRating.setUser(user);
+        newRating.setRating(rating);
+        user.getRatings().add(newRating);
+        userRepository.save(user);
+    }*/
+
+    public void increaseBalance(Long id, float amount) {}
+
+    public void decreaseBalance(Long id, float amount) {}
 }

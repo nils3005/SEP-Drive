@@ -41,6 +41,7 @@ export class GeoService {
     this.openRouteServiceService.getRouteFromPointArray(coordinates).subscribe({
       next: response => {
         this.route.next(response.body);
+        console.log(response.body);
         this.showInput.next(false);
       },
       error: error => {
@@ -49,15 +50,17 @@ export class GeoService {
     })
   }
 
-  public updateStart(start: GeocodeFeature): void
+  public updateStart(start: GeocodeFeature, zoom: boolean = true): void
   {
     let tempWaypoints = this.waypoints.getValue();
     tempWaypoints[0] = start;
     this.waypoints.next(tempWaypoints);
-    this.currentPoint.next(start);
+    if (zoom) {
+      this.currentPoint.next(start);
+    }
   }
 
-  public updateDestination(destination: GeocodeFeature): void
+  public updateDestination(destination: GeocodeFeature, zoom: boolean = true): void
   {
     let tempWaypoints = this.waypoints.getValue();
     if (tempWaypoints.length <= 1) {
@@ -65,7 +68,9 @@ export class GeoService {
     }
     tempWaypoints[tempWaypoints.length - 1] = destination;
     this.waypoints.next(tempWaypoints);
-    this.currentPoint.next(destination);
+    if (zoom) {
+      this.currentPoint.next(destination);
+    }
   }
 
   public addStop(stop: GeocodeFeature): void

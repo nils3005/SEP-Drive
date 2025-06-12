@@ -5,6 +5,7 @@ import lombok.*;
 
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "drive_history")
@@ -20,7 +21,7 @@ public class History {
     private Long historyId;
 
     @Column(nullable = false)
-    private LocalDate finishDate;
+    private LocalDateTime finishDate;
 
     @Column(nullable = false)
     private double drivenDistance;
@@ -29,7 +30,7 @@ public class History {
     private double price;
 
     @Column(nullable = false)
-    private int drivenTime; //in Minuten
+    private float drivenTime; //in Minuten
 
     //Assoziationen
     @Getter(AccessLevel.NONE)
@@ -80,6 +81,10 @@ public class History {
     public String getLastNameDriver() {
         return driver.getLastName();
     }
+
+    public String getNameCustomer() { return customer.getFirstName() + " " + customer.getLastName(); }
+
+    public String getNameDriver() { return driver.getFirstName() + " " + driver.getLastName(); }
 
     public String getUsernameCustomer() {
         return customer.getUsername();

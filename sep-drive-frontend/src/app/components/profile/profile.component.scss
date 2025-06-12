@@ -65,6 +65,16 @@
   border: 2px solid #ddd;
 }
 
+.not-logged-in {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-top: 200px;
+  font-size: 1.25rem;
+  color: #555;
+}
+
 .avatar-circle {
   width: 15rem;
   height: 15rem;

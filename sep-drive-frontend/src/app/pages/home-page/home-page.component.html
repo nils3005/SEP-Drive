@@ -2,11 +2,16 @@
     <div class="routeContainer">
         @if (!showOnlyMap) {
           @if (geoService.showInput.getValue()) {
-              <app-route-input class="routeInput" />
+              <app-route-input class="leftSide" />
           } @else {
+            @if (isAccepted) {
+<!--              <app-ride-simulation class="leftSide"/>-->
+            } @else {
               <app-ride-request-summary class="rideRequestSummary" />
+            }
           }
         }
+          <app-ride-simulation class="leftSide"/>
         <app-map class="map" />
     </div>
 </main>
