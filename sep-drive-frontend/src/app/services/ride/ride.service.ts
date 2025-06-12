@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpResponse} from '@angular/common/http';
 import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
 import {Coord, RideResponse, RideUpdateDTO} from '../../types';
 import {ErrorService} from '../error/error.service';
@@ -101,8 +101,12 @@ export class RideService {
         {
           responseType: "text"
         }
-      ).subscribe((response) => {console.log(response)})
+      )
     }
+  }
+
+  rateUser(userId: number, rating: number): void {
+    this.httpClient.post(`http://localhost:8080/ratings/${userId}/${rating}`, {})
   }
 
   calculateKmh(meters: number, seconds: number): number {
