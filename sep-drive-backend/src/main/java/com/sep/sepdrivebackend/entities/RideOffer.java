@@ -2,18 +2,14 @@ package com.sep.sepdrivebackend.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.OffsetDateTime;
 
 @Entity
 /* Ein Fahrer darf maximal auf eine Anfrage ein Angebot senden. */
-@Table(name = "offers", uniqueConstraints = @UniqueConstraint(columnNames = {"driver_id", "ride_request_id"}))
-@Builder
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(
+        name = "offers",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"driver_id", "ride_request_id"})
+)
+@Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder
 public class RideOffer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,15 +18,15 @@ public class RideOffer {
     /**
      * Fahrer, der das Angebot gemacht hat.
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "driver_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "driver_id")
     private User driver;
 
     /**
      * Fahranfrage, auf die sich dieses Angebot bezieht.
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ride_request_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "ride_request_id")
     private RideRequest rideRequest;
 
     /**

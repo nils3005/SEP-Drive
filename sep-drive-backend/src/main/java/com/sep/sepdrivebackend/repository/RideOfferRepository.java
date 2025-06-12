@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,15 +29,9 @@ public interface RideOfferRepository extends JpaRepository<RideOffer, Long> {
     List<RideOffer> findByDriverAndStatus(User driver, RideOfferStatus status);
 
     /**
-     * Findet Angebote nach Status (z.B. zum Auflisten aller offenen Angebote).
-     */
-    List<RideOffer> findByStatus(RideOfferStatus status);
-
-    /**
      * Löscht alle Angebote für eine gegebene Fahranfrage anhand der Request-ID.
      */
     @Modifying
-    @Transactional
     int deleteByRideRequest_Id(Long rideRequestId);
 
     /**
@@ -46,8 +39,17 @@ public interface RideOfferRepository extends JpaRepository<RideOffer, Long> {
      * außer demjenigen, das vom Kunden angenommen wurde.
      */
     @Modifying
-    @Query("UPDATE RideOffer o SET o.status = :newStatus WHERE o.rideRequest = :rideRequest AND o.status = 'PENDING' AND o.id <> :acceptedOfferId")
-    int rejectAllOtherOffers(@Param("rideRequest") RideRequest rideRequest,
-                             @Param("acceptedOfferId") Long acceptedOfferId,
-                             @Param("newStatus") RideOfferStatus newStatus);
+    @Query("""
+      UPDATE RideOffer o
+      SET o.status = :newStatus
+      WHERE o.rideRequest = :rideRequest
+        AND o.status = :pendingStatus
+        AND o.id <> :acceptedOfferId
+      """)
+    int rejectAllOtherOffers(
+            @Param("rideRequest")      RideRequest rideRequest,
+            @Param("acceptedOfferId")  Long acceptedOfferId,
+            @Param("pendingStatus")    RideOfferStatus pendingStatus,
+            @Param("newStatus")        RideOfferStatus newStatus
+    );
 }

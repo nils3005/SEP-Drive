@@ -17,11 +17,6 @@ export class RideRequestListComponent implements OnDestroy {
   private authService: AuthService = inject(AuthService);
   private sub?: Subscription;
 
-  ngOnDestroy(): void {
-    // Bei Verlassen der Komponente Subscription abbrechen
-    this.sub?.unsubscribe();
-  }
-
   /**
    * @brief Wenn der Driver ein Angebot für eine Anfrage erstellt, subscribed er dem Topic, um zu erfahren,
    * ob er
@@ -68,6 +63,11 @@ export class RideRequestListComponent implements OnDestroy {
         console.log(err);
       }
     })
+  }
+
+  ngOnDestroy(): void {
+    // Bei Verlassen der Komponente Subscription abbrechen
+    this.sub?.unsubscribe();
   }
 }
 

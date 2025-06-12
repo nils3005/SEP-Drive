@@ -39,20 +39,22 @@ public class RideOfferService {
         }
 
         // Ein Fahrer darf nur genau ein PENDING-Angebot insgesamt haben
-        List<RideOffer> existing = rideOfferRepository.findByDriverAndStatus(driver, RideOfferStatus.PENDING);
-        if (!existing.isEmpty()) {
-            throw new ResponseStatusException(BAD_REQUEST, "Du hast bereits ein offenes Angebot. Fahrer dürfen nur ein Angebot gleichzeitig haben.");
+        if (!rideOfferRepository.findByDriverAndStatus(driver, RideOfferStatus.PENDING).isEmpty()) {
+            throw new ResponseStatusException(BAD_REQUEST,
+                    "Du hast bereits ein offenes Angebot. Fahrer dürfen nur ein Angebot gleichzeitig haben.");
         }
 
         // Prüfen, ob Auto des Fahrer auch das gewünschte des Kunden ist
         if(driver.getCarType() != rideRequest.getCarType()) {
-            throw new ResponseStatusException(BAD_REQUEST, "Kunde hat CarType " + rideRequest.getCarType() + " bestellt, aber driver hat " + driver.getCarType());
+            throw new ResponseStatusException(BAD_REQUEST,
+                    "Kunde hat CarType " + rideRequest.getCarType() + " bestellt, aber driver hat " + driver.getCarType());
         }
 
-        // Fahrer darf nicht bereits auf dieselbe Request PENDING bieten (wird bereits durch unique constraint abgefangen, aber hier um sicher zu sein).
+        // Fahrer darf nicht bereits auf dieselbe Request PENDING bieten
         rideOfferRepository.findByDriverAndRideRequestAndStatus(driver, rideRequest, RideOfferStatus.PENDING)
                 .ifPresent(o -> {
-                    throw new ResponseStatusException(BAD_REQUEST, "Du hast bereits ein PENDING-Angebot auf diese Fahranfrage");
+                    throw new ResponseStatusException(BAD_REQUEST,
+                            "Du hast bereits ein offenes Angebot auf diese Fahranfrage");
                 });
 
         RideOffer rideOffer = RideOffer.builder()
@@ -63,24 +65,9 @@ public class RideOfferService {
 
         RideOffer savedOffer =  rideOfferRepository.save(rideOffer);
 
-        // Sende per WebSocket eine Notification an den Kunden, der die Request gestellt hat
-        // Alle nötigen Infos in OfferNotificationDto
-
-        // Fahrerstatistiken holen (Rating, totalRides, totalDistance)
-        double rating = driver.getRatings().stream().mapToDouble(Rating::getRating).average().orElse(0.0);
-        long totalRides = driver.getNumberOfRides();
-        double totalDistance = 0.0; //TODO: wie bekommen wir das? Als attribut für jeden user -> dann immer wieder update nach fahrt oder wird der wert immer neu berechnet?
-
-        RideOfferNotificationDto notification = RideOfferNotificationDto.builder()
-                .rideOfferId(savedOffer.getId())
-                .rideRequestId(rideRequestId)
-                .driverId(driverId)
-                .driverName(driver.getUsername())
-                .description(RideOfferNotificationDescription.NEW_OFFER)
-                .build();
-
-        String destination = "/topic/ride-requests/" + rideRequestId + "/offers";
-        messagingTemplate.convertAndSend(destination, notification);
+        // Notification an den Kunden, der die Request erstellt hat
+        sendNotification(rideRequest.getId(), rideOffer.getId(), driver,
+                RideOfferNotificationDescription.NEW_OFFER);
 
         return savedOffer;
     }
@@ -101,16 +88,8 @@ public class RideOfferService {
             throw new ResponseStatusException(BAD_REQUEST, "Nur PENDING-Angebote können zurückgezogen werden");
         }
 
-        RideOfferNotificationDto notification = RideOfferNotificationDto.builder()
-                .rideOfferId(rideOffer.getId())
-                .rideRequestId(rideOffer.getRideRequest().getId())
-                .driverId(rideOffer.getDriver().getId())
-                .driverName(rideOffer.getDriver().getUsername())
-                .description(RideOfferNotificationDescription.WITHDRAWN_OFFER)
-                .build();
-
-        String destination = "/topic/ride-requests/" + rideOffer.getRideRequest().getId() + "/offers";
-        messagingTemplate.convertAndSend(destination, notification);
+        sendNotification(rideOffer.getRideRequest().getId(), rideOffer.getId(), rideOffer.getDriver(),
+                RideOfferNotificationDescription.WITHDRAWN_OFFER);
 
         rideOffer.setStatus(RideOfferStatus.WITHDRAWN);
         rideOfferRepository.save(rideOffer);
@@ -138,7 +117,9 @@ public class RideOfferService {
         rideOfferRepository.save(RideOffer);
     }
 
+    @Transactional
     public int rejectAllOffersForRideRequest(Long rideRequestId) {
+        // TODO lieber auf rejected setzen oder ganz löschen? Es macht keinen Sinn Angebote für eine Fahrt zu speichern, die nicht existiert
         return rideOfferRepository.deleteByRideRequest_Id(rideRequestId);
     }
 
@@ -170,32 +151,19 @@ public class RideOfferService {
         int count = rideOfferRepository.rejectAllOtherOffers(
                 rideRequest,
                 offerToAccept.getId(),
+                RideOfferStatus.PENDING,
                 RideOfferStatus.REJECTED
         );
 
-
         // Notifications an alle betroffenen Fahrer senden,
-        // Sendet ACCEPTED_OFFER als Beschreibung. Daraus leitet man im Frontend ab, dass ein User ein bestimmtes Angebot angenommen
-        // hat (das Angebot, das auch in der Notification gesetzt ist). Alle anderen Angebote, die nicht gleich der Angebots-Id aus
-        // der Notification sind wissen, dass sie abgelehnt wurden. Analog weiß der eine Fahrer, der angenommen wurde,
-        // dass er die Fahrt startet.
-        RideOfferNotificationDto notification = RideOfferNotificationDto.builder()
-                .rideOfferId(offerToAccept.getId())
-                .rideRequestId(rideRequest.getId())
-                .driverId(offerToAccept.getDriver().getId())
-                .driverName(offerToAccept.getDriver().getUsername())
-                .description(RideOfferNotificationDescription.ACCEPTED_OFFER)
-                .build();
-
-        String destination = "/topic/ride-requests/" + rideRequest.getId() + "/offers";
-        messagingTemplate.convertAndSend(destination, notification);
+        sendNotification(rideRequest.getId(), offerId, offerToAccept.getDriver(),
+                RideOfferNotificationDescription.ACCEPTED_OFFER);
 
         return saved;
     }
 
     /**
-     * Liefert alle aktuellen PENDING-Angebote für eine gegebene Fahranfrage,
-     * inklusive Fahrer-Statistiken (Bewertung, Gesamtstrecke, Anzahl Fahrten).
+     * Liefert alle aktuellen PENDING-Angebote für eine gegebene Fahranfrage.
      */
     @Transactional(readOnly = true)
     public List<RideOffer> getPendingOffersForRequest(Long customerId, Long rideRequestId) {
@@ -207,6 +175,17 @@ public class RideOfferService {
         }
 
         return rideOfferRepository.findByRideRequestAndStatus(request, RideOfferStatus.PENDING);
+    }
+
+    private void sendNotification(Long requestId, Long offerId, User driver, RideOfferNotificationDescription desc) {
+        var dto = RideOfferNotificationDto.builder()
+                .rideOfferId(offerId)
+                .rideRequestId(requestId)
+                .driverId(driver.getId())
+                .driverName(driver.getUsername())
+                .description(desc)
+                .build();
+        messagingTemplate.convertAndSend("/topic/ride-requests/" + requestId + "/offers", dto);
     }
 
     @Data

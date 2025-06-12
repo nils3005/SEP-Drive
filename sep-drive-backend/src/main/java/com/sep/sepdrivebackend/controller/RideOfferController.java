@@ -4,7 +4,6 @@ import com.sep.sepdrivebackend.entities.Rating;
 import com.sep.sepdrivebackend.entities.RideOffer;
 import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.service.RideOfferService;
-import com.sep.sepdrivebackend.service.RideRequestService;
 import com.sep.sepdrivebackend.service.UserService;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,7 +30,7 @@ public class RideOfferController {
      */
     @PostMapping("/offers/{requestId}")
     public ResponseEntity<RideOfferDto> createOfferAsDriver(@PathVariable Long requestId) {
-        Long driverId = getCurrentDriverId();
+        Long driverId = getUserIdForCurrentRequest();
         RideOffer offer = rideOfferService.createOffer(driverId, requestId);
         return ResponseEntity.ok(RideOfferDto.fromEntity(offer));
     }
@@ -42,7 +40,7 @@ public class RideOfferController {
      */
     @DeleteMapping("/offers/{offerId}")
     public ResponseEntity<Void> withdrawOffer(@PathVariable Long offerId) {
-        Long driverId = getCurrentDriverId();
+        Long driverId = getUserIdForCurrentRequest();
         rideOfferService.withdrawOffer(driverId, offerId);
         return ResponseEntity.ok().build();
     }
@@ -58,7 +56,7 @@ public class RideOfferController {
             @RequestParam(name = "sortBy", required = false, defaultValue = "rating") String sortBy,
             @RequestParam(name = "direction", required = false, defaultValue = "desc") String direction
     ) {
-        Long customerId = getCurrentCustomerId();
+        Long customerId = getUserIdForCurrentRequest();
         List<RideOffer> offers = rideOfferService.getPendingOffersForRequest(customerId, rideRequestId);
 
         // Baue eine Liste von DTOs, in denen die Fahrer-Statistiken mit drin sind
@@ -101,7 +99,7 @@ public class RideOfferController {
      */
     @PostMapping("/offers/{offerId}/accept")
     public ResponseEntity<RideOfferDto> acceptOffer(@PathVariable Long offerId) {
-        Long customerId = getCurrentCustomerId();
+        Long customerId = getUserIdForCurrentRequest();
         RideOffer accepted = rideOfferService.acceptOffer(customerId, offerId);
         return ResponseEntity.ok(RideOfferDto.fromEntity(accepted));
     }
@@ -111,17 +109,12 @@ public class RideOfferController {
      */
     @PostMapping("/offers/{offerId}/reject")
     public ResponseEntity<Void> rejectOffer(@PathVariable Long offerId) {
-        Long customerId = getCurrentCustomerId();
+        Long customerId = getUserIdForCurrentRequest();
         rideOfferService.rejectOffer(customerId, offerId);
         return ResponseEntity.ok().build();
     }
 
-    private Long getCurrentDriverId() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userService.findByUsername(username).getId();
-    }
-
-    private Long getCurrentCustomerId() {
+    private Long getUserIdForCurrentRequest() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return userService.findByUsername(username).getId();
     }
@@ -153,6 +146,5 @@ public class RideOfferController {
         private double rating;
         private long totalRides;
         private double totalDistance;
-        private OffsetDateTime createdAt;
     }
 }
