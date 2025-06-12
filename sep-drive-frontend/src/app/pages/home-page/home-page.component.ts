@@ -18,7 +18,6 @@ import {RideSimulationComponent} from '../../components/ride-simulation/ride-sim
     RouteInputComponent,
     MapComponent,
     RideRequestSummaryComponent,
-    RideSimulationComponent
   ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'
