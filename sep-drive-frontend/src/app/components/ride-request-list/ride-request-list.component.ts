@@ -44,7 +44,6 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
   private openRouteService: OpenRouteServiceService = inject(OpenRouteServiceService);
   private errorService: ErrorService = inject(ErrorService);
   private mapService: MapService = inject(MapService);
-  private userService: UserService = inject(UserService);
 
   private webSocketService: WebsocketService = inject(WebsocketService);
   private authService: AuthService = inject(AuthService);
@@ -55,8 +54,8 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<RideTableRow>();
   displayedColumns: string[] = ['fahrtid', 'entfernung', 'zeitpunkt', 'klasse', 'name', 'bewertung', 'annehmen'];
 
-  public accepted: boolean = false;
   public selectedRideRequestId = signal(-1);
+  public notificationSignal = signal("");
   public summaryData: RideRequestSummary | null = null;
 
   private currentPosition: BehaviorSubject<GeocodeFeature | null> = new BehaviorSubject<GeocodeFeature | null>(null);
@@ -96,8 +95,6 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
     });
   }
 
-
-
   /**
    * @brief Wenn der Driver ein Angebot für eine Anfrage erstellt, subscribed er dem Topic, um zu erfahren,
    * ob er
@@ -109,7 +106,7 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
     this.rideOfferService.createOffer(rideRequestId).subscribe({
       next: (rideOffer: RideOffer) => {
         this.selectedRideRequestId.set(rideRequestId);
-        this.subscribeToTopic(rideRequestId);
+        this.subscribeToTopic(rideOffer.offerId);
       },
       error: err => {
         console.log(err);
@@ -119,7 +116,7 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
 
   withdrawRideOffer(rideRequestId: number): void {
     this.mapService.resetMap()
-    this.rideOfferService.withdrawOfferForRideRequest(rideRequestId).subscribe({
+    this.rideOfferService.withdrawRideOfferWithRideRequestId(rideRequestId).subscribe({
       next: _ => {
         // TODO Fahrer darstellen, dass er wieder neue Angebote machen kann
         this.selectedRideRequestId.set(-1);
@@ -128,22 +125,31 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
         console.log(err);
       }
     });
-    this.accepted = false;
   }
 
-  subscribeToTopic(rideRequestId: number) {
+  subscribeToTopic(rideOfferId: number) {
     // TODO was wenn Driver Seite neu lädt => Dann ist Topic nicht mehr subscribed, aber die Offer noch gültig => Fahrer würde nicht informiert werden
     this.sub = this.webSocketService
-        .subscribe<RideOfferNotification>(`/topic/ride-requests/${rideRequestId}/offers`)
+        .subscribe<RideOfferNotification>(`/topic/offers/${rideOfferId}`)
         .subscribe({
           next: (notification) => {
             if (notification.description === "ACCEPTED_OFFER") {
               if (notification.driverId === this.authService.user()!.id) {
                 // TODO Das passiert für den Driver, dessen Offer akzeptiert wurde
+                this.notificationSignal.set("Dein Angebot für Fahranfrage " + notification.rideRequestId + " wurde angenommen!");
               } else {
                 // TODO Das passiert für alle anderen Driver
+                this.updateDistance()
+                this.notificationSignal.set("Der Kunde von Fahranfrage " + notification.rideRequestId + " hat sich nicht für dein Angebot entschieden.");
+                this.selectedRideRequestId.set(-1);
               }
+            } else if(notification.description === "REJECTED_OFFER") {
+              // TODO POP up oder so, dass fahrer angebot abgelehnt wurde
+              this.updateDistance()
+              this.notificationSignal.set("Dein Angebot für Fahranfrage " + notification.rideRequestId + " wurde abgelehnt!");
+              this.selectedRideRequestId.set(-1);
             }
+            setTimeout(() => this.notificationSignal.set(""), 8000);
           },
           error: (err) => {
             console.error("WebSocket Fehler:", err);
@@ -182,12 +188,6 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
         Math.sin(dLon / 2) ** 2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return Math.round(R * c * 100) / 100; // auf 2 Nachkommastellen runden
-  }
-
-  public minutesToHHMM(minutes: number): string {
-    const hours = Math.floor(minutes / 60);
-    const mins = Math.floor(minutes % 60); // Ensure no fractions here
-    return `${hours}:${mins.toString().padStart(2, '0')}`;
   }
 
   checkCoordinates() {

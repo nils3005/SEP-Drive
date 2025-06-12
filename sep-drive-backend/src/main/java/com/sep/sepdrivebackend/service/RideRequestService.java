@@ -26,7 +26,7 @@ public class RideRequestService {
 
     public List<RideRequestDto> getAllRideRequests() {
         List<RideRequestDto> result = new ArrayList<>();
-        rideRepo.findAll().forEach(rideRequest -> {
+        rideRepo.findPendingRideRequestsWithoutRejectedOffers().forEach(rideRequest -> {
             result.add(RideRequestDto.fromEntity(rideRequest));
         });
         return result;

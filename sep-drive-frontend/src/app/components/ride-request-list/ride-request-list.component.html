@@ -1,3 +1,6 @@
+@if (this.notificationSignal()) {
+    <p class="notification">{{ this.notificationSignal() }}</p>
+}
     <form [formGroup]="routeForm" class="routeInputForm">
         <div *ngIf="!useStartCoordinates; else coordinatesInput" class="inputRow">
             <button class="imageButton" type="button" (click)="useStartCoordinates = !useStartCoordinates">

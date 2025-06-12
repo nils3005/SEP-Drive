@@ -3,8 +3,6 @@ package com.sep.sepdrivebackend.service;
 import com.sep.sepdrivebackend.entities.*;
 import com.sep.sepdrivebackend.repository.RideOfferRepository;
 import lombok.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,7 +66,7 @@ public class RideOfferService {
         RideOffer savedOffer =  rideOfferRepository.save(rideOffer);
 
         // Notification an den Kunden, der die Request erstellt hat
-        sendNotification(rideRequest.getId(), rideOffer.getId(), driver,
+        sendRideOfferNotification("/topic/ride-requests/" + rideRequestId + "/offers", rideRequest.getId(), rideOffer.getId(), driver,
                 RideOfferNotificationDescription.NEW_OFFER);
 
         return savedOffer;
@@ -91,7 +89,7 @@ public class RideOfferService {
             throw new ResponseStatusException(BAD_REQUEST, "Nur PENDING-Angebote können zurückgezogen werden");
         }
 
-        sendNotification(rideOffer.getRideRequest().getId(), rideOffer.getId(), rideOffer.getDriver(),
+        sendRideOfferNotification("/topic/ride-requests/" + rideRequestId + "/offers", rideOffer.getRideRequest().getId(), rideOffer.getId(), rideOffer.getDriver(),
                 RideOfferNotificationDescription.WITHDRAWN_OFFER);
 
         rideOffer.setStatus(RideOfferStatus.WITHDRAWN);
@@ -115,6 +113,17 @@ public class RideOfferService {
         if (RideOffer.getStatus() != RideOfferStatus.PENDING) {
             throw new ResponseStatusException(BAD_REQUEST, "Nur PENDING-Angebote können abgelehnt werden");
         }
+
+        // Notification an Driver? topic
+        sendRideOfferNotification("/topic/offers/" + offerId,
+                request.getId(),
+                offerId,
+                userService.findByUserId(customerId),
+                RideOfferNotificationDescription.REJECTED_OFFER);
+
+        // driver subscriben auf /topic/offer/offerId
+
+        // customer subscriben auf /topic/ride-request/rrId/offers
 
         RideOffer.setStatus(RideOfferStatus.REJECTED);
         rideOfferRepository.save(RideOffer);
@@ -159,7 +168,7 @@ public class RideOfferService {
         );
 
         // Notifications an alle betroffenen Fahrer senden,
-        sendNotification(rideRequest.getId(), offerId, offerToAccept.getDriver(),
+        sendRideOfferNotification("/topic/offers/" + offerId, rideRequest.getId(), offerId, offerToAccept.getDriver(),
                 RideOfferNotificationDescription.ACCEPTED_OFFER);
 
         return saved;
@@ -180,15 +189,15 @@ public class RideOfferService {
         return rideOfferRepository.findByRideRequestAndStatus(request, RideOfferStatus.PENDING);
     }
 
-    private void sendNotification(Long requestId, Long offerId, User driver, RideOfferNotificationDescription desc) {
-        var dto = RideOfferNotificationDto.builder()
+    private void sendRideOfferNotification(String destination, Long requestId, Long offerId, User driver, RideOfferNotificationDescription desc) {
+        RideOfferNotificationDto dto = RideOfferNotificationDto.builder()
                 .rideOfferId(offerId)
                 .rideRequestId(requestId)
                 .driverId(driver.getId())
                 .driverName(driver.getUsername())
                 .description(desc)
                 .build();
-        messagingTemplate.convertAndSend("/topic/ride-requests/" + requestId + "/offers", dto);
+        messagingTemplate.convertAndSend(destination, dto);
     }
 
     @Data
@@ -202,7 +211,7 @@ public class RideOfferService {
     }
 
     public enum RideOfferNotificationDescription {
-        NEW_OFFER, WITHDRAWN_OFFER, ACCEPTED_OFFER;
+        NEW_OFFER, WITHDRAWN_OFFER, ACCEPTED_OFFER, REJECTED_OFFER;
     }
 
 
