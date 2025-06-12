@@ -54,7 +54,24 @@
                 </div>
             }
         </div>
-    } @else {
-        <div class="not-logged-in">Logge dich ein, um die User zu sehen.</div>
-    }
+      <div *ngIf="ownProfile()">
+        <button (click)= "drivinghistory()" class="btn btn-info bg-[#914141] text-white hover:bg-[#733C3C] rounded h-10 w-30 mt-2">
+          Fahrthistorie
+        </button>
+      </div>
+    </div>
+
+    <div class="profile-avatar">
+        @if (user()?.profilePicture) {
+            <img
+                    [src]="'data:image/png;base64,' + user()!.profilePicture"
+                    alt="Profilbild {{ user()!.username }}"
+                    class="avatar-img"
+            />
+        } @else {
+            <div class="avatar-circle">
+                Profilbild
+            </div>
+        }
+    </div>
 </div>

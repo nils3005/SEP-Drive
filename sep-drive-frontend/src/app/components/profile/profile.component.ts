@@ -5,21 +5,26 @@ import {FormsModule} from "@angular/forms";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {switchMap} from "rxjs";
 import {toSignal} from "@angular/core/rxjs-interop";
-import {AuthService} from "../../services/auth/auth-service.service";
+import {Router} from '@angular/router';
+import {AuthService} from '../../services/auth/auth-service.service';
+import { NgIf} from '@angular/common';
+
 
 @Component({
   selector: 'app-profile',
   imports: [
     FormsModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    NgIf
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent {
+  private router: Router = inject(Router)
   private route = inject(ActivatedRoute);
   private userService = inject(UserService);
-  auth = inject(AuthService);
+  auth: AuthService = inject(AuthService);
 
   // Macht aus dem RxJS-Observable ein Angular Signal
   user = toSignal(
@@ -65,4 +70,16 @@ export class ProfileComponent {
     }
   }
 
+  drivinghistory() {
+    this.router.navigate(['/history']);
+  }
+
+  ownProfile = computed(() => {
+    const current = this.auth.user();
+    const profile = this.user();
+
+
+
+    return !!current && !!profile && current.id === profile.id;
+  });
 }

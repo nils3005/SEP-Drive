@@ -96,6 +96,22 @@ export type DriveUser = {
   carType: string
 }
 
+export interface fahrt {
+  historyId: number;
+  finishDate: string;
+  drivenDistance: string;
+  drivenTime: string;
+  price: string;
+  ratingCustomer: number;
+  ratingDriver: number;
+  usernameCustomer: string;
+  lastNameCustomer: string;
+  firstNameCustomer: string;
+  usernameDriver: string;
+  lastNameDriver: string;
+  firstNameDriver: string
+}
+
 export type RideResponse = {
   ride: Ride
   coords: RideCords
