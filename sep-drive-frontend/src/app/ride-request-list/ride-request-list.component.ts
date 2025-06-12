@@ -5,11 +5,11 @@ import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {MatSort, MatSortModule} from '@angular/material/sort';
 import {RideRequestService} from '../services/riderequest/ride-request.service';
 import {FormGroup, FormControl, ReactiveFormsModule} from '@angular/forms';
-import {GeoService} from '../services/geo/geo.service';
 import {OpenRouteServiceService} from '../services/openroute/open-route-service.service';
 import {ErrorService} from '../services/error/error.service';
-import {Coordinates, GeocodeFeature, RideRequest} from '../types';
+import {GeocodeFeature, RideRequest, RideRequestSummary} from '../types';
 import {BehaviorSubject} from 'rxjs';
+import {MapService} from '../services/map/map.service';
 
 export interface RideTableRow {
   fahrtid: string;
@@ -28,16 +28,24 @@ export interface RideTableRow {
   imports: [FormsModule, CommonModule, MatTableModule, MatSortModule, ReactiveFormsModule]
 })
 export class RideRequestListComponent implements OnInit, AfterViewInit {
+  // TODO: create RideOffer
+  // TODO: keep track to accept only one
+    // TODO: disable other buttons
+    // TODO: cancel accept
   dataSource = new MatTableDataSource<RideTableRow>();
   displayedColumns: string[] = ['fahrtid', 'entfernung', 'zeitpunkt', 'klasse', 'name', 'bewertung', 'annehmen'];
+
+  public accepted: boolean = false;
+  public summaryData: RideRequestSummary | null = null;
 
   private currentPosition: BehaviorSubject<GeocodeFeature | null> = new BehaviorSubject<GeocodeFeature | null>(null);
 
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(private rideRequestService: RideRequestService,
-  private openRouteServiceService: OpenRouteServiceService,
-  private errorService: ErrorService
+    private openRouteServiceService: OpenRouteServiceService,
+    private errorService: ErrorService,
+    private mapService: MapService,
   ) {
   }
 
@@ -60,20 +68,6 @@ export class RideRequestListComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     // Bestehender Code für RideRequests laden
     this.updateDistance()
-    // this.rideRequestService.getAllRideRequests().subscribe((requests: any[]) => {
-    //   const now = new Date();
-    //   this.dataSource.data = requests.map(req => ({
-    //     fahrtid: req.id.toString(),
-    //     zeitpunkt: now,
-    //     entfernung: this.calculateDistanceKm(
-    //       {lat: req.startLocation.latitude, lon: req.startLocation.longitude},
-    //       {lat: req.destination.latitude, lon: req.destination.longitude}
-    //     ),
-    //     klasse: req.carType,
-    //     name: req.customerName ?? 'Unbekannt',
-    //     bewertung: req.averageRating ?? 0
-    //   }));
-    // });
 
     // Autocomplete für Start-Input
     this.routeForm.controls.start.valueChanges.subscribe(value => {
@@ -192,6 +186,32 @@ export class RideRequestListComponent implements OnInit, AfterViewInit {
     }
   }
 
+  public createRideOffer(id: number): void
+  {
+    console.log("Create RideOffer")
+    this.getSummary(id)
+    this.accepted = true;
+  }
+
+  getSummary(id: number) {
+    this.rideRequestService.getRideRequestById(id).subscribe({
+      next: data => {
+        if (data.body) {
+          this.rideRequestService.getRideRequestSummaryFromRideRequest(data.body).then((response) => {
+            this.summaryData = response;
+            }
+          );
+        }
+      }
+    })
+  }
+
+  public minutesToHHMM(minutes: number): string {
+    const hours = Math.floor(minutes / 60);
+    const mins = Math.floor(minutes % 60); // Ensure no fractions here
+    return `${hours}:${mins.toString().padStart(2, '0')}`;
+  }
+
   private calculateDistanceKm(start: { lon: number | string; lat: number | string }, end: {
     lon: number | string;
     lat: number | string
@@ -220,4 +240,8 @@ export class RideRequestListComponent implements OnInit, AfterViewInit {
     }
   }
 
+  unAcceptRideRequest() {
+    this.mapService.resetMap()
+    this.accepted = false;
+  }
 }

@@ -69,6 +69,20 @@ export class RideRequestService {
     )
   }
 
+  public getRideRequestById(id: number): Observable<HttpResponse<RideRequest>>
+  {
+    return this.http.get<RideRequest>(
+        `http://localhost:8080/api/ride-requests/${id}`,
+        {
+          headers: {
+            accept: 'application/json',
+          }
+          ,
+          observe: 'response'
+        }
+    )
+  }
+
   public cancelRide(): Observable<HttpResponse<any>>
   {
     return this.http.delete<any>(
