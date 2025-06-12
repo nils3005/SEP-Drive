@@ -60,6 +60,9 @@ public class User implements UserDetails {
 
     private Long numberOfRides = 0L;
 
+    @OneToOne (cascade = CascadeType.ALL, orphanRemoval = true, optional = true)
+    private Financials financials;
+
     @Setter(AccessLevel.NONE)
     @Enumerated(EnumType.STRING)
     private CarType carType;
@@ -159,4 +162,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }

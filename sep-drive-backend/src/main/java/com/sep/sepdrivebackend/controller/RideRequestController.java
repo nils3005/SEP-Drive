@@ -1,6 +1,7 @@
 package com.sep.sepdrivebackend.controller;
 
 import com.sep.sepdrivebackend.dto.RideRequestDto;
+import com.sep.sepdrivebackend.dto.RidePriceDto;
 import com.sep.sepdrivebackend.entities.RideRequest;
 import com.sep.sepdrivebackend.service.RideOfferService;
 import com.sep.sepdrivebackend.service.RideRequestService;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -20,6 +22,31 @@ public class RideRequestController {
     private RideRequestService rideRequestService;
     @Autowired
     private RideOfferService rideOfferService;
+
+    @GetMapping("/all")
+    public ResponseEntity<List<RideRequest>> getAllRideRequests() {
+        return new ResponseEntity<>(rideRequestService.getAllRideRequests(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<RideRequest> getRideRequestById(@PathVariable("id") Long id)
+    {
+        RideRequest rideRequest = rideRequestService.getRideRequestById(id);
+        if (rideRequest == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(rideRequestService.getRideRequestById(id), HttpStatus.OK);
+    }
+
+    @PostMapping("/price")
+    public ResponseEntity<?> getPrice(@RequestBody RidePriceDto ridePriceDto) {
+        try{
+            float price = rideRequestService.ridePrice(ridePriceDto);
+            return new ResponseEntity<>(price, HttpStatus.OK);
+        } catch (RuntimeException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody RideRequest request) {

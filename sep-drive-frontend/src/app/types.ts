@@ -1,5 +1,6 @@
 import {RideRequestStatus} from "./enums/ride-request-status";
 import {CarType} from "./enums/car-type";
+import {RideStatus} from './enums/ride-status';
 
 export type NavLink = {
   id: number,
@@ -112,3 +113,56 @@ export type DriveUser = {
   wdhpasswort: string,
   carType: string
 }
+
+export interface fahrt {
+  historyId: number;
+  finishDate: string;
+  drivenDistance: string;
+  drivenTime: string;
+  price: string;
+  ratingCustomer: number;
+  ratingDriver: number;
+  usernameCustomer: string;
+  lastNameCustomer: string;
+  firstNameCustomer: string;
+  usernameDriver: string;
+  lastNameDriver: string;
+  firstNameDriver: string
+}
+
+export type RideResponse = {
+  ride: Ride
+  coords: RideCords
+  speeds: Speeds
+}
+
+export type Ride = {
+  rideId: number
+  driver: User
+  customer: User
+  speed: number
+  price: number
+  distance: number
+  duration: number
+  status: RideStatus
+  coordsIndex: number
+  geoJson: any
+  coords: [[number, number]]
+  speeds: number[]
+}
+
+export type RideCords = [[number, number]]
+
+export type Speeds = number[]
+
+export type RideUpdateDTO = {
+  rideId: number
+  paused: boolean
+  resuming: boolean
+  completed: boolean
+  speed: number
+  coordsIndex: number
+  historyId: number | null
+}
+
+export type Coord = [number, number]

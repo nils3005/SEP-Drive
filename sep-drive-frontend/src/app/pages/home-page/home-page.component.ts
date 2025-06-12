@@ -31,11 +31,12 @@ import {AsyncPipe} from "@angular/common";
 })
 export class HomePageComponent implements OnInit {
   public authService: AuthService = inject(AuthService);
+  public geoService: GeoService = inject(GeoService);
+  public rideRequestService: RideRequestService = inject(RideRequestService)
+  private userService: UserService = inject(UserService)
 
-  constructor(
-      public rideRequestService: RideRequestService,
-      public geoService: GeoService,
-  ) {}
+  public isAccepted: boolean = true;
+  public showOnlyMap = false;
 
   ngOnInit(): void {
     console.log("HomePageComponent ngOnInit");
