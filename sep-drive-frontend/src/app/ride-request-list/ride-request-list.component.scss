@@ -185,3 +185,14 @@
   background: #253146;
   transition: 0.2s;
 }
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-bottom: 10px;
+}
+
