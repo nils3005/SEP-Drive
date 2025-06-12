@@ -104,7 +104,6 @@ export class RideRequestListComponent implements OnInit, AfterViewInit {
       next: data => {
         if (data.body) {
           let rideRequests: RideRequest[] = data.body;
-          const now = new Date();
           let position: [number, number];
           const currentPosition: GeocodeFeature | null = this.currentPosition.getValue();
           if (currentPosition) {
@@ -112,7 +111,7 @@ export class RideRequestListComponent implements OnInit, AfterViewInit {
           }
           this.dataSource.data = rideRequests.map(req => ({
             fahrtid: req.id.toString(),
-            zeitpunkt: now,
+            zeitpunkt: new Date(req.createdAt),
             entfernung: position ? this.calculateDistanceKm(
               {lat: req.startLocation.latitude, lon: req.startLocation.longitude},
               {lat: position[1], lon: position[0]}
