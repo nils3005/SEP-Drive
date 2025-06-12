@@ -18,7 +18,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
   public speedValue = 15;
 
   private started: number = 0;
-
+  
   constructor(
     private mapService: MapService,
     private rideService: RideService,
@@ -95,22 +95,22 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
           });
         }
     });
-
+    setInterval(() => {
+      // send update
+      if (!this.rideSimulationStore.rideData.getValue().completed) {
+        this.rideService.updateIndex()
+      }
+    }, 200);
   }
 
   checkUpdates(): void
   {
     this.rideSimulationStore.rideData.asObservable().subscribe((rideData) => {
       if (rideData.paused && this.rideSimulationStore.motionPolyLine) {
+        // this.rideSimulationStore.motionPolyLine.motionToggle();
         this.rideSimulationStore.motionPolyLine.motionPause()
       }
       if (rideData.resuming && this.rideSimulationStore.motionPolyLine) {
-        if (!this.rideSimulationStore.started) {
-          this.rideSimulationStore.motionPolyLine.motionStart()
-          this.rideSimulationStore.started = true;
-        } else {
-          this.rideSimulationStore.motionPolyLine.motionResume()
-        }
         this.started += 1;
       }
       if (this.started > 1) {
@@ -137,7 +137,8 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
   }
 
   toggleRideStatus() {
-    console.log(this.rideSimulationStore.started)
+    // console.log("Button press")
+    this.rideSimulationStore.motionPolyLine.motionToggle();
     let rideData = this.rideSimulationStore.rideData.getValue();
     this.rideService.updateRideData(!rideData.paused, !rideData.resuming, null, null);
   }

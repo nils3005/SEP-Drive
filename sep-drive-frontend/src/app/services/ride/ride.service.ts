@@ -93,6 +93,18 @@ export class RideService {
     return -1;
   }
 
+  updateIndex(): void {
+    if (this.rideSimulationStore.motionPolyLine) {
+      const index = this.getCoordsIndex();
+      this.httpClient.post(`http://localhost:8080/ride/updateIndex/${this.rideSimulationStore.ride.getValue()?.ride.rideId ?? 0}/${index}`,
+        index,
+        {
+          responseType: "text"
+        }
+      ).subscribe((response) => {console.log(response)})
+    }
+  }
+
   calculateKmh(meters: number, seconds: number): number {
     if (seconds === 0) {
       return Infinity;
