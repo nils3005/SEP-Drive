@@ -140,7 +140,6 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
   }
 
   subscribeToTopic(rideOfferId: number) {
-    // TODO was wenn Driver Seite neu lädt => Dann ist Topic nicht mehr subscribed, aber die Offer noch gültig => Fahrer würde nicht informiert werden
     this.sub = this.webSocketService
         .subscribe<RideOfferNotification>(`/topic/offers/${rideOfferId}`)
         .subscribe({
