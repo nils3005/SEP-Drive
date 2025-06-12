@@ -24,6 +24,16 @@ public class RideRequestController {
         return new ResponseEntity<>(rideRequestService.getAllRideRequests(), HttpStatus.OK);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<RideRequest> getRideRequestById(@PathVariable("id") Long id)
+    {
+        RideRequest rideRequest = rideRequestService.getRideRequestById(id);
+        if (rideRequest == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(rideRequestService.getRideRequestById(id), HttpStatus.OK);
+    }
+
     @PostMapping("/price")
     public ResponseEntity<?> getPrice(@RequestBody RidePriceDto ridePriceDto) {
         try{

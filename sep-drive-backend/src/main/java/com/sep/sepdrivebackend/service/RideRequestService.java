@@ -23,6 +23,11 @@ public class RideRequestService {
         return rideRepo.findAll();
     }
 
+    public RideRequest getRideRequestById(Long id)
+    {
+        return rideRepo.findById(id).orElse(null);
+    }
+
     public RideRequest createRideRequest(RideRequest rideRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User customer = userService.findByUsername(username);
