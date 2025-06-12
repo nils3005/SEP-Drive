@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {DataDisplayComponent} from '../core/data-display/data-display.component';
 import {MapService} from '../../services/map/map.service';
 import {RideService} from '../../services/ride/ride.service';
@@ -14,7 +14,7 @@ import {WebsocketService} from '../../services/websocket/web-socket.service';
   templateUrl: './ride-simulation.component.html',
   styleUrl: './ride-simulation.component.scss',
 })
-export class RideSimulationComponent implements OnInit {
+export class RideSimulationComponent implements OnInit, OnDestroy {
   public speedValue = 15;
 
   private started: number = 0;
@@ -41,6 +41,10 @@ export class RideSimulationComponent implements OnInit {
         })
       }
     })
+  }
+
+  ngOnDestroy(): void {
+    this.rideSimulationStore.started = false;
   }
 
   ngOnInit(): void {
@@ -133,6 +137,7 @@ export class RideSimulationComponent implements OnInit {
   }
 
   toggleRideStatus() {
+    console.log(this.rideSimulationStore.started)
     let rideData = this.rideSimulationStore.rideData.getValue();
     this.rideService.updateRideData(!rideData.paused, !rideData.resuming, null, null);
   }
