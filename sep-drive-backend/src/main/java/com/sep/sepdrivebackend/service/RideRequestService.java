@@ -1,5 +1,6 @@
 package com.sep.sepdrivebackend.service;
 
+import com.sep.sepdrivebackend.dto.RidePriceDto;
 import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.repository.RideRequestRepository;
 import com.sep.sepdrivebackend.entities.RideRequest;
@@ -62,5 +63,14 @@ public class RideRequestService {
             ride.setActive(false);
             rideRepo.save(ride);
         });
+    }
+
+    public float ridePrice(RidePriceDto ridePriceDto) {
+        if(ridePriceDto.getDistance() <= 0) {throw new RuntimeException("Distance must be greater than 0");}
+        return switch (ridePriceDto.getCarType().toString()) {
+            case "SMALL" -> ridePriceDto.getDistance() / 1000;
+            case "MEDIUM" -> ridePriceDto.getDistance() / 1000 * 2;
+            default -> ridePriceDto.getDistance() / 1000 * 10;
+        };
     }
 }

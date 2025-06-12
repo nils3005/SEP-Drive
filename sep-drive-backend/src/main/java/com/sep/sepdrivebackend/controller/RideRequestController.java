@@ -1,5 +1,6 @@
 package com.sep.sepdrivebackend.controller;
 
+import com.sep.sepdrivebackend.dto.RidePriceDto;
 import com.sep.sepdrivebackend.entities.RideRequest;
 import com.sep.sepdrivebackend.service.RideRequestService;
 
@@ -21,6 +22,16 @@ public class RideRequestController {
     @GetMapping("/all")
     public ResponseEntity<List<RideRequest>> getAllRideRequests() {
         return new ResponseEntity<>(rideRequestService.getAllRideRequests(), HttpStatus.OK);
+    }
+
+    @PostMapping("/price")
+    public ResponseEntity<?> getPrice(@RequestBody RidePriceDto ridePriceDto) {
+        try{
+            float price = rideRequestService.ridePrice(ridePriceDto);
+            return new ResponseEntity<>(price, HttpStatus.OK);
+        } catch (RuntimeException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/create")
