@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, computed, OnInit, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
@@ -8,6 +8,8 @@ import {FormGroup, FormControl, ReactiveFormsModule} from '@angular/forms';
 import {GeoService} from '../services/geo/geo.service';
 import {OpenRouteServiceService} from '../services/openroute/open-route-service.service';
 import {ErrorService} from '../services/error/error.service';
+import {Coordinates, GeocodeFeature, RideRequest} from '../types';
+import {BehaviorSubject} from 'rxjs';
 
 export interface RideTableRow {
   fahrtid: string;
@@ -29,10 +31,11 @@ export class RideRequestListComponent implements OnInit, AfterViewInit {
   dataSource = new MatTableDataSource<RideTableRow>();
   displayedColumns: string[] = ['fahrtid', 'entfernung', 'zeitpunkt', 'klasse', 'name', 'bewertung', 'annehmen'];
 
+  private currentPosition: BehaviorSubject<GeocodeFeature | null> = new BehaviorSubject<GeocodeFeature | null>(null);
+
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(private rideRequestService: RideRequestService,
-  private geoService: GeoService,
   private openRouteServiceService: OpenRouteServiceService,
   private errorService: ErrorService
   ) {
@@ -56,20 +59,21 @@ export class RideRequestListComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     // Bestehender Code für RideRequests laden
-    this.rideRequestService.getAllRideRequests().subscribe((requests: any[]) => {
-      const now = new Date();
-      this.dataSource.data = requests.map(req => ({
-        fahrtid: req.id.toString(),
-        zeitpunkt: now,
-        entfernung: this.calculateDistanceKm(
-          {lat: req.startLocation.latitude, lon: req.startLocation.longitude},
-          {lat: req.destination.latitude, lon: req.destination.longitude}
-        ),
-        klasse: req.carType,
-        name: req.customerName ?? 'Unbekannt',
-        bewertung: req.averageRating ?? 0
-      }));
-    });
+    this.updateDistance()
+    // this.rideRequestService.getAllRideRequests().subscribe((requests: any[]) => {
+    //   const now = new Date();
+    //   this.dataSource.data = requests.map(req => ({
+    //     fahrtid: req.id.toString(),
+    //     zeitpunkt: now,
+    //     entfernung: this.calculateDistanceKm(
+    //       {lat: req.startLocation.latitude, lon: req.startLocation.longitude},
+    //       {lat: req.destination.latitude, lon: req.destination.longitude}
+    //     ),
+    //     klasse: req.carType,
+    //     name: req.customerName ?? 'Unbekannt',
+    //     bewertung: req.averageRating ?? 0
+    //   }));
+    // });
 
     // Autocomplete für Start-Input
     this.routeForm.controls.start.valueChanges.subscribe(value => {
@@ -84,12 +88,50 @@ export class RideRequestListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onStartSelect(suggestion: any) {
-    this.geoService.updateStart(suggestion);
+  getAverageRating(ratings: number[]): number {
+    if (ratings.length) {
+      return 0;
+    }
+    const sum = ratings.reduce((acc, cur) => acc + cur, 0);
+    return sum / ratings.length;
+  }
+
+  onStartSelect(suggestion: GeocodeFeature) {
+    // this.geoService.updateStart(suggestion);
+    this.currentPosition.next(suggestion);
+    this.updateDistance()
     this.startSuppressAutocomplete = true;
     this.routeForm.controls.start.setValue(suggestion.properties.label);
     this.startSuggestions = [];
     this.startShowSuggestions = false;
+  }
+
+  updateDistance(): void
+  {
+    this.rideRequestService.getAllRideRequests().subscribe({
+      next: data => {
+        if (data.body) {
+          let rideRequests: RideRequest[] = data.body;
+          const now = new Date();
+          let position: [number, number];
+          const currentPosition: GeocodeFeature | null = this.currentPosition.getValue();
+          if (currentPosition) {
+            position = currentPosition.geometry.coordinates;
+          }
+          this.dataSource.data = rideRequests.map(req => ({
+            fahrtid: req.id.toString(),
+            zeitpunkt: now,
+            entfernung: position ? this.calculateDistanceKm(
+              {lat: req.startLocation.latitude, lon: req.startLocation.longitude},
+              {lat: position[1], lon: position[0]}
+            ) : 0,
+            klasse: req.carType,
+            name: req.customer.username ?? 'Unbekannt',
+            bewertung: this.getAverageRating(req.customer.ratings) ?? 0
+          }));
+        }
+      }
+    })
   }
 
   onStartBlur() {
@@ -113,7 +155,7 @@ export class RideRequestListComponent implements OnInit, AfterViewInit {
             longitude: position.coords.longitude,
           };
           this.openRouteServiceService.getGeocodeFeatureByCoordinates(coords).subscribe({
-            next: (response: any) => {
+            next: (response) => {
               if (response.body) {
                 this.onStartSelect(response.body.features[0]);
               }
@@ -139,8 +181,8 @@ export class RideRequestListComponent implements OnInit, AfterViewInit {
       this.openRouteServiceService.getGeocodeFeatureByCoordinates({latitude: lat, longitude: lon}).subscribe({
         next: (response: any) => {
           if (response.body) {
-            this.geoService.updateStart(response.body.features[0]);
-            this.geoService.currentPoint.next(response.body.features[0]);
+            this.currentPosition.next(response.body.features[0]);
+            // this.geoService.currentPoint.next(response.body.features[0]);
           }
         },
         error: () => this.errorService.showError('Position konnte nicht gefunden werden'),
@@ -150,16 +192,6 @@ export class RideRequestListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onSubmit() {
-    if (
-      this.geoService.waypoints.getValue()[0] &&
-      this.geoService.waypoints.getValue()[1]
-    ) {
-      this.geoService.calculateRoute();
-    } else {
-      this.errorService.showError('Start- und Zielpunkt müssen gesetzt sein.');
-    }
-  }
   private calculateDistanceKm(start: { lon: number | string; lat: number | string }, end: {
     lon: number | string;
     lat: number | string

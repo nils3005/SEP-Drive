@@ -1,11 +1,10 @@
 import {inject, Injectable} from '@angular/core';
-import {Coordinates, GeocodeFeature, GeoJsonRoute, RideRequest, RideRequestSummary} from '../../types';
-import {BehaviorSubject, firstValueFrom, Observable} from 'rxjs';
+import {GeocodeFeature, GeoJsonRoute, RideRequest, RideRequestSummary} from '../../types';
+import {BehaviorSubject, firstValueFrom, Observable, of} from 'rxjs';
 import {GeoService} from '../geo/geo.service';
 import {CarType} from "../../enums/car-type";
 import {HttpClient, HttpResponse} from "@angular/common/http";
 import {OpenRouteServiceService} from "../openroute/open-route-service.service";
-import {ErrorService} from "../error/error.service";
 
 @Injectable({
   providedIn: 'root'
@@ -152,5 +151,19 @@ export class RideRequestService {
       };
     }
     return null;
+  }
+
+  public getAllRideRequests(): Observable<HttpResponse<RideRequest[]>>
+  {
+    return this.http.get<RideRequest[]>(
+      'http://localhost:8080/api/ride-requests/all',
+      {
+        headers: {
+          accept: 'application/json',
+        }
+        ,
+        observe: 'response'
+      }
+    )
   }
 }
