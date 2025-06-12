@@ -1,77 +1,61 @@
 <div class="profile-container">
-    @if (this.auth.isLoggedIn()) {
-        <div class="profile-form">
+  <div class="profile-form">
+    <div class="form-grid">
+      <h2>Benutzerprofil</h2>
+      <h2></h2> <!-- Wichtig, damit das Grid stimmt -->
 
-            <div class="form-grid">
-                <h2>Benutzerprofil</h2>
-                <h2></h2> <!-- Wichtig, damit das Grid stimmt -->
+      <label>Benutzername</label>
+      <input type="text" [value]="user()?.username" readonly />
 
-                <label>Benutzername</label>
-                <input type="text" [value]="user()?.username" readonly />
+      <label>Rolle</label>
+      <input type="text" [value]="user()?.role" readonly />
 
-                <label>Rolle</label>
-                <input type="text" [value]="user()?.role" readonly />
+      <label>Vorname</label>
+      <input type="text" [value]="user()?.firstName" readonly />
 
-                <label>Vorname</label>
-                <input type="text" [value]="user()?.firstName" readonly />
+      <label>Nachname</label>
+      <input type="text" [value]="user()?.lastName" readonly />
 
-                <label>Nachname</label>
-                <input type="text" [value]="user()?.lastName" readonly />
+      <label>E-Mail-Adresse</label>
+      <input type="text" [value]="user()?.email" readonly />
 
-                <label>E-Mail-Adresse</label>
-                <input type="text" [value]="user()?.email" readonly />
+      <label>Geburtsdatum</label>
+      <input type="text" [value]="user()?.birthdate" readonly />
 
-                <label>Geburtsdatum</label>
-                <input type="text" [value]="user()?.birthdate" readonly />
+      <label>Gesamtzahl der Fahrten</label>
+      <input type="text" [value]="user()?.numberOfRides" readonly />
 
-                <label>Gesamtzahl der Fahrten</label>
-                <input type="text" [value]="user()?.numberOfRides" readonly />
-
-                <label>Rating</label>
-                <div class="stars">
-                    @for (star of [1, 2, 3, 4, 5]; track star) {
-                        <i [class]="averageClass(star)"></i>
-                    }
-                </div>
-
-                @if (user()?.carType) {
-                    <label>Autoklasse</label>
-                    <input type="text" [value]="user()!.carType">
-                }
-            </div>
-        </div>
-
-        <div class="profile-avatar">
-            @if (user()?.profilePicture) {
-                <img
-                        [src]="'data:image/png;base64,' + user()!.profilePicture"
-                        alt="Profilbild {{ user()!.username }}"
-                        class="avatar-img"
-                />
-            } @else {
-                <div class="avatar-circle">
-                    Profilbild
-                </div>
-            }
-        </div>
-      <div *ngIf="ownProfile()">
-        <button (click)= "drivinghistory()" class="btn btn-info bg-[#914141] text-white hover:bg-[#733C3C] rounded h-10 w-30 mt-2">
-          Fahrthistorie
-        </button>
-      </div>
-    </div>
-
-    <div class="profile-avatar">
-        @if (user()?.profilePicture) {
-            <img
-                    [src]="'data:image/png;base64,' + user()!.profilePicture"
-                    alt="Profilbild {{ user()!.username }}"
-                    class="avatar-img"
-            />
-        } @else {
-            <div class="avatar-circle">
-                Profilbild
-            </div>
+      <label>Rating</label>
+      <div class="stars">
+        @for (star of [1, 2, 3, 4, 5]; track star) {
+          <i [class]="averageClass(star)"></i>
         }
+      </div>
+
+      @if (user()?.carType) {
+        <label>Autoklasse</label>
+        <input type="text" [value]="user()!.carType">
+      }
     </div>
+    <div *ngIf="ownProfile()">
+      <button (click)= "drivinghistory()" class="btn btn-info bg-[#914141] text-white hover:bg-[#733C3C] rounded h-10 w-30 mt-2">
+        Fahrthistorie
+      </button>
+    </div>
+  </div>
+
+  <div class="profile-avatar">
+    @if (user()?.profilePicture) {
+      <img
+        [src]="'data:image/png;base64,' + user()!.profilePicture"
+        alt="Profilbild {{ user()!.username }}"
+        class="avatar-img"
+      />
+    } @else {
+      <div class="avatar-circle">
+        Profilbild
+      </div>
+    }
+  </div>
 </div>
+

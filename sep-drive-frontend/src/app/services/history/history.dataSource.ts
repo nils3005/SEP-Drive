@@ -17,7 +17,7 @@ export class HistoryDataSource extends DataSource <fahrt> {
   set sort(sort: MatSort) {
     if (this._sort !== sort) {
       this._sort = sort;
-      sort.sortChange.subscribe(s => this.sortSubject.next(s));
+      sort.sortChange.subscribe((s: Sort) => this.sortSubject.next(s));
       this.sortSubject.next({ active: sort.active, direction: sort.direction });
     }
   }
