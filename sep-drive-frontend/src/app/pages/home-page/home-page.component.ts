@@ -30,7 +30,7 @@ export class HomePageComponent implements OnInit {
       private userService: UserService
   ) {}
 
-  public isAccepted: boolean = true;
+  public isAccepted: boolean = false;
   public showOnlyMap = false;
 
   ngOnInit(): void {
