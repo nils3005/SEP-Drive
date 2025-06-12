@@ -29,9 +29,7 @@ export interface RideTableRow {
 })
 export class RideRequestListComponent implements OnInit, AfterViewInit {
   // TODO: create RideOffer
-  // TODO: keep track to accept only one
-    // TODO: disable other buttons
-    // TODO: cancel accept
+  // TODO: cancel RideOffer
   dataSource = new MatTableDataSource<RideTableRow>();
   displayedColumns: string[] = ['fahrtid', 'entfernung', 'zeitpunkt', 'klasse', 'name', 'bewertung', 'annehmen'];
 
