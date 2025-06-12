@@ -56,18 +56,6 @@
               </ng-container>
             </div>
         </div>
-      @if (user()?.carType) {
-        <label>Autoklasse</label>
-        <input type="text" [value]="user()!.carType">
-      }
-    </div>
-    <div *ngIf="ownProfile()">
-      <button (click)= "drivinghistory()" class="btn btn-info bg-[#914141] text-white hover:bg-[#733C3C] rounded h-10 w-30 mt-2">
-        Fahrthistorie
-      </button>
-    </div>
-  </div>
-
         <div class="profile-avatar flex flex-col items-center space-y-6">
             @if (user()?.profilePicture) {
                 <img
@@ -87,6 +75,9 @@
               </button>
               <button (click)="balance()" class="bg-[#914141] text-white hover:bg-[#733C3C] rounded h-13 px-4 py-2">
                 Guthaben aufladen/abbuchen
+              </button>
+              <button (click)= "drivinghistory()" class="bg-[#914141] text-white hover:bg-[#733C3C] rounded h-13 px-4 py-2">
+                Fahrthistorie
               </button>
             </div>
           }

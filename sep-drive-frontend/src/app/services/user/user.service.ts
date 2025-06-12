@@ -44,7 +44,7 @@ export class UserService {
     expiryDate: number;
     cvc: string;
   }): Observable<string> {
-    return this.http.post('http://localhost:8080/users/addcreditcard', data, {
+    return this.http.post('http://localhost:8080/money/addcreditcard', data, {
       responseType: 'text'
     });
   }
@@ -52,19 +52,19 @@ export class UserService {
   addBankAccount(data: {
     iban: string;
   }): Observable<string> {
-    return this.http.post('http://localhost:8080/users/addbankaccount', data, {
+    return this.http.post('http://localhost:8080/money/addbankaccount', data, {
       responseType: 'text'
     });
   }
 
   deposit(amount: number): Observable<string> {
-    return this.http.post(`http://localhost:8080/users/deposit/${amount}`, null, {
+    return this.http.post(`http://localhost:8080/money/deposit/${amount}`, null, {
       responseType: 'text'
     });
   }
 
   disburse(amount: number): Observable<string> {
-    return this.http.post(`http://localhost:8080/users/disburse/${amount}`, null, {
+    return this.http.post(`http://localhost:8080/money/disburse/${amount}`, null, {
       responseType: 'text'
     });
   }
