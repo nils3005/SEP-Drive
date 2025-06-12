@@ -28,11 +28,15 @@ export class RideofferService {
    * Alle PENDING-Angebote für eine Fahranfrage (als Kunde),
    * mit optionaler Sortierung.
    */
-  getOffersForRequest(rideRequestId: number, sortBy: string = 'rating', direction: string = 'desc'): Observable<any[]> {
+  getOffersForRequest(rideRequestId: number, sortBy: string = 'rating', direction: string = 'desc'): Observable<any[]> {  // TODO Array von RideOffer?
     let params = new HttpParams()
         .set('sortBy', sortBy)
         .set('direction', direction);
     return this.http.get<any[]>(`${this.baseUrl}/ride-requests/${rideRequestId}/offers`, { params });
+  }
+
+  getPendingOfferForDriver(driverId: number): Observable<RideOffer> {
+    return this.http.get<RideOffer>(`${this.baseUrl}/offers/drivers/${driverId}`);
   }
 
   /**

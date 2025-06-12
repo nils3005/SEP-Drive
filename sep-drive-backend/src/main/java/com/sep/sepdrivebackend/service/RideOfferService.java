@@ -1,5 +1,6 @@
 package com.sep.sepdrivebackend.service;
 
+import com.sep.sepdrivebackend.controller.RideOfferController;
 import com.sep.sepdrivebackend.entities.*;
 import com.sep.sepdrivebackend.repository.RideOfferRepository;
 import lombok.*;
@@ -187,6 +188,12 @@ public class RideOfferService {
         }
 
         return rideOfferRepository.findByRideRequestAndStatus(request, RideOfferStatus.PENDING);
+    }
+
+    @Transactional
+    public RideOffer getPendingOfferForDriver(Long driverId) {
+        var offers = rideOfferRepository.findByDriverAndStatus(userService.findByUserId(driverId), RideOfferStatus.PENDING);
+        return offers.size() == 1 ? offers.getFirst() : null;
     }
 
     private void sendRideOfferNotification(String destination, Long requestId, Long offerId, User driver, RideOfferNotificationDescription desc) {

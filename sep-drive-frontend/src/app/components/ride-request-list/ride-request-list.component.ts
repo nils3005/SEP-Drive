@@ -23,7 +23,7 @@ import {MapService} from "../../services/map/map.service";
 import {UserService} from "../../services/user/user.service";
 
 export interface RideTableRow {
-  fahrtid: string;
+  fahrtid: number;
   zeitpunkt: Date;
   entfernung: number;
   klasse: string;
@@ -79,8 +79,21 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
   public useStartCoordinates = false;
 
   ngOnInit() {
+    // TODO prüfe, ob der Fahrer bereits ein Angebot erstellt hat
+    if (this.authService.user) {
+      this.rideOfferService.getPendingOfferForDriver(this.authService.user()!.id).subscribe({
+        next: rideOffer => {
+          console.log("PENDING rideOffer:", rideOffer);
+          this.selectedRideRequestId.set(rideOffer.rideRequestId);
+          this.subscribeToTopic(rideOffer.offerId);
+        }
+      })
+    } else {
+      console.log("AuthService nicht geladen. Kann eingeloggten Fahrer nicht zurückgeben");
+    }
+
     // Bestehender Code für RideRequests laden
-    this.updateDistance()
+    this.updateDistanceAndData()
 
     // Autocomplete für Start-Input
     this.routeForm.controls.start.valueChanges.subscribe(value => {
@@ -102,7 +115,6 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
    * @param rideRequestId
    */
   createRideOffer(rideRequestId: number): void {
-    // TODO Button für entsprechende Zeile wird zu Abbrechen-Button, alle anderen Buttons verschwinden
     this.rideOfferService.createOffer(rideRequestId).subscribe({
       next: (rideOffer: RideOffer) => {
         this.selectedRideRequestId.set(rideRequestId);
@@ -118,8 +130,8 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
     this.mapService.resetMap()
     this.rideOfferService.withdrawRideOfferWithRideRequestId(rideRequestId).subscribe({
       next: _ => {
-        // TODO Fahrer darstellen, dass er wieder neue Angebote machen kann
         this.selectedRideRequestId.set(-1);
+        this.updateDistanceAndData()
       },
       error: err => {
         console.log(err);
@@ -139,13 +151,13 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
                 this.notificationSignal.set("Dein Angebot für Fahranfrage " + notification.rideRequestId + " wurde angenommen!");
               } else {
                 // TODO Das passiert für alle anderen Driver
-                this.updateDistance()
+                this.updateDistanceAndData()
                 this.notificationSignal.set("Der Kunde von Fahranfrage " + notification.rideRequestId + " hat sich nicht für dein Angebot entschieden.");
                 this.selectedRideRequestId.set(-1);
               }
             } else if(notification.description === "REJECTED_OFFER") {
               // TODO POP up oder so, dass fahrer angebot abgelehnt wurde
-              this.updateDistance()
+              this.updateDistanceAndData()
               this.notificationSignal.set("Dein Angebot für Fahranfrage " + notification.rideRequestId + " wurde abgelehnt!");
               this.selectedRideRequestId.set(-1);
             }
@@ -251,14 +263,14 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
   onStartSelect(suggestion: GeocodeFeature) {
     // this.geoService.updateStart(suggestion);
     this.currentPosition.next(suggestion);
-    this.updateDistance()
+    this.updateDistanceAndData()
     this.startSuppressAutocomplete = true;
     this.routeForm.controls.start.setValue(suggestion.properties.label);
     this.startSuggestions = [];
     this.startShowSuggestions = false;
   }
 
-  updateDistance(): void
+  updateDistanceAndData(): void
   {
     this.rideRequestService.getAllRideRequests().subscribe({
       next: data => {
@@ -270,7 +282,7 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
             position = currentPosition.geometry.coordinates;
           }
           this.dataSource.data = rideRequests.map(req => ({
-            fahrtid: req.id.toString(),
+            fahrtid: req.id,
             zeitpunkt: new Date(req.createdAt),
             entfernung: position ? this.calculateDistanceKm(
                 {lat: req.startLocation.latitude, lon: req.startLocation.longitude},

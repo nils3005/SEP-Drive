@@ -78,6 +78,7 @@ export type RideRequest = {
 export type RideOffer = {
   offerId: number;
   driverId: number;
+  rideRequestId: number
   driverName: string;
   rating: number;
   totalRides: number;

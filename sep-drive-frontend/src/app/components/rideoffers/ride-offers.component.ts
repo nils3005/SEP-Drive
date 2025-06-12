@@ -122,6 +122,7 @@ export class RideOffersComponent implements OnInit, OnDestroy {
     if (confirm('Möchtest du dieses Angebot annehmen?')) {
       this.rideOfferService.acceptOffer(offerId).subscribe({
         next: () => {
+          // TODO Weiterleiten zur Simulation
           this.loadOffers();
         },
         error: (err) => {

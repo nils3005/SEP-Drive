@@ -94,6 +94,16 @@ public class RideOfferController {
         return ResponseEntity.ok(dtos);
     }
 
+    @GetMapping("/offers/drivers/{driverId}")
+    public ResponseEntity<RideOfferDto> offerForDriverAndRequest(@PathVariable Long driverId) {
+        RideOffer rideOffer = rideOfferService.getPendingOfferForDriver(driverId);
+        if (rideOffer == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(RideOfferDto.fromEntity(rideOffer));
+        }
+    }
+
     /**
      * Kunde nimmt ein Angebot an.
      */
