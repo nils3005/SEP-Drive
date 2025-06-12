@@ -7,6 +7,7 @@ import {Coordinates, RideUpdateDTO} from '../../types';
 import {OpenRouteServiceService} from '../../services/openroute/open-route-service.service';
 import {GeoService} from '../../services/geo/geo.service';
 import {WebsocketService} from '../../services/websocket/web-socket.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-ride-simulation',
@@ -18,14 +19,15 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
   public speedValue = 15;
 
   private started: number = 0;
-  
+
   constructor(
     private mapService: MapService,
     private rideService: RideService,
     public rideSimulationStore: RideSimulationStore,
     private openRouteService: OpenRouteServiceService,
     private geoService: GeoService,
-    private webSocketService: WebsocketService
+    private webSocketService: WebsocketService,
+    private router: Router
     ) {
     this.webSocketService.isConnected.subscribe(isConnected => {
       if (isConnected) {
@@ -50,49 +52,54 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.mapService.clearMap()
     this.rideService.getActiveRide()
-      .subscribe(rideResponse => {
-        this.rideSimulationStore.ride.next(rideResponse);
-        if (rideResponse.ride) {
-          this.rideSimulationStore.rideData.next({
-            rideId: rideResponse.ride.rideId,
-            paused: true,
-            resuming: false,
-            completed: false,
-            speed: rideResponse.ride.speed,
-            coordsIndex: rideResponse.ride.coordsIndex,
-            historyId: null
-          });
-          if (rideResponse.ride.coordsIndex > 0) {
-            this.rideSimulationStore.started = true;
-          }
-          const startCords: Coordinates = {
-            latitude: rideResponse.coords[0][0],
-            longitude: rideResponse.coords[0][1]
-          }
-          this.speedValue = rideResponse.ride.speed;
-          this.openRouteService.getGeocodeFeatureByCoordinates(startCords).subscribe({
-            next: data => {
-              if (data.body) {
-                this.rideSimulationStore.start.set(data.body.features[0].properties.label)
-                this.geoService.updateStart(data.body.features[0], false)
-                const endCords: Coordinates = {
-                  latitude: rideResponse.coords[rideResponse.coords.length - 1][0],
-                  longitude: rideResponse.coords[rideResponse.coords.length - 1][1]
-                }
-                this.openRouteService.getGeocodeFeatureByCoordinates(endCords).subscribe({
-                  next: data => {
-                    if (data.body) {
-                      this.rideSimulationStore.destination.set(data.body.features[0].properties.label)
-                      this.geoService.updateDestination(data.body.features[0], false)
-                      this.geoService.route.next(JSON.parse(rideResponse.ride.geoJson))
-                      this.rideService.simulateRide()
-                      this.checkUpdates()
-                    }
-                  }
-                })
-              }
+      .subscribe({
+        next: rideResponse => {
+          this.rideSimulationStore.ride.next(rideResponse);
+          if (rideResponse.ride) {
+            this.rideSimulationStore.rideData.next({
+              rideId: rideResponse.ride.rideId,
+              paused: true,
+              resuming: false,
+              completed: false,
+              speed: rideResponse.ride.speed,
+              coordsIndex: rideResponse.ride.coordsIndex,
+              historyId: null
+            });
+            if (rideResponse.ride.coordsIndex > 0) {
+              this.rideSimulationStore.started = true;
             }
-          });
+            const startCords: Coordinates = {
+              latitude: rideResponse.coords[0][0],
+              longitude: rideResponse.coords[0][1]
+            }
+            this.speedValue = rideResponse.ride.speed;
+            this.openRouteService.getGeocodeFeatureByCoordinates(startCords).subscribe({
+              next: data => {
+                if (data.body) {
+                  this.rideSimulationStore.start.set(data.body.features[0].properties.label)
+                  this.geoService.updateStart(data.body.features[0], false)
+                  const endCords: Coordinates = {
+                    latitude: rideResponse.coords[rideResponse.coords.length - 1][0],
+                    longitude: rideResponse.coords[rideResponse.coords.length - 1][1]
+                  }
+                  this.openRouteService.getGeocodeFeatureByCoordinates(endCords).subscribe({
+                    next: data => {
+                      if (data.body) {
+                        this.rideSimulationStore.destination.set(data.body.features[0].properties.label)
+                        this.geoService.updateDestination(data.body.features[0], false)
+                        this.geoService.route.next(JSON.parse(rideResponse.ride.geoJson))
+                        this.rideService.simulateRide()
+                        this.checkUpdates()
+                      }
+                    }
+                  })
+                }
+              }
+            });
+          }
+        },
+        error: error => {
+            this.router.navigate(['/'])
         }
     });
     setInterval(() => {
