@@ -44,7 +44,7 @@
                   <div *ngIf="user()?.role === 'CUSTOMER' && user()?.financials?.lastFourCreditCardNumber">
                     <input type="text" class="w-300"[value]="'Kreditkarte: **** **** **** ' + user()?.financials?.lastFourCreditCardNumber" readonly />
                   </div>
-                  <div *ngIf="user()?.role === 'DRIVER' && user()?.financials?.iban">
+                  <div *ngIf="user()?.role === 'DRIVER' && user()?.financials?.lastFourIban">
                     <input type="text" class="w-300" [value]="'IBAN: **** ' + user()?.financials?.lastFourIban" readonly />
                   </div>
                   <div *ngIf="(user()?.role === 'CUSTOMER' && !user()?.financials?.lastFourCreditCardNumber) || (user()?.role === 'DRIVER' && !user()?.financials?.lastFourIban)">
