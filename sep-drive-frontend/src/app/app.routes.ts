@@ -9,7 +9,7 @@ import { RegistrierungComponent } from './components/registrierung/registrierung
 import { PaymentMethodComponent } from './components/payment-method/payment-method.component';
 import {BalanceComponent} from './components/balance/balance.component';
 import {DrivinghistoryComponent} from './components/drivinghistory/drivinghistory.component';
-import {RideSimulationComponent} from "./components/ride-simulation/ride-simulation.component";
+import {SimulationPageComponent} from "./pages/simulation-page/simulation-page.component";
 
 export const routes: Routes = [{ path: 'login', component: LoginComponent },
   { path: 'password', component: PasswordComponent },
@@ -19,7 +19,7 @@ export const routes: Routes = [{ path: 'login', component: LoginComponent },
   { path: 'social', component: SocialComponent },
   { path: 'social/user/:id', component: ProfileComponent },
   { path: 'history', component: DrivinghistoryComponent },
-  { path: 'simulation', component: RideSimulationComponent },
   { path: 'payment-method', component: PaymentMethodComponent },
   { path: 'balance' , component: BalanceComponent },
+  { path: 'simulation', component: SimulationPageComponent },
   { path: '**', redirectTo: '' }];

@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpResponse} from '@angular/common/http';
 import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
 import {Coord, RideResponse, RideUpdateDTO} from '../../types';
 import {ErrorService} from '../error/error.service';
@@ -91,6 +91,22 @@ export class RideService {
       return this.findClosestCoordinateIndex(ride.coords, [this.rideSimulationStore.motionPolyLine.__marker.getLatLng().lat, this.rideSimulationStore.motionPolyLine.__marker.getLatLng().lng])
     }
     return -1;
+  }
+
+  updateIndex(): void {
+    if (this.rideSimulationStore.motionPolyLine) {
+      const index = this.getCoordsIndex();
+      this.httpClient.post(`http://localhost:8080/ride/updateIndex/${this.rideSimulationStore.ride.getValue()?.ride.rideId ?? 0}/${index}`,
+        index,
+        {
+          responseType: "text"
+        }
+      )
+    }
+  }
+
+  rateUser(userId: number, rating: number): void {
+    this.httpClient.post(`http://localhost:8080/ratings/${userId}/${rating}`, {})
   }
 
   calculateKmh(meters: number, seconds: number): number {
