@@ -115,16 +115,12 @@ public class RideOfferService {
             throw new ResponseStatusException(BAD_REQUEST, "Nur PENDING-Angebote können abgelehnt werden");
         }
 
-        // Notification an Driver? topic
+        // Notification an Fahrer, dass sein Angebot abgelehnt wurde
         sendRideOfferNotification("/topic/offers/" + offerId,
                 request.getId(),
                 offerId,
                 userService.findByUserId(customerId),
                 RideOfferNotificationDescription.REJECTED_OFFER);
-
-        // driver subscriben auf /topic/offer/offerId
-
-        // customer subscriben auf /topic/ride-request/rrId/offers
 
         RideOffer.setStatus(RideOfferStatus.REJECTED);
         rideOfferRepository.save(RideOffer);
@@ -168,7 +164,17 @@ public class RideOfferService {
                 RideOfferStatus.REJECTED
         );
 
-        // Notifications an alle betroffenen Fahrer senden,
+        // Notification an alle Fahrer, die auf ein Angebot geboten haben, aber ein anderes akzeptiert wurde
+        List<RideOffer> rejected = rideOfferRepository.findByRideRequestAndStatus(rideRequest, RideOfferStatus.REJECTED);
+        for (RideOffer rejectedOffer : rejected) {
+            sendRideOfferNotification("/topic/offers/" + rejectedOffer.getId(),
+                    rideRequest.getId(),
+                    rejectedOffer.getId(),
+                    offerToAccept.getDriver(),
+                    RideOfferNotificationDescription.REJECTED_OFFER);
+        }
+
+        // Notifications an den Fahrer für den der Kunde das Angebot angenommen hat
         sendRideOfferNotification("/topic/offers/" + offerId, rideRequest.getId(), offerId, offerToAccept.getDriver(),
                 RideOfferNotificationDescription.ACCEPTED_OFFER);
 

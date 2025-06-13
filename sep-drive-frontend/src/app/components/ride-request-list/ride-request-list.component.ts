@@ -21,6 +21,7 @@ import {OpenRouteServiceService} from "../../services/openroute/open-route-servi
 import {ErrorService} from "../../services/error/error.service";
 import {MapService} from "../../services/map/map.service";
 import {UserService} from "../../services/user/user.service";
+import {getMatIconNameNotFoundError} from "@angular/material/icon";
 
 export interface RideTableRow {
   fahrtid: number;
@@ -79,9 +80,10 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
   public useStartCoordinates = false;
 
   ngOnInit() {
-    // TODO prüfe, ob der Fahrer bereits ein Angebot erstellt hat
+    // Prüfe, ob der Fahrer bereits ein Angebot erstellt hat
     if (this.authService.user) {
       this.rideOfferService.getPendingOfferForDriver(this.authService.user()!.id).subscribe({
+        // Wenn ein PENDING Angebot existiert, dann setze die Buttons entsprechend
         next: rideOffer => {
           console.log("PENDING rideOffer:", rideOffer);
           this.selectedRideRequestId.set(rideOffer.rideRequestId);
@@ -144,22 +146,22 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
         .subscribe<RideOfferNotification>(`/topic/offers/${rideOfferId}`)
         .subscribe({
           next: (notification) => {
-            if (notification.description === "ACCEPTED_OFFER") {
-              if (notification.driverId === this.authService.user()!.id) {
+            switch (notification.description) {
+              case "ACCEPTED_OFFER":
                 // TODO Das passiert für den Driver, dessen Offer akzeptiert wurde
-                this.notificationSignal.set("Dein Angebot für Fahranfrage " + notification.rideRequestId + " wurde angenommen!");
-              } else {
-                // TODO Das passiert für alle anderen Driver
                 this.updateDistanceAndData()
-                this.notificationSignal.set("Der Kunde von Fahranfrage " + notification.rideRequestId + " hat sich nicht für dein Angebot entschieden.");
+                this.notificationSignal.set("Dein Angebot für Fahranfrage " + notification.rideRequestId + " wurde angenommen.");
+                this.selectedRideRequestId.set(notification.rideRequestId);
+                  break;
+              case "REJECTED_OFFER":
+                // TODO Das passiert für den Driver, dessen Offer abgelehnt wurde
+                this.updateDistanceAndData()
+                this.notificationSignal.set("Dein Angebot für Fahranfrage " + notification.rideRequestId + " wurde abgelehnt.");
                 this.selectedRideRequestId.set(-1);
-              }
-            } else if(notification.description === "REJECTED_OFFER") {
-              // TODO POP up oder so, dass fahrer angebot abgelehnt wurde
-              this.updateDistanceAndData()
-              this.notificationSignal.set("Dein Angebot für Fahranfrage " + notification.rideRequestId + " wurde abgelehnt!");
-              this.selectedRideRequestId.set(-1);
+                  break;
             }
+
+            // Timeout bis die Notification zurückgesetzt wird
             setTimeout(() => this.notificationSignal.set(""), 8000);
           },
           error: (err) => {
