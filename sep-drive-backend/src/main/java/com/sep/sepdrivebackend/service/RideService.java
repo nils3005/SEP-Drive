@@ -5,13 +5,11 @@ import com.sep.sepdrivebackend.controller.RideWebSocketController;
 import com.sep.sepdrivebackend.dto.ActiveRideDto;
 import com.sep.sepdrivebackend.dto.RideDto;
 import com.sep.sepdrivebackend.dto.RideUpdateDto;
-import com.sep.sepdrivebackend.entities.History;
-import com.sep.sepdrivebackend.entities.Ride;
-import com.sep.sepdrivebackend.entities.RideStatus;
-import com.sep.sepdrivebackend.entities.User;
+import com.sep.sepdrivebackend.entities.*;
 import com.sep.sepdrivebackend.exception.RideNotFoundException;
 import com.sep.sepdrivebackend.exception.UserHasRideExcpetion;
 import com.sep.sepdrivebackend.repository.RideRepository;
+import com.sep.sepdrivebackend.repository.RideRequestRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,13 +24,17 @@ public class RideService {
     private final UserService userService;
     private final GeoJsonRouteParser geoJsonRouteParser;
     private final HistoryService historyService;
+    private final RideRequestService rideRequestService;
+    private final RideRequestRepository rideRequestRepository;
 
-    public RideService(RideRepository rideRepository, RideWebSocketController rideWebSocketController, UserService userService, GeoJsonRouteParser geoJsonRouteParser, HistoryService historyService) {
+    public RideService(RideRepository rideRepository, RideWebSocketController rideWebSocketController, UserService userService, GeoJsonRouteParser geoJsonRouteParser, HistoryService historyService, RideRequestService rideRequestService, RideRequestRepository rideRequestRepository) {
         this.rideRepository = rideRepository;
         this.rideWebSocketController = rideWebSocketController;
         this.userService = userService;
         this.geoJsonRouteParser = geoJsonRouteParser;
         this.historyService = historyService;
+        this.rideRequestService = rideRequestService;
+        this.rideRequestRepository = rideRequestRepository;
     }
 
     @Transactional
@@ -44,6 +46,9 @@ public class RideService {
         }
         Ride ride = new Ride(driver, customer, rideDto.getSpeed(), rideDto.getPrice(), rideDto.getDistance(), rideDto.getGeoJson(), rideDto.getDuration());
         rideRepository.save(ride);
+        RideRequest activeRideRequest = rideRequestService.getActiveRide();
+        activeRideRequest.setActive(false);
+        rideRequestRepository.save(activeRideRequest);
     }
 
     //Methode nur zum testen

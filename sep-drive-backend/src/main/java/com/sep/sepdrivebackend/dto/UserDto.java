@@ -1,9 +1,6 @@
 package com.sep.sepdrivebackend.dto;
 
-import com.sep.sepdrivebackend.entities.CarType;
-import com.sep.sepdrivebackend.entities.Rating;
-import com.sep.sepdrivebackend.entities.Role;
-import com.sep.sepdrivebackend.entities.User;
+import com.sep.sepdrivebackend.entities.*;
 import lombok.Builder;
 import lombok.Data;
 
@@ -24,6 +21,7 @@ public class UserDto {
     private Double rating;
     private Long numberOfRides;
     private CarType carType;
+    private Financials financials;
 
     public static UserDto fromEntity(User user) {
         return UserDto.builder()
@@ -43,6 +41,7 @@ public class UserDto {
                 )
                 .numberOfRides(user.getNumberOfRides())
                 .carType(user.getCarType())
+                .financials(user.getFinancials())
                 .build();
     }
 }
