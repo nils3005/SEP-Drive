@@ -155,10 +155,6 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
                 this.notificationSignal.set("Dein Angebot für Fahranfrage " + notification.rideRequestId + " wurde angenommen.");
                 this.selectedRideRequestId.set(notification.rideRequestId);
                 console.log("CUSTOMERID: ", notification.customerId, " DRIVERID:", notification.driverId)
-                this.rideService.createRide({
-                  driverId: notification.driverId,
-                  customerId: notification.customerId
-                });
                 break;
               case "REJECTED_OFFER":
                 // TODO Das passiert für den Driver, dessen Offer abgelehnt wurde

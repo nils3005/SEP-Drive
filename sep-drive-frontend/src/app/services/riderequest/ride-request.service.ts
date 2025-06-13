@@ -55,7 +55,7 @@ export class RideRequestService {
     )
   }
 
-  public getActiveRide(): Observable<HttpResponse<any>>
+  public getActiveRideRequest(): Observable<HttpResponse<any>>
   {
     return this.http.get<RideRequest>(
         'http://localhost:8080/api/ride-requests/active',

@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, Inject, inject, OnInit} from '@angular/core';
 import {RouteInputComponent} from "../../components/route-input/route-input.component";
 import {MapComponent} from "../../components/map/map.component";
 import {RideRequestService} from "../../services/riderequest/ride-request.service";
@@ -7,8 +7,9 @@ import {GeoService} from "../../services/geo/geo.service";
 import {RideOffersComponent} from "../../components/rideoffers/ride-offers.component";
 import {RideRequestListComponent} from "../../components/ride-request-list/ride-request-list.component";
 import {AuthService} from "../../services/auth/auth-service.service";
-import {RouterLink} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
 import {UserService} from "../../services/user/user.service";
+import {RideService} from '../../services/ride/ride.service';
 
 @Component({
   selector: 'app-home-page',
@@ -28,19 +29,13 @@ export class HomePageComponent implements OnInit {
   public geoService: GeoService = inject(GeoService);
   public rideRequestService: RideRequestService = inject(RideRequestService)
   private userService: UserService = inject(UserService)
-
+  private rideService: RideService = inject(RideService)
+  private router: Router = inject(Router)
   public isAccepted: boolean = false;
   public showOnlyMap = false;
 
   ngOnInit(): void {
-    /*
-    console.log("HomePageComponent ngOnInit");
-    console.log("showInput:", this.geoService.showInput.getValue());
-    console.log("isSubmitted:", this.geoService.isSubmitted.getValue());
-
-     */
-
-    this.rideRequestService.getActiveRide().subscribe({
+    this.rideRequestService.getActiveRideRequest().subscribe({
       next: (response)=> {
         if (response.status === 200) {
           this.rideRequestService.getRideRequestSummaryFromRideRequest(response.body).then((summary) => {
@@ -62,6 +57,11 @@ export class HomePageComponent implements OnInit {
         }
         if (error.status === 404) {
           console.log("404 ERROR AUS HOMECOMPONENT:",error);
+          this.rideService.getActiveRide().subscribe({
+            next: (response)=> {
+              this.router.navigateByUrl("/simulation");
+            }
+          })
           this.geoService.isSubmitted.next(false);
           this.geoService.showInput.next(true)
         }

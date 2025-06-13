@@ -146,6 +146,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
   toggleRideStatus() {
     // console.log("Button press")
     this.rideSimulationStore.motionPolyLine.motionToggle();
+    this.rideSimulationStore.started = true;
     let rideData = this.rideSimulationStore.rideData.getValue();
     this.rideService.updateRideData(!rideData.paused, !rideData.resuming, null, null);
   }

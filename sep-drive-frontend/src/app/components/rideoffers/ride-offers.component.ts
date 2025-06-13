@@ -1,12 +1,14 @@
 import {Component, OnInit, OnDestroy, inject, signal} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RideofferService } from '../../services/rideoffer/rideoffer.service';
-import {RideOffer, RideOfferNotification} from '../../types';
+import {GeoJsonRoute, RideDto, RideOffer, RideOfferNotification} from '../../types';
 
 import {WebsocketService} from "../../services/websocket/websocket.service";
 import {RideRequestService} from "../../services/riderequest/ride-request.service";
 import {Subscription} from "rxjs";
 import { Router } from '@angular/router';
+import {GeoService} from '../../services/geo/geo.service';
+import {RideService} from '../../services/ride/ride.service';
 
 @Component({
   selector: 'app-rideoffers',
@@ -21,6 +23,8 @@ export class RideOffersComponent implements OnInit, OnDestroy {
   private rideOfferService = inject(RideofferService);
   private webSocketService = inject(WebsocketService);
   private rideRequestService: RideRequestService = inject(RideRequestService);
+  private geoService = inject(GeoService);
+  private rideService: RideService = inject(RideService);
 
   /** Aktuelle Liste, vom Websocket-Stream befüllt */
   offers = signal<RideOffer[]>([]);
@@ -31,6 +35,8 @@ export class RideOffersComponent implements OnInit, OnDestroy {
   // Signal für Banner-Anzeige
   notification = signal("");
 
+  private rideOfferNotification: RideOfferNotification | null = null;
+
   private rideRequestId: number = -1;
 
   // Subscription für paramMap (wird in ngOnDestroy unsubscribet)
@@ -40,7 +46,7 @@ export class RideOffersComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // active RideRequest holen
-    this.rideRequestService.getActiveRide().subscribe({
+    this.rideRequestService.getActiveRideRequest().subscribe({
       next: ({ body }) => {
         this.rideRequestId = body.id;
 
@@ -53,6 +59,7 @@ export class RideOffersComponent implements OnInit, OnDestroy {
             .subscribe({
               next: (notification) => {
                 this.loadOffers(); // Das löst den HTTP-Call aus
+                this.rideOfferNotification = notification;
                 if (notification.description === "NEW_OFFER") {
                   this.notification.set("Du hast ein neues Fahrangebot von " +  notification.driverName + " erhalten.");
                 } else if(notification.description === "WITHDRAWN_OFFER") {
@@ -125,7 +132,27 @@ export class RideOffersComponent implements OnInit, OnDestroy {
     if (confirm('Möchtest du dieses Angebot annehmen?')) {
       this.rideOfferService.acceptOffer(offerId).subscribe({
         next: () => {
-          this.router.navigate(['/simulation']);
+
+          const start = this.geoService.getStart();
+          const destination = this.geoService.getDestination();
+          const route: GeoJsonRoute = this.geoService.route.getValue()
+
+          let rideDto: RideDto;
+
+          if (this.rideOfferNotification) {
+            this.rideService.createRide({
+              driverId: this.rideOfferNotification.driverId,
+              customerId: this.rideOfferNotification.customerId,
+              speed: 15,
+              price: 0,
+              duration: route.features[0].properties.summary.duration,
+              distance: route.features[0].properties.summary.distance,
+              geoJson: JSON.stringify(route)
+            });
+            console.log("Created ride")
+            this.router.navigate(['/simulation']);
+          }
+
           this.loadOffers();
         },
         error: (err) => {
