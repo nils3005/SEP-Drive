@@ -21,6 +21,7 @@ public interface RideRequestRepository extends JpaRepository<RideRequest, Long> 
                 WHERE  o.rideRequest = r
                   AND  o.driver.id   = :driverId
                   AND  o.status      IN ('REJECTED', 'WITHDRAWN')
+                  AND r.carType = o.driver.carType
               )
        """)
     List<RideRequest> findActiveRideRequestsWithoutRejectedOrWithdrawnOfferByDriver(

@@ -1,6 +1,5 @@
 package com.sep.sepdrivebackend.service;
 
-import com.sep.sepdrivebackend.controller.RideOfferController;
 import com.sep.sepdrivebackend.entities.*;
 import com.sep.sepdrivebackend.repository.RideOfferRepository;
 import lombok.*;
@@ -147,7 +146,8 @@ public class RideOfferService {
                     rideRequest.getCustomer().getId(),
                     RideOfferNotificationDescription.REJECTED_OFFER);
         }
-        return rideOfferRepository.deleteAllRideOffersForRideRequest(rideRequest.getId());
+        return rideOfferRepository.rejectAllRideOffersForRideRequest(rideRequest.getId(),
+                RideOfferStatus.REJECTED);
     }
 
     /**
@@ -160,6 +160,8 @@ public class RideOfferService {
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Angebot nicht gefunden"));
 
         RideRequest rideRequest = offerToAccept.getRideRequest();
+        // Nicht mehr active, weil sie angeommen wurde und es zu einer Ride geworden ist
+        rideRequest.setActive(false);
 
         if (!rideRequest.getCustomer().getId().equals(customerId)) {
             throw new ResponseStatusException(FORBIDDEN, "Du darfst nur Angebote zu deinen eigenen Fahranfragen verarbeiten");
@@ -171,7 +173,7 @@ public class RideOfferService {
 
         // Setze dieses Angebot auf ACCEPTED
         offerToAccept.setStatus(RideOfferStatus.ACCEPTED);
-        RideOffer saved = rideOfferRepository.save(offerToAccept);
+        // Brauche ich nicht, weil @transactional RideOffer saved = rideOfferRepository.save(offerToAccept);
 
         // Alle anderen Pending-Angebote für dieselbe Anfrage auf REJECTED setzen
         // count zeigt an, wie viele Records geändert wurden - nur für debugging
@@ -201,7 +203,7 @@ public class RideOfferService {
                 rideRequest.getCustomer().getId(),
                 RideOfferNotificationDescription.ACCEPTED_OFFER);
 
-        return saved;
+        return rideOfferRepository.save(offerToAccept);
     }
 
     /**

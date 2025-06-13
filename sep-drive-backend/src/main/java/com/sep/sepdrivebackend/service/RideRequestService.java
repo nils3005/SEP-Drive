@@ -68,7 +68,7 @@ public class RideRequestService {
         return rideRepo.findByCustomerIdAndActiveTrue(customer.getId()).orElse(null);
     }
 
-    public void deleteActiveRide() {
+    public void deactivateCurrentRideRequest() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User customer = userService.findByUsername(username);
         if (customer == null) {
@@ -79,6 +79,10 @@ public class RideRequestService {
             ride.setActive(false);
             rideRepo.save(ride);
         });
+    }
+
+    public void save(RideRequest rideRequest) {
+        rideRepo.save(rideRequest);
     }
 
     public Optional<RideRequest> findById(Long id) {
