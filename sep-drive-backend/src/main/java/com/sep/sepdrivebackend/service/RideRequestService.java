@@ -1,11 +1,15 @@
 package com.sep.sepdrivebackend.service;
 
+import com.sep.sepdrivebackend.dto.RidePriceDto;
 import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.repository.RideRequestRepository;
 import com.sep.sepdrivebackend.entities.RideRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class RideRequestService {
@@ -15,6 +19,15 @@ public class RideRequestService {
 
     @Autowired
     private UserService userService;
+
+    public List<RideRequest> getAllRideRequests() {
+        return rideRepo.findAll();
+    }
+
+    public RideRequest getRideRequestById(Long id)
+    {
+        return rideRepo.findById(id).orElse(null);
+    }
 
     public RideRequest createRideRequest(RideRequest rideRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -30,6 +43,7 @@ public class RideRequestService {
         }
 
         rideRequest.setCustomer(customer);
+        rideRequest.setCreatedAt(LocalDateTime.now());
         rideRequest.setActive(true);
 
         return rideRepo.save(rideRequest);
@@ -56,5 +70,14 @@ public class RideRequestService {
             ride.setActive(false);
             rideRepo.save(ride);
         });
+    }
+
+    public float ridePrice(RidePriceDto ridePriceDto) {
+        if(ridePriceDto.getDistance() <= 0) {throw new RuntimeException("Distance must be greater than 0");}
+        return switch (ridePriceDto.getCarType().toString()) {
+            case "SMALL" -> ridePriceDto.getDistance() / 1000;
+            case "MEDIUM" -> ridePriceDto.getDistance() / 1000 * 2;
+            default -> ridePriceDto.getDistance() / 1000 * 10;
+        };
     }
 }

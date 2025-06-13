@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity  /*Bedeutet, dass diese Klasse in der Datenbank als Tabelle gespeichert wird.*/
 @Getter @Setter @NoArgsConstructor /*automatically generates getter and setter methods for all these fields.*/
 public class RideRequest{
@@ -30,4 +32,7 @@ public class RideRequest{
     private CarType carType;
 
     private boolean active;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 }
