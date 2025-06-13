@@ -17,7 +17,7 @@ public class Rating {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private float rating;
+    private Integer rating;
 
     public Long getUserID() {
         return user.getId();

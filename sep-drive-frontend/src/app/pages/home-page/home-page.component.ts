@@ -1,16 +1,14 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {RouteInputComponent} from "../../components/route-input/route-input.component";
 import {MapComponent} from "../../components/map/map.component";
 import {RideRequestService} from "../../services/riderequest/ride-request.service";
-import {RideRequestStatus} from "../../enums/ride-request-status";
 import {RideRequestSummaryComponent} from "../../components/ride-request-summary/ride-request-summary.component";
 import {GeoService} from "../../services/geo/geo.service";
-import {RideRequestSummary} from "../../types";
-import {ErrorService} from "../../services/error/error.service";
-import {BehaviorSubject} from "rxjs";
+import {RideOffersComponent} from "../../components/rideoffers/ride-offers.component";
+import {RideRequestListComponent} from "../../components/ride-request-list/ride-request-list.component";
+import {AuthService} from "../../services/auth/auth-service.service";
+import {RouterLink} from "@angular/router";
 import {UserService} from "../../services/user/user.service";
-import {jwtDecode} from "jwt-decode";
-import {RideSimulationComponent} from '../../components/ride-simulation/ride-simulation.component';
 
 @Component({
   selector: 'app-home-page',
@@ -18,59 +16,57 @@ import {RideSimulationComponent} from '../../components/ride-simulation/ride-sim
     RouteInputComponent,
     MapComponent,
     RideRequestSummaryComponent,
+    RideOffersComponent,
+    RideRequestListComponent,
+    RouterLink
   ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'
 })
 export class HomePageComponent implements OnInit {
-
-  constructor(
-      public rideRequestService: RideRequestService,
-      public geoService: GeoService,
-      private userService: UserService
-  ) {}
+  public authService: AuthService = inject(AuthService);
+  public geoService: GeoService = inject(GeoService);
+  public rideRequestService: RideRequestService = inject(RideRequestService)
+  private userService: UserService = inject(UserService)
 
   public isAccepted: boolean = false;
   public showOnlyMap = false;
 
   ngOnInit(): void {
-    const jwt = localStorage.getItem("jwt");
-    if (jwt) {
-      const decode = jwtDecode(jwt);
-      if (decode.sub) {
-        this.userService.getUserByUsername(decode.sub).subscribe(user => {
-          if (user.role == "CUSTOMER") {
-            this.showOnlyMap = false;
-          } else if (user.role == "DRIVER") {
-            this.showOnlyMap = true;
+    /*
+    console.log("HomePageComponent ngOnInit");
+    console.log("showInput:", this.geoService.showInput.getValue());
+    console.log("isSubmitted:", this.geoService.isSubmitted.getValue());
+
+     */
+
+    this.rideRequestService.getActiveRide().subscribe({
+      next: (response)=> {
+        if (response.status === 200) {
+          this.rideRequestService.getRideRequestSummaryFromRideRequest(response.body).then((summary) => {
+            this.geoService.rideRequestSummaryData.next(summary);
+            this.geoService.isSubmitted.next(true);
+            this.geoService.showInput.next(false);
+          })
+        }
+      },
+      error: (error)=> {
+        if (error.status === 400 || error.status === 401) {
+          // this.errorService.showError(error.message);
+          console.log("403 ERROR AUS HOMECOMPONENT:",error);
+          if (!this.geoService.rideRequestSummaryData.getValue()) {
+            this.geoService.showInput.next(true);
           }
-        })
-      }
-    }
-    if (!this.isAccepted) {
-      this.rideRequestService.getActiveRide().subscribe({
-        next: (response)=> {
-          if (response.status === 200) {
-            this.rideRequestService.getRideRequestSummaryFromRideRequest(response.body).then((summary) => {
-              this.geoService.rideRequestSummaryData.next(summary);
-              this.geoService.isSubmitted.next(true);
-            })
-          }
-        },
-        error: (error)=> {
-          if (error.status === 403 || error.status === 401) {
-            // this.errorService.showError(error.message);
-            this.geoService.showInput.next(true)
-            this.geoService.isSubmitted.next(false);
-            return
-          }
-          if (error.status === 404) {
-            this.geoService.isSubmitted.next(false);
-            this.geoService.showInput.next(true)
-          }
+          this.geoService.isSubmitted.next(false);
           return
         }
-      })
-    }
+        if (error.status === 404) {
+          console.log("404 ERROR AUS HOMECOMPONENT:",error);
+          this.geoService.isSubmitted.next(false);
+          this.geoService.showInput.next(true)
+        }
+        return
+      }
+    })
   }
 }

@@ -1,0 +1,61 @@
+.ride-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background: #f8dcdc;
+    th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      cursor: pointer;
+      user-select: none;
+
+      .arrow {
+        font-size: 0.8rem;
+        opacity: 0.7;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #ddd;
+    }
+    td {
+      padding: 0.5rem 1rem;
+      vertical-align: middle;
+    }
+    .rating {
+      color: #a02;
+
+      .star {
+        font-size: 1.2rem;
+      }
+    }
+    .actions {
+      button {
+        cursor: pointer;
+        margin-right: 0.5rem;
+        padding: 0.4rem 0.8rem;
+        border: none;
+        border-radius: 0.25rem;
+        font-size: 0.9rem;
+        &.accept { background: #4caf50; color: white; }
+        &.decline { background: #f44336; color: white; }
+      }
+    }
+  }
+}
+
+.notification {
+  margin-top: 0.5rem;
+  background: #fff4e5;
+  color: #663c00;
+  border: 1px solid #ffd27f;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  text-align: center;
+}
+

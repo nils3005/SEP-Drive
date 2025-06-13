@@ -1,0 +1,243 @@
+.main_container{
+  display: flex;
+  width: 738px;
+  padding-bottom: 44px;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.start_input{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#startInput{
+  width: 280px;
+  height: 35px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  background: #D9D9D9;
+  /*text*/
+  color: #929292;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px; /* 100% */
+  padding-left: 16px;
+}
+
+#calculateButton{
+  width: 138px;
+  height: 35px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  background: #6C6C6C;
+  /*text*/
+  color: #FFF;
+
+  text-align: center;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px; /* 100% */
+}
+
+.ride-request-table{
+  width: 830px;
+}
+
+.table_header{
+  height: 39px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  background: #F2D8D8;
+}
+.stars {
+  color: #853838;
+  display: inline-flex;
+  gap: 2px;
+}
+
+.annehmen-btn{
+  width: 89px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: #914040;
+  /*text*/
+  color: #FFFBFB;
+  text-align: center;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px; /* 100% */
+  cursor: pointer;
+}
+
+.annehmen-btn-deaktiviert {
+  width: 89px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: #b68585;
+  /*text*/
+  color: #FFFBFB;
+  text-align: center;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px; /* 100% */
+}
+
+.abbrechen-btn {
+  width: 89px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: #914040;
+  /*text*/
+  color: #FFFBFB;
+  text-align: center;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px; /* 100% */
+  cursor: pointer;
+}
+
+.notification {
+  margin-top: 0.5rem;
+  background: #fff4e5;
+  color: #663c00;
+  border: 1px solid #ffd27f;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+
+.rideRequestSummaryContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: 10px;
+  row-gap: 10px;
+  width: 100%;
+  background-color: #F3F3F3;
+  padding: 16px;
+  border-radius: 15px;
+}
+
+.infoLabel {
+  padding: 6px 10px;
+  background: #F3F4F6;
+  overflow: hidden;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  display: flex
+}
+
+.infoData {
+  padding: 6px 10px;
+  background: white;
+  overflow: hidden;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  display: flex
+}
+
+.infoField {
+  overflow: hidden;
+  border-radius: 8px;
+  outline: 1px #D1D5DB solid;
+  outline-offset: -1px;
+  justify-content: flex-start;
+  width: fit-content;
+  align-items: center;
+  display: flex
+}
+
+.infoText {
+  color: black;
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
+  font-weight: 400;
+  line-height: 20px;
+  word-wrap: break-word
+}
+
+.buttonContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.buttonRow {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.submitButton {
+  transition: background-color 0.2s;
+  padding: 6px 12px;
+  background: #914141;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-family: "Roboto", sans-serif;
+  border-radius: 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  display: inline-flex;
+  width: fit-content;
+  border: none;
+}
+
+.submitButton:hover {
+  background: #753838;
+  transition: 0.2s;
+}
+
+.cancelButton {
+  padding: 6px 12px;
+  background: #374151;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-family: "Roboto", sans-serif;
+  border-radius: 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  display: inline-flex;
+  width: fit-content;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.cancelButton:hover {
+  background: #253146;
+  transition: 0.2s;
+}
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-bottom: 10px;
+}
+

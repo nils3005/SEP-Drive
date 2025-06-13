@@ -50,7 +50,7 @@ public class History {
     private User driver;
 
     //Getter
-    public Float getRatingCustomer() {
+    public Integer getRatingCustomer() {
         if (ratingCustomer != null) {
             return ratingCustomer.getRating();
         } else {
@@ -58,7 +58,7 @@ public class History {
         }
     }
 
-    public Float getRatingDriver() {
+    public Integer getRatingDriver() {
         if (ratingDriver != null) {
             return ratingDriver.getRating();
         } else {

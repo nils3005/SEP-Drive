@@ -55,7 +55,10 @@ public class User implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     private List<Rating> ratings;
 
-    private int numberOfRides;
+    //@ElementCollection
+    //private List<Integer> ratings;
+
+    private Long numberOfRides = 0L;
 
     @OneToOne (cascade = CascadeType.ALL, orphanRemoval = true, optional = true)
     private Financials financials;
@@ -70,7 +73,6 @@ public class User implements UserDetails {
     //Token id matched to jwt for validation, increments with every logout
     @JsonIgnore
     private int tokenId;
-
 
     public float getAvgRating() {
         int count = ratings.size();
@@ -121,8 +123,6 @@ public class User implements UserDetails {
     }
 
 
-
-
     public User(String username, String email, String password, Role role, String firstName, String lastName, LocalDate birthdate) {
         this.username = username;
         this.email = email;
@@ -162,6 +162,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 
 }

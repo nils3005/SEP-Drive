@@ -3,6 +3,7 @@ package com.sep.sepdrivebackend.service;
 import com.sep.sepdrivebackend.component.GeoJsonRouteParser;
 import com.sep.sepdrivebackend.controller.RideWebSocketController;
 import com.sep.sepdrivebackend.dto.ActiveRideDto;
+import com.sep.sepdrivebackend.dto.RideDto;
 import com.sep.sepdrivebackend.dto.RideUpdateDto;
 import com.sep.sepdrivebackend.entities.History;
 import com.sep.sepdrivebackend.entities.Ride;
@@ -35,12 +36,13 @@ public class RideService {
     }
 
     @Transactional
-    public void addRide(Ride ride) {
-        User driver = userService.findByUserId(ride.getDriver().getId());
-        User customer = userService.findByUserId(ride.getCustomer().getId());
+    public void addRide(RideDto rideDto) {
+        User driver = userService.findByUserId(rideDto.getDriverId());
+        User customer = userService.findByUserId(rideDto.getCustomerId());
         if(rideRepository.findRideByUsername(customer.getUsername()).isPresent() || rideRepository.findRideByUsername(driver.getUsername()).isPresent()) {
             throw new UserHasRideExcpetion("One or more users already part of another ride");
         }
+        Ride ride = new Ride(driver, customer, rideDto.getSpeed(), rideDto.getPrice(), rideDto.getDistance(), rideDto.getGeoJson(), rideDto.getDuration());
         rideRepository.save(ride);
     }
 

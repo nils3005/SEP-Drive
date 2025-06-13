@@ -1,15 +1,52 @@
 <main>
     <div class="routeContainer">
-        @if (!showOnlyMap) {
-          @if (geoService.showInput.getValue()) {
-              <app-route-input class="leftSide" />
-          } @else {
-            @if (isAccepted) {
-            } @else {
-              <app-ride-request-summary class="rideRequestSummary" />
+        <!-- User ist nicht eingeloggt -->
+        @if (!this.authService.isLoggedIn()) {
+            <div class="left-container">
+                <h1>Willkommen bei SEP DRIVE!</h1>
+                <a routerLink="/login">Logge dich ein, um loszulegen.</a>
+            </div>
+            <div class="right-container">
+                <app-map class="map" />
+            </div>
+        } @else {
+            <!-- User ist eingeloggt -->
+            @if (this.authService.user()?.role === "DRIVER") { <!-- Kunde ist Driver -->
+            <div class="left-container">
+                <app-ride-request-list class="ride-request-list"/>
+            </div>
+            <div class="right-container">
+                <!-- TODO Braucht der Fahrer überhaupt die Map? -->
+                <app-map class="map" />
+            </div>
+        } @else if(this.authService.user()?.role === "CUSTOMER") {
+            <!-- Loading State während HTTP-Call -->
+            @if (geoService.showInput.getValue()) { <!-- Wenn keine aktive RideRequest -->
+                <div class="left-container">
+                    <app-route-input class="routeInput" />
+                </div>
+                <div class="right-container">
+                    <app-map class="map" />
+                </div>
+            } @else if (!geoService.showInput.getValue() && !geoService.isSubmitted.getValue()) { <!-- User hat Koordinaten eingegeben und noch nicht bestätigt -->
+                <div class="left-container">
+                    <app-ride-request-summary class="rideRequestSummary" />
+                </div>
+                <div class="right-container">
+                    <app-map class="map" />
+                </div>
+            } @else { <!-- User hat die Fahrt bestätigt -->
+                <div class="left-container">
+                    <app-rideoffers class="rideRequestOffers"/>
+                </div>
+                <div class="right-container">
+                    <div class="right-container-splitted">
+                        <app-ride-request-summary class="rideRequestSummary" />
+                        <app-map class="map" />
+                    </div>
+                </div>
             }
-          }
         }
-        <app-map class="map" />
+        }
     </div>
 </main>

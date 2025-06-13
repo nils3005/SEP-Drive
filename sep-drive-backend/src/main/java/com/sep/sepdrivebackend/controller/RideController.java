@@ -1,5 +1,6 @@
 package com.sep.sepdrivebackend.controller;
 
+import com.sep.sepdrivebackend.dto.RideDto;
 import com.sep.sepdrivebackend.dto.RideUpdateDto;
 import com.sep.sepdrivebackend.entities.Ride;
 import com.sep.sepdrivebackend.exception.GeoJsonParsingException;
@@ -41,9 +42,9 @@ public class RideController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<String> addRide(@RequestBody Ride ride) {
+    public ResponseEntity<String> addRide(@RequestBody RideDto rideDto) {
         try{
-            rideService.addRide(ride);
+            rideService.addRide(rideDto);
             return ResponseEntity.ok("Ride added");
         } catch (UserHasRideExcpetion e){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());

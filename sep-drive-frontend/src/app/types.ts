@@ -53,7 +53,7 @@ export type User = {
   email: string;
   birthdate: string;
   numberOfRides: number;
-  ratings: number[];
+  rating: number;
   carType: string;
   profilePicture: string;
   financials: Financial
@@ -80,6 +80,28 @@ export type RideRequest = {
   destination: Coordinates
   carType: CarType
   active: boolean
+  createdAt: string
+  username: string
+  userRating: number
+}
+
+export type RideOffer = {
+  offerId: number;
+  driverId: number;
+  rideRequestId: number
+  driverName: string;
+  rating: number;
+  totalRides: number;
+  totalDistance: number;
+}
+
+export type RideOfferNotification = {
+  rideOfferId: number;
+  rideRequestId: number;
+  driverId: number;
+  driverName: string;
+  customerId: number
+  description: string;
 }
 
 export type RideRequestSummary = {
@@ -160,6 +182,11 @@ export type Ride = {
   geoJson: any
   coords: [[number, number]]
   speeds: number[]
+}
+
+export type RideDto = {
+  driverId: number,
+  customerId: number
 }
 
 export type RideCords = [[number, number]]

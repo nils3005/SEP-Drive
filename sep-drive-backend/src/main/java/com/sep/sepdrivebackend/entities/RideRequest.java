@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import java.time.LocalDateTime;
 
 @Entity  /*Bedeutet, dass diese Klasse in der Datenbank als Tabelle gespeichert wird.*/
@@ -32,6 +35,9 @@ public class RideRequest{
     private CarType carType;
 
     private boolean active;
+
+    @OneToMany(mappedBy = "rideRequest", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RideOffer> rideOffers = new ArrayList<>();
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

@@ -1,7 +1,9 @@
 package com.sep.sepdrivebackend.controller;
 
+import com.sep.sepdrivebackend.dto.RideRequestDto;
 import com.sep.sepdrivebackend.dto.RidePriceDto;
 import com.sep.sepdrivebackend.entities.RideRequest;
+import com.sep.sepdrivebackend.service.RideOfferService;
 import com.sep.sepdrivebackend.service.RideRequestService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,20 +20,23 @@ public class RideRequestController {
 
     @Autowired
     private RideRequestService rideRequestService;
+    @Autowired
+    private RideOfferService rideOfferService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<RideRequest>> getAllRideRequests() {
-        return new ResponseEntity<>(rideRequestService.getAllRideRequests(), HttpStatus.OK);
+    public ResponseEntity<List<RideRequestDto>> getAllRideRequests() {
+        return new ResponseEntity<>(rideRequestService.getAllOpenRideRequestsForDriver(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RideRequest> getRideRequestById(@PathVariable("id") Long id)
+    public ResponseEntity<RideRequestDto> getRideRequestById(@PathVariable("id") Long id)
     {
         RideRequest rideRequest = rideRequestService.getRideRequestById(id);
         if (rideRequest == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(rideRequestService.getRideRequestById(id), HttpStatus.OK);
+        return new ResponseEntity<>(RideRequestDto.fromEntity(rideRequestService.getRideRequestById(id)),
+                HttpStatus.OK);
     }
 
     @PostMapping("/price")
@@ -55,17 +60,21 @@ public class RideRequestController {
     }
 
     @GetMapping("/active")
-    public ResponseEntity<?> getActive() {
+    public ResponseEntity<RideRequestDto> getActive() {
         RideRequest activeRide = rideRequestService.getActiveRide();
+
         if (activeRide == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "No active ride request found"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } else {
+            return ResponseEntity.ok(RideRequestDto.fromEntity(activeRide));
         }
-        return ResponseEntity.ok(activeRide);
     }
 
     @DeleteMapping("/cancel")
     public ResponseEntity<?> cancel() {
+        RideRequest activeRideRequest = rideRequestService.getActiveRide();
         rideRequestService.deleteActiveRide();
-        return ResponseEntity.ok(Map.of("message", "Ride request cancelled"));
+        int deleted = rideOfferService.rejectAllOffersForRideRequest(activeRideRequest);
+        return ResponseEntity.ok(Map.of("message", "Ride request cancelled. Number of offers rejected: " + deleted));
     }
 }
