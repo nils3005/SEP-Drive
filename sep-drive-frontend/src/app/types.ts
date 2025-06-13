@@ -1,5 +1,6 @@
 import {RideRequestStatus} from "./enums/ride-request-status";
 import {CarType} from "./enums/car-type";
+import {RideStatus} from './enums/ride-status';
 
 export type NavLink = {
   id: number,
@@ -55,6 +56,9 @@ export type User = {
   ratings: number[];
   carType: string;
   profilePicture: string;
+  financials: Financial
+}
+export type Financial = {
   creditCardNumber: string | null;
   expiryDate: string | null;
   cvc: string | null;
@@ -62,7 +66,6 @@ export type User = {
   balance: number;
   lastFourIban: number | null;
   lastFourCreditCardNumber: number | null;
-
 }
 
 export type Coordinates = {
@@ -174,3 +177,4 @@ export type RideUpdateDTO = {
 }
 
 export type Coord = [number, number]
+

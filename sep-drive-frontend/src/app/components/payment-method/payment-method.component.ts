@@ -22,9 +22,8 @@ export class PaymentMethodComponent {
   private userService = inject(UserService);
   private errorMessage = inject(ErrorService);
 
-
   user = signal<User|null>(null);
-  constructor() {
+  constructor(private router: Router) {
     effect(() => {
       this.user.set(this.auth.user());
     });
@@ -82,7 +81,10 @@ export class PaymentMethodComponent {
       };
 
       this.userService.addCreditCard(dto).subscribe({
-        next: () => this.errorMessage.showError("Zahlungsmethode erfolgreich gespeichert."),
+        next: () => {
+          this.errorMessage.showError("Zahlungsmethode erfolgreich gespeichert.");
+          this.router.navigate(['/social/user', this.user()?.id]);
+        },
         error: err => this.errorMessage.showError("Fehler beim Speichern der Kreditkarte: " + err.error.message)
       });
 
@@ -99,7 +101,10 @@ export class PaymentMethodComponent {
       };
 
       this.userService.addBankAccount(dto).subscribe({
-        next: () => this.errorMessage.showError("Bankkonto erfolgreich gespeichert."),
+        next: () => {
+          this.errorMessage.showError("Bankkonto erfolgreich gespeichert.");
+          this.router.navigate(['/social/user', this.user()?.id]);
+        },
         error: err => this.errorMessage.showError("Fehler beim Speichern des Bankkontos: " + err.error.message)
       });
 

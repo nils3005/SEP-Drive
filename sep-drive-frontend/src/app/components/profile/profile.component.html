@@ -41,18 +41,18 @@
               <ng-container *ngIf="ownProfile()">
                 <label>Zahlungsmethode</label>
                 <div>
-                  <div *ngIf="user()?.role === 'CUSTOMER' && user()?.lastFourCreditCardNumber">
-                    <input type="text" class="w-300"[value]="'Kreditkarte: **** **** **** ' + user()?.lastFourCreditCardNumber" readonly />
+                  <div *ngIf="user()?.role === 'CUSTOMER' && user()?.financials?.lastFourCreditCardNumber">
+                    <input type="text" class="w-300"[value]="'Kreditkarte: **** **** **** ' + user()?.financials?.lastFourCreditCardNumber" readonly />
                   </div>
-                  <div *ngIf="user()?.role === 'DRIVER' && user()?.iban">
-                    <input type="text" class="w-300" [value]="'IBAN: **** ' + user()?.lastFourIban" readonly />
+                  <div *ngIf="user()?.role === 'DRIVER' && user()?.financials?.iban">
+                    <input type="text" class="w-300" [value]="'IBAN: **** ' + user()?.financials?.lastFourIban" readonly />
                   </div>
-                  <div *ngIf="(user()?.role === 'CUSTOMER' && !user()?.lastFourCreditCardNumber) || (user()?.role === 'DRIVER' && !user()?.lastFourIban)">
+                  <div *ngIf="(user()?.role === 'CUSTOMER' && !user()?.financials?.lastFourCreditCardNumber) || (user()?.role === 'DRIVER' && !user()?.financials?.lastFourIban)">
                     <input type="text" class="w-300" value="Keine Zahlungsmethode hinterlegt." readonly />
                   </div>
                 </div>
                 <label>Guthaben</label>
-                <input type="text" class="w-300" [value]= user()?.balance readonly />
+                <input type="text" class="w-300" [value]= user()?.financials?.balance readonly />
               </ng-container>
             </div>
         </div>

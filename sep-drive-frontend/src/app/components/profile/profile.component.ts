@@ -88,12 +88,5 @@ export class ProfileComponent {
     this.router.navigate(['/history']);
   }
 
-  ownProfile = computed(() => {
-    const current = this.auth.user();
-    const profile = this.user();
 
-
-
-    return !!current && !!profile && current.id === profile.id;
-  });
 }
