@@ -1,61 +1,89 @@
 <div class="profile-container">
-  <div class="profile-form">
-    <div class="form-grid">
-      <h2>Benutzerprofil</h2>
-      <h2></h2> <!-- Wichtig, damit das Grid stimmt -->
+    @if (this.auth.isLoggedIn()) {
+        <div class="profile-form">
 
-      <label>Benutzername</label>
-      <input type="text" [value]="user()?.username" readonly />
+            <div class="form-grid">
+                <h2>Benutzerprofil</h2>
+                <h2></h2> <!-- Wichtig, damit das Grid stimmt -->
 
-      <label>Rolle</label>
-      <input type="text" [value]="user()?.role" readonly />
+                <label>Benutzername</label>
+                <input type="text" [value]="user()?.username" readonly />
 
-      <label>Vorname</label>
-      <input type="text" [value]="user()?.firstName" readonly />
+                <label>Rolle</label>
+                <input type="text" [value]="user()?.role" readonly />
 
-      <label>Nachname</label>
-      <input type="text" [value]="user()?.lastName" readonly />
+                <label>Vorname</label>
+                <input type="text" [value]="user()?.firstName" readonly />
 
-      <label>E-Mail-Adresse</label>
-      <input type="text" [value]="user()?.email" readonly />
+                <label>Nachname</label>
+                <input type="text" [value]="user()?.lastName" readonly />
 
-      <label>Geburtsdatum</label>
-      <input type="text" [value]="user()?.birthdate" readonly />
+                <label>E-Mail-Adresse</label>
+                <input type="text" [value]="user()?.email" readonly />
 
-      <label>Gesamtzahl der Fahrten</label>
-      <input type="text" [value]="user()?.numberOfRides" readonly />
+                <label>Geburtsdatum</label>
+                <input type="text" [value]="user()?.birthdate" readonly />
 
-      <label>Rating</label>
-      <div class="stars">
-        @for (star of [1, 2, 3, 4, 5]; track star) {
-          <i [class]="averageClass(star)"></i>
-        }
-      </div>
+                <label>Gesamtzahl der Fahrten</label>
+                <input type="text" [value]="user()?.numberOfRides" readonly />
 
-      @if (user()?.carType) {
-        <label>Autoklasse</label>
-        <input type="text" [value]="user()!.carType">
-      }
-    </div>
-    <div *ngIf="ownProfile()">
-      <button (click)= "drivinghistory()" class="btn btn-info bg-[#914141] text-white hover:bg-[#733C3C] rounded h-10 w-30 mt-2">
-        Fahrthistorie
-      </button>
-    </div>
-  </div>
+                <label>Rating</label>
+                <div class="stars">
+                    @for (star of [1, 2, 3, 4, 5]; track star) {
+                        <i [class]="averageClass(star)"></i>
+                    }
+                </div>
 
-  <div class="profile-avatar">
-    @if (user()?.profilePicture) {
-      <img
-        [src]="'data:image/png;base64,' + user()!.profilePicture"
-        alt="Profilbild {{ user()!.username }}"
-        class="avatar-img"
-      />
+                @if (user()?.carType) {
+                    <label>Autoklasse</label>
+                    <input type="text" [value]="user()!.carType">
+                }
+              <ng-container *ngIf="ownProfile()">
+                <label>Zahlungsmethode</label>
+                <div>
+                  <div *ngIf="user()?.role === 'CUSTOMER' && user()?.financials?.lastFourCreditCardNumber">
+                    <input type="text" class="w-300"[value]="'Kreditkarte: **** **** **** ' + user()?.financials?.lastFourCreditCardNumber" readonly />
+                  </div>
+                  <div *ngIf="user()?.role === 'DRIVER' && user()?.financials?.lastFourIban">
+                    <input type="text" class="w-300" [value]="'IBAN: **** ' + user()?.financials?.lastFourIban" readonly />
+                  </div>
+                  <div *ngIf="(user()?.role === 'CUSTOMER' && !user()?.financials?.lastFourCreditCardNumber) || (user()?.role === 'DRIVER' && !user()?.financials?.lastFourIban)">
+                    <input type="text" class="w-300" value="Keine Zahlungsmethode hinterlegt." readonly />
+                  </div>
+                </div>
+                <label>Guthaben</label>
+                <input type="text" class="w-300" [value]= user()?.financials?.balance readonly />
+              </ng-container>
+            </div>
+        </div>
+        <div class="profile-avatar flex flex-col items-center space-y-6">
+            @if (user()?.profilePicture) {
+                <img
+                        [src]="'data:image/png;base64,' + user()!.profilePicture"
+                        alt="Profilbild {{ user()!.username }}"
+                        class="avatar-img"
+                />
+            } @else {
+                <div class="avatar-circle">
+                    Profilbild
+                </div>
+            }
+          @if (ownProfile()) {
+            <div class="flex flex-col space-y-4 mt-8">
+              <button (click)="paymentMethod()" class="bg-[#914141] text-white hover:bg-[#733C3C] rounded h-13 px-4 py-2">
+                Zahlungsdaten hinzufügen/ändern
+              </button>
+              <button (click)="balance()" class="bg-[#914141] text-white hover:bg-[#733C3C] rounded h-13 px-4 py-2">
+                Guthaben aufladen/abbuchen
+              </button>
+              <button (click)= "drivinghistory()" class="bg-[#914141] text-white hover:bg-[#733C3C] rounded h-13 px-4 py-2">
+                Fahrthistorie
+              </button>
+            </div>
+          }
+        </div>
+
     } @else {
-      <div class="avatar-circle">
-        Profilbild
-      </div>
+        <div class="not-logged-in">Logge dich ein, um die User zu sehen.</div>
     }
-  </div>
 </div>
-
