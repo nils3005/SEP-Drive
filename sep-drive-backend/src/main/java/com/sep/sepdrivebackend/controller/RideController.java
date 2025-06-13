@@ -63,4 +63,14 @@ public class RideController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    @PostMapping("/updateIndex/{rideId}/{index}")
+    public ResponseEntity<?> updateIndex(@PathVariable Long rideId, @PathVariable int index) {
+        try {
+            rideService.updateIndex(rideId, index);
+            return ResponseEntity.ok("Ride index updated");
+        } catch (RideNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 }

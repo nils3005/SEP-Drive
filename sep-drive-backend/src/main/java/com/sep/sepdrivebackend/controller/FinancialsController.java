@@ -45,7 +45,10 @@ public class FinancialsController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "CVC wrong.", null);
         }
 
-        Financials financials = new Financials();
+        Financials financials = user.getFinancials();
+        if (financials == null) {
+            financials = new Financials();
+        }
         financials.setCreditCardNumber(creditCardDto.getCardNumber());
         financials.setExpirationDate(creditCardDto.getExpiryDate());
         financials.setCvc(creditCardDto.getCvc());
@@ -66,7 +69,10 @@ public class FinancialsController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "IBAN wrong.", null);
         }
 
-        Financials financials = new Financials();
+        Financials financials = user.getFinancials();
+        if (financials == null) {
+            financials = new Financials();
+        }
         financials.setIban(bankAccountDto.getIban());
         user.setFinancials(financials);
         userService.save(user);

@@ -29,7 +29,7 @@ export class HomePageComponent implements OnInit {
   public rideRequestService: RideRequestService = inject(RideRequestService)
   private userService: UserService = inject(UserService)
 
-  public isAccepted: boolean = true;
+  public isAccepted: boolean = false;
   public showOnlyMap = false;
 
   ngOnInit(): void {

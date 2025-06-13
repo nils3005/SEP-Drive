@@ -5,9 +5,10 @@ import {FormsModule} from "@angular/forms";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {switchMap} from "rxjs";
 import {toSignal} from "@angular/core/rxjs-interop";
+import {AuthService} from "../../services/auth/auth-service.service";
+import {NgIf} from '@angular/common';
 import {Router} from '@angular/router';
-import {AuthService} from '../../services/auth/auth-service.service';
-import { NgIf} from '@angular/common';
+
 
 
 @Component({
@@ -37,7 +38,14 @@ export class ProfileComponent {
       ),
       { initialValue: null }
   );
+  ownProfile = computed(() => {
+    const current = this.auth.user();
+    const profile = this.user();
 
+
+
+    return !!current && !!profile && current.id === profile.id;
+  });
   /**
    * @brief Gibt die CSS Klasse für den entsprechenden Durchschnitt zurück.
    *
@@ -55,17 +63,16 @@ export class ProfileComponent {
       return 'far fa-star';                 // leerer Stern
     }
   }
+  paymentMethod(): void {
+    this.router.navigate(['/payment-method']);
+  }
 
+  balance() {
+    this.router.navigate(['/balance']);
+  }
   drivinghistory() {
     this.router.navigate(['/history']);
   }
 
-  ownProfile = computed(() => {
-    const current = this.auth.user();
-    const profile = this.user();
 
-
-
-    return !!current && !!profile && current.id === profile.id;
-  });
 }

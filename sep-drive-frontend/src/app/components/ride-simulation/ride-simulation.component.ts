@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {DataDisplayComponent} from '../core/data-display/data-display.component';
 import {MapService} from '../../services/map/map.service';
 import {RideService} from '../../services/ride/ride.service';
@@ -7,6 +7,7 @@ import {Coordinates, RideUpdateDTO} from '../../types';
 import {OpenRouteServiceService} from '../../services/openroute/open-route-service.service';
 import {GeoService} from '../../services/geo/geo.service';
 import {WebsocketService} from '../../services/websocket/web-socket.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-ride-simulation',
@@ -14,7 +15,7 @@ import {WebsocketService} from '../../services/websocket/web-socket.service';
   templateUrl: './ride-simulation.component.html',
   styleUrl: './ride-simulation.component.scss',
 })
-export class RideSimulationComponent implements OnInit {
+export class RideSimulationComponent implements OnInit, OnDestroy {
   public speedValue = 15;
 
   private started: number = 0;
@@ -25,7 +26,8 @@ export class RideSimulationComponent implements OnInit {
     public rideSimulationStore: RideSimulationStore,
     private openRouteService: OpenRouteServiceService,
     private geoService: GeoService,
-    private webSocketService: WebsocketService
+    private webSocketService: WebsocketService,
+    private router: Router
     ) {
     this.webSocketService.isConnected.subscribe(isConnected => {
       if (isConnected) {
@@ -43,70 +45,79 @@ export class RideSimulationComponent implements OnInit {
     })
   }
 
+  ngOnDestroy(): void {
+    this.rideSimulationStore.started = false;
+  }
+
   ngOnInit(): void {
     this.mapService.clearMap()
     this.rideService.getActiveRide()
-      .subscribe(rideResponse => {
-        this.rideSimulationStore.ride.next(rideResponse);
-        if (rideResponse.ride) {
-          this.rideSimulationStore.rideData.next({
-            rideId: rideResponse.ride.rideId,
-            paused: true,
-            resuming: false,
-            completed: false,
-            speed: rideResponse.ride.speed,
-            coordsIndex: rideResponse.ride.coordsIndex,
-            historyId: null
-          });
-          if (rideResponse.ride.coordsIndex > 0) {
-            this.rideSimulationStore.started = true;
-          }
-          const startCords: Coordinates = {
-            latitude: rideResponse.coords[0][0],
-            longitude: rideResponse.coords[0][1]
-          }
-          this.speedValue = rideResponse.ride.speed;
-          this.openRouteService.getGeocodeFeatureByCoordinates(startCords).subscribe({
-            next: data => {
-              if (data.body) {
-                this.rideSimulationStore.start.set(data.body.features[0].properties.label)
-                this.geoService.updateStart(data.body.features[0], false)
-                const endCords: Coordinates = {
-                  latitude: rideResponse.coords[rideResponse.coords.length - 1][0],
-                  longitude: rideResponse.coords[rideResponse.coords.length - 1][1]
-                }
-                this.openRouteService.getGeocodeFeatureByCoordinates(endCords).subscribe({
-                  next: data => {
-                    if (data.body) {
-                      this.rideSimulationStore.destination.set(data.body.features[0].properties.label)
-                      this.geoService.updateDestination(data.body.features[0], false)
-                      this.geoService.route.next(JSON.parse(rideResponse.ride.geoJson))
-                      this.rideService.simulateRide()
-                      this.checkUpdates()
-                    }
-                  }
-                })
-              }
+      .subscribe({
+        next: rideResponse => {
+          this.rideSimulationStore.ride.next(rideResponse);
+          if (rideResponse.ride) {
+            this.rideSimulationStore.rideData.next({
+              rideId: rideResponse.ride.rideId,
+              paused: true,
+              resuming: false,
+              completed: false,
+              speed: rideResponse.ride.speed,
+              coordsIndex: rideResponse.ride.coordsIndex,
+              historyId: null
+            });
+            if (rideResponse.ride.coordsIndex > 0) {
+              this.rideSimulationStore.started = true;
             }
-          });
+            const startCords: Coordinates = {
+              latitude: rideResponse.coords[0][0],
+              longitude: rideResponse.coords[0][1]
+            }
+            this.speedValue = rideResponse.ride.speed;
+            this.openRouteService.getGeocodeFeatureByCoordinates(startCords).subscribe({
+              next: data => {
+                if (data.body) {
+                  this.rideSimulationStore.start.set(data.body.features[0].properties.label)
+                  this.geoService.updateStart(data.body.features[0], false)
+                  const endCords: Coordinates = {
+                    latitude: rideResponse.coords[rideResponse.coords.length - 1][0],
+                    longitude: rideResponse.coords[rideResponse.coords.length - 1][1]
+                  }
+                  this.openRouteService.getGeocodeFeatureByCoordinates(endCords).subscribe({
+                    next: data => {
+                      if (data.body) {
+                        this.rideSimulationStore.destination.set(data.body.features[0].properties.label)
+                        this.geoService.updateDestination(data.body.features[0], false)
+                        this.geoService.route.next(JSON.parse(rideResponse.ride.geoJson))
+                        this.rideService.simulateRide()
+                        this.checkUpdates()
+                      }
+                    }
+                  })
+                }
+              }
+            });
+          }
+        },
+        error: error => {
+            this.router.navigate(['/'])
         }
     });
-
+    setInterval(() => {
+      // send update
+      if (!this.rideSimulationStore.rideData.getValue().completed) {
+        this.rideService.updateIndex()
+      }
+    }, 200);
   }
 
   checkUpdates(): void
   {
     this.rideSimulationStore.rideData.asObservable().subscribe((rideData) => {
       if (rideData.paused && this.rideSimulationStore.motionPolyLine) {
+        // this.rideSimulationStore.motionPolyLine.motionToggle();
         this.rideSimulationStore.motionPolyLine.motionPause()
       }
       if (rideData.resuming && this.rideSimulationStore.motionPolyLine) {
-        if (!this.rideSimulationStore.started) {
-          this.rideSimulationStore.motionPolyLine.motionStart()
-          this.rideSimulationStore.started = true;
-        } else {
-          this.rideSimulationStore.motionPolyLine.motionResume()
-        }
         this.started += 1;
       }
       if (this.started > 1) {
@@ -133,6 +144,8 @@ export class RideSimulationComponent implements OnInit {
   }
 
   toggleRideStatus() {
+    // console.log("Button press")
+    this.rideSimulationStore.motionPolyLine.motionToggle();
     let rideData = this.rideSimulationStore.rideData.getValue();
     this.rideService.updateRideData(!rideData.paused, !rideData.resuming, null, null);
   }

@@ -81,6 +81,18 @@ public class RideService {
         }
     }
 
+    public void updateIndex(Long rideId, int index) {
+        Ride ride = rideRepository.findById(rideId).orElseThrow(()->new RideNotFoundException("Ride not found"));
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if(!ride.getCustomer().getUsername().equals(username) && !ride.getDriver().getUsername().equals(username)) {
+            throw new RuntimeException("User is not part of ride");
+        }
+        ride.setCoordsIndex(index);
+        rideRepository.save(ride);
+    }
+
+
     public void updateRideStatus(Ride ride, RideUpdateDto rideUpdateDTO) {
         if (rideUpdateDTO.isPaused()) {
             ride.setStatus(RideStatus.PAUSED);
