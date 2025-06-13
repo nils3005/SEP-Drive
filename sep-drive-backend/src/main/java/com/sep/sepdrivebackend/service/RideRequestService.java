@@ -24,9 +24,10 @@ public class RideRequestService {
     @Autowired
     private UserService userService;
 
-    public List<RideRequestDto> getAllRideRequests() {
+    public List<RideRequestDto> getAllOpenRideRequestsForDriver() {
         List<RideRequestDto> result = new ArrayList<>();
-        rideRepo.findPendingRideRequestsWithoutRejectedOffers().forEach(rideRequest -> {
+        Long driverId = userService.getCurrentUser().getId();
+        rideRepo.findActiveRideRequestsWithoutRejectedOrWithdrawnOfferByDriver(driverId).forEach(rideRequest -> {
             result.add(RideRequestDto.fromEntity(rideRequest));
         });
         return result;

@@ -25,7 +25,7 @@ public class RideRequestController {
 
     @GetMapping("/all")
     public ResponseEntity<List<RideRequestDto>> getAllRideRequests() {
-        return new ResponseEntity<>(rideRequestService.getAllRideRequests(), HttpStatus.OK);
+        return new ResponseEntity<>(rideRequestService.getAllOpenRideRequestsForDriver(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
