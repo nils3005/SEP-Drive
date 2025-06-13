@@ -59,7 +59,10 @@ export class BalanceComponent {
         this.errorMessage.showError("Zu hoher Betrag. Bitte wähle einen Betrag unter 1000€");
       }
       this.userService.deposit(this.balance.balance).subscribe({
-        next: () => this.errorMessage.showError("Guthaben wurde erfolgreich aufgeladen"),
+        next: () => {
+          this.errorMessage.showError("Guthaben wurde erfolgreich aufgeladen"),
+            this.router.navigate(['/social/user', this.user()?.id]);
+        },
         error: err => this.errorMessage.showError("Fehler beim Aufladen : " + err.error.message)
       });
 
@@ -83,7 +86,10 @@ export class BalanceComponent {
         return;
       }
       this.userService.disburse(this.balance.balance).subscribe({
-        next: () => this.errorMessage.showError("Guthaben wurde erfolgreich abgebucht"),
+        next: () => {
+          this.errorMessage.showError("Guthaben wurde erfolgreich abgebucht"),
+            this.router.navigate(['/social/user', this.user()?.id]);
+        },
         error: err => this.errorMessage.showError("Fehler bei der Abbuchung: " + err.error.message)
       });
 
