@@ -76,14 +76,18 @@ export class RideService {
   }
 
   createRide(ride: RideDto): void {
-    this.httpClient.post<string>(
+    this.httpClient.post(
         'http://localhost:8080/ride/add',
-        ride
+        ride,
+        { responseType: 'text' }
     ).subscribe({
       next: _ => {
         // weiterleiten
+        console.log("Weiterleiten zu Simulation")
         this.router.navigate(['/simulation']);
-      }
+      },
+      error: err =>
+          console.log(err)
     })
   }
 

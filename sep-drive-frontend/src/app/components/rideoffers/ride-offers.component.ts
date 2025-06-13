@@ -6,6 +6,7 @@ import {RideOffer, RideOfferNotification} from '../../types';
 import {WebsocketService} from "../../services/websocket/websocket.service";
 import {RideRequestService} from "../../services/riderequest/ride-request.service";
 import {Subscription} from "rxjs";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-rideoffers',
@@ -34,6 +35,8 @@ export class RideOffersComponent implements OnInit, OnDestroy {
 
   // Subscription für paramMap (wird in ngOnDestroy unsubscribet)
   private sub?: Subscription;
+
+  private router: Router = inject(Router);
 
   ngOnInit(): void {
     // active RideRequest holen
@@ -122,7 +125,7 @@ export class RideOffersComponent implements OnInit, OnDestroy {
     if (confirm('Möchtest du dieses Angebot annehmen?')) {
       this.rideOfferService.acceptOffer(offerId).subscribe({
         next: () => {
-          // TODO Weiterleiten zur Simulation
+          this.router.navigate(['/simulation']);
           this.loadOffers();
         },
         error: (err) => {
