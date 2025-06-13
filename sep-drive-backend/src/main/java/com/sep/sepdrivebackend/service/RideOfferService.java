@@ -127,9 +127,16 @@ public class RideOfferService {
     }
 
     @Transactional
-    public int rejectAllOffersForRideRequest(Long rideRequestId) {
-        // TODO lieber auf rejected setzen oder ganz löschen? Es macht keinen Sinn Angebote für eine Fahrt zu speichern, die nicht existiert
-        return rideOfferRepository.deleteByRideRequest_Id(rideRequestId);
+    public int rejectAllOffersForRideRequest(RideRequest rideRequest) {
+        for (RideOffer rideOffer : rideRequest.getRideOffers()) {
+            // Fahrer Notification, dass Angebot zurückgezogen wurde
+            sendRideOfferNotification("/topic/offers/" + rideOffer.getId(),
+                    rideRequest.getId(),
+                    rideOffer.getId(),
+                    rideOffer.getDriver(),
+                    RideOfferNotificationDescription.REJECTED_OFFER);
+        }
+        return rideOfferRepository.deleteAllRideOffersForRideRequest(rideRequest.getId());
     }
 
     /**

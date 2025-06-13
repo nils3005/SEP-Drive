@@ -72,9 +72,9 @@ public class RideRequestController {
 
     @DeleteMapping("/cancel")
     public ResponseEntity<?> cancel() {
-        Long rideRequestId = rideRequestService.getActiveRide().getId();
+        RideRequest activeRideRequest = rideRequestService.getActiveRide();
         rideRequestService.deleteActiveRide();
-        int deleted = rideOfferService.rejectAllOffersForRideRequest(rideRequestId);
+        int deleted = rideOfferService.rejectAllOffersForRideRequest(activeRideRequest);
         return ResponseEntity.ok(Map.of("message", "Ride request cancelled. Number of offers rejected: " + deleted));
     }
 }
