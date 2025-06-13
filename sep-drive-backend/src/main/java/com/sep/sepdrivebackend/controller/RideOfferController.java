@@ -3,6 +3,7 @@ package com.sep.sepdrivebackend.controller;
 import com.sep.sepdrivebackend.entities.Rating;
 import com.sep.sepdrivebackend.entities.RideOffer;
 import com.sep.sepdrivebackend.entities.User;
+import com.sep.sepdrivebackend.service.HistoryService;
 import com.sep.sepdrivebackend.service.RideOfferService;
 import com.sep.sepdrivebackend.service.UserService;
 import lombok.Builder;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class RideOfferController {
     private final RideOfferService rideOfferService;
     private final UserService userService;
+    private final HistoryService historyService;
 
     /**
      * Fahrer legt ein neues Angebot an.
@@ -66,7 +68,7 @@ public class RideOfferController {
                     // Hole Bewertung, Gesamtfahrten, Gesamtstrecke von Driver
                     double rating = driver.getRatings().stream().mapToDouble(Rating::getRating).average().orElse(0.0);
                     long totalRides = driver.getNumberOfRides();
-                    double totalDistance = 0.0; // TODO
+                    double totalDistance = historyService.getDrivenDistanceForDriverId(driver.getId());
                     return RideOfferForCustomerDto.builder()
                             .offerId(offer.getId())
                             .driverId(driver.getId())

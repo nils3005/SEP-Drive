@@ -24,7 +24,6 @@ public class UserDto {
     private Double rating;
     private Long numberOfRides;
     private CarType carType;
-    private Double totalDistance;
 
     public static UserDto fromEntity(User user) {
         return UserDto.builder()
@@ -44,7 +43,6 @@ public class UserDto {
                 )
                 .numberOfRides(user.getNumberOfRides())
                 .carType(user.getCarType())
-                .totalDistance(0.0) // TODO
                 .build();
     }
 }

@@ -36,4 +36,8 @@ public class HistoryService {
     public List<History> findAllHistory(Sort sort) {
         return historyRepository.findAll(sort);
     }
+
+    public Double getDrivenDistanceForDriverId(Long driverId) {
+        return historyRepository.getTotalDrivenDistanceByUserId(driverId);
+    }
 }
