@@ -67,7 +67,11 @@ public class RideOfferService {
         RideOffer savedOffer =  rideOfferRepository.save(rideOffer);
 
         // Notification an den Kunden, der die Request erstellt hat
-        sendRideOfferNotification("/topic/ride-requests/" + rideRequestId + "/offers", rideRequest.getId(), rideOffer.getId(), driver,
+        sendRideOfferNotification("/topic/ride-requests/" + rideRequestId + "/offers",
+                rideRequest.getId(),
+                rideOffer.getId(),
+                driver,
+                rideRequest.getCustomer().getId(),
                 RideOfferNotificationDescription.NEW_OFFER);
 
         return savedOffer;
@@ -78,8 +82,9 @@ public class RideOfferService {
      */
     @Transactional
     public void withdrawOfferForRideRequest(Long driverId, Long rideRequestId) {
+        RideRequest rideRequest = rideRequestService.getRideRequestById(rideRequestId);
         RideOffer rideOffer = rideOfferRepository.findByDriverAndRideRequestAndStatus(userService.findByUserId(driverId),
-                rideRequestService.getRideRequestById(rideRequestId),
+                rideRequest,
                         RideOfferStatus.PENDING).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Angebot nicht gefunden"));
 
         if (!rideOffer.getDriver().getId().equals(driverId)) {
@@ -90,7 +95,11 @@ public class RideOfferService {
             throw new ResponseStatusException(BAD_REQUEST, "Nur PENDING-Angebote können zurückgezogen werden");
         }
 
-        sendRideOfferNotification("/topic/ride-requests/" + rideRequestId + "/offers", rideOffer.getRideRequest().getId(), rideOffer.getId(), rideOffer.getDriver(),
+        sendRideOfferNotification("/topic/ride-requests/" + rideRequestId + "/offers",
+                rideOffer.getRideRequest().getId(),
+                rideOffer.getId(),
+                rideOffer.getDriver(),
+                rideRequest.getCustomer().getId(),
                 RideOfferNotificationDescription.WITHDRAWN_OFFER);
 
         rideOffer.setStatus(RideOfferStatus.WITHDRAWN);
@@ -105,9 +114,9 @@ public class RideOfferService {
         RideOffer RideOffer = rideOfferRepository.findById(offerId)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Angebot nicht gefunden"));
 
-        RideRequest request = RideOffer.getRideRequest();
+        RideRequest rideRequest = RideOffer.getRideRequest();
 
-        if (!request.getCustomer().getId().equals(customerId)) {
+        if (!rideRequest.getCustomer().getId().equals(customerId)) {
             throw new ResponseStatusException(FORBIDDEN, "Du darfst nur Angebote zu deinen eigenen Fahranfragen verarbeiten");
         }
 
@@ -117,9 +126,10 @@ public class RideOfferService {
 
         // Notification an Fahrer, dass sein Angebot abgelehnt wurde
         sendRideOfferNotification("/topic/offers/" + offerId,
-                request.getId(),
+                rideRequest.getId(),
                 offerId,
                 userService.findByUserId(customerId),
+                rideRequest.getCustomer().getId(),
                 RideOfferNotificationDescription.REJECTED_OFFER);
 
         RideOffer.setStatus(RideOfferStatus.REJECTED);
@@ -134,6 +144,7 @@ public class RideOfferService {
                     rideRequest.getId(),
                     rideOffer.getId(),
                     rideOffer.getDriver(),
+                    rideRequest.getCustomer().getId(),
                     RideOfferNotificationDescription.REJECTED_OFFER);
         }
         return rideOfferRepository.deleteAllRideOffersForRideRequest(rideRequest.getId());
@@ -178,11 +189,16 @@ public class RideOfferService {
                     rideRequest.getId(),
                     rejectedOffer.getId(),
                     offerToAccept.getDriver(),
+                    rideRequest.getCustomer().getId(),
                     RideOfferNotificationDescription.REJECTED_OFFER);
         }
 
         // Notifications an den Fahrer für den der Kunde das Angebot angenommen hat
-        sendRideOfferNotification("/topic/offers/" + offerId, rideRequest.getId(), offerId, offerToAccept.getDriver(),
+        sendRideOfferNotification("/topic/offers/" + offerId,
+                rideRequest.getId(),
+                offerId,
+                offerToAccept.getDriver(),
+                rideRequest.getCustomer().getId(),
                 RideOfferNotificationDescription.ACCEPTED_OFFER);
 
         return saved;
@@ -209,12 +225,13 @@ public class RideOfferService {
         return offers.size() == 1 ? offers.getFirst() : null;
     }
 
-    private void sendRideOfferNotification(String destination, Long requestId, Long offerId, User driver, RideOfferNotificationDescription desc) {
+    private void sendRideOfferNotification(String destination, Long requestId, Long offerId, User driver, Long customerId, RideOfferNotificationDescription desc) {
         RideOfferNotificationDto dto = RideOfferNotificationDto.builder()
                 .rideOfferId(offerId)
                 .rideRequestId(requestId)
                 .driverId(driver.getId())
                 .driverName(driver.getUsername())
+                .customerId(customerId)
                 .description(desc)
                 .build();
         messagingTemplate.convertAndSend(destination, dto);
@@ -227,6 +244,7 @@ public class RideOfferService {
         private Long rideRequestId;
         private Long driverId;
         private String driverName;
+        private Long customerId;
         private RideOfferNotificationDescription description;
     }
 

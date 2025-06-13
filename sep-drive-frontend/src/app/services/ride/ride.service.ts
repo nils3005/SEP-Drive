@@ -1,12 +1,13 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
-import {Coord, RideResponse, RideUpdateDTO} from '../../types';
+import {Coord, Ride, RideDto, RideResponse, RideUpdateDTO} from '../../types';
 import {ErrorService} from '../error/error.service';
 import {Observable} from 'rxjs';
 import * as L from 'leaflet';
 import 'leaflet.motion/dist/leaflet.motion.js'
 import {GeoService} from '../geo/geo.service';
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,7 @@ import {GeoService} from '../geo/geo.service';
 export class RideService {
 
   private httpClient: HttpClient = inject(HttpClient);
+  private router: Router = inject(Router);
 
 
   constructor(
@@ -69,6 +71,18 @@ export class RideService {
     ).subscribe((response) => {
       if (response != "Ride updated") {
         this.errorService.showError(response)
+      }
+    })
+  }
+
+  createRide(ride: RideDto): void {
+    this.httpClient.post<string>(
+        'http://localhost:8080/ride/add',
+        ride
+    ).subscribe({
+      next: _ => {
+        // weiterleiten
+        this.router.navigate(['/simulation']);
       }
     })
   }

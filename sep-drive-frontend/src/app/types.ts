@@ -90,6 +90,7 @@ export type RideOfferNotification = {
   rideRequestId: number;
   driverId: number;
   driverName: string;
+  customerId: number
   description: string;
 }
 
@@ -152,6 +153,11 @@ export type Ride = {
   geoJson: any
   coords: [[number, number]]
   speeds: number[]
+}
+
+export type RideDto = {
+  driverId: number,
+  customerId: number
 }
 
 export type RideCords = [[number, number]]

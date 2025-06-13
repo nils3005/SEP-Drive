@@ -22,6 +22,7 @@ import {ErrorService} from "../../services/error/error.service";
 import {MapService} from "../../services/map/map.service";
 import {UserService} from "../../services/user/user.service";
 import {getMatIconNameNotFoundError} from "@angular/material/icon";
+import {RideService} from "../../services/ride/ride.service";
 
 export interface RideTableRow {
   fahrtid: number;
@@ -45,6 +46,7 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
   private openRouteService: OpenRouteServiceService = inject(OpenRouteServiceService);
   private errorService: ErrorService = inject(ErrorService);
   private mapService: MapService = inject(MapService);
+  private rideService: RideService = inject(RideService);
 
   private webSocketService: WebsocketService = inject(WebsocketService);
   private authService: AuthService = inject(AuthService);
@@ -152,13 +154,18 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
                 this.updateDistanceAndData()
                 this.notificationSignal.set("Dein Angebot für Fahranfrage " + notification.rideRequestId + " wurde angenommen.");
                 this.selectedRideRequestId.set(notification.rideRequestId);
-                  break;
+                console.log("CUSTOMERID: ", notification.customerId, " DRIVERID:", notification.driverId)
+                this.rideService.createRide({
+                  driverId: notification.driverId,
+                  customerId: notification.customerId
+                });
+                break;
               case "REJECTED_OFFER":
                 // TODO Das passiert für den Driver, dessen Offer abgelehnt wurde
                 this.updateDistanceAndData()
                 this.notificationSignal.set("Dein Angebot für Fahranfrage " + notification.rideRequestId + " wurde abgelehnt.");
                 this.selectedRideRequestId.set(-1);
-                  break;
+                break;
             }
 
             // Timeout bis die Notification zurückgesetzt wird
