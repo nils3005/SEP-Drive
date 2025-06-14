@@ -26,8 +26,8 @@ public class RideRequestService {
 
     public List<RideRequestDto> getAllOpenRideRequestsForDriver() {
         List<RideRequestDto> result = new ArrayList<>();
-        Long driverId = userService.getCurrentUser().getId();
-        rideRepo.findActiveRideRequestsWithoutRejectedOrWithdrawnOfferByDriver(driverId).forEach(rideRequest -> {
+        User driver = userService.getCurrentUser();
+        rideRepo.findActiveRideRequestsWithoutRejectedOrWithdrawnOfferByDriver(driver.getId(), driver.getCarType()).forEach(rideRequest -> {
             result.add(RideRequestDto.fromEntity(rideRequest));
         });
         return result;
@@ -68,7 +68,7 @@ public class RideRequestService {
         return rideRepo.findByCustomerIdAndActiveTrue(customer.getId()).orElse(null);
     }
 
-    public void deleteActiveRide() {
+    public void deactivateCurrentRideRequest() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User customer = userService.findByUsername(username);
         if (customer == null) {
@@ -79,6 +79,10 @@ public class RideRequestService {
             ride.setActive(false);
             rideRepo.save(ride);
         });
+    }
+
+    public void save(RideRequest rideRequest) {
+        rideRepo.save(rideRequest);
     }
 
     public Optional<RideRequest> findById(Long id) {

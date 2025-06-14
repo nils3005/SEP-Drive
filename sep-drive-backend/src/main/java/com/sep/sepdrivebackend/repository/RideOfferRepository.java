@@ -29,14 +29,13 @@ public interface RideOfferRepository extends JpaRepository<RideOffer, Long> {
     List<RideOffer> findByDriverAndStatus(User driver, RideOfferStatus status);
 
     /**
-     * Löscht alle RideOffers, die zu der angegebenen RideRequest gehören.
-     *
-     * @param rideRequestId ID der RideRequest
-     * @return Anzahl der gelöschten Datensätze
+     * Wird benutzt, wenn ein Fahrangebot angenommen wird. Setzt die Fahrangebote von den anderen Fahrern auf REJECTED.
+     * @param id
+     * @return Anzahl der betroffenen Ride Offers
      */
     @Modifying
-    @Query("DELETE FROM RideOffer ro WHERE ro.rideRequest.id = :rideRequestId")
-    int deleteAllRideOffersForRideRequest(@Param("rideRequestId") Long rideRequestId);
+    @Query("UPDATE RideOffer o SET o.status = 'REJECTED' WHERE o.rideRequest.id = :rideRequestId")
+    int rejectAllRideOffersForRideRequest(@Param("rideRequestId") Long id);
 
     /**
      * Setzt den Status aller PENDING-Angebote auf REJECTED,
