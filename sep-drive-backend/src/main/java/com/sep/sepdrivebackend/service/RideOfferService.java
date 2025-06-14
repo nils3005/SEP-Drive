@@ -146,8 +146,7 @@ public class RideOfferService {
                     rideRequest.getCustomer().getId(),
                     RideOfferNotificationDescription.REJECTED_OFFER);
         }
-        return rideOfferRepository.rejectAllRideOffersForRideRequest(rideRequest.getId(),
-                RideOfferStatus.REJECTED);
+        return rideOfferRepository.rejectAllRideOffersForRideRequest(rideRequest.getId());
     }
 
     /**

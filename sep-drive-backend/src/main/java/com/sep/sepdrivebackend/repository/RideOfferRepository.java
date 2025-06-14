@@ -31,13 +31,11 @@ public interface RideOfferRepository extends JpaRepository<RideOffer, Long> {
     /**
      * Wird benutzt, wenn ein Fahrangebot angenommen wird. Setzt die Fahrangebote von den anderen Fahrern auf REJECTED.
      * @param id
-     * @param status
      * @return Anzahl der betroffenen Ride Offers
      */
     @Modifying
-    @Query("UPDATE RideOffer o SET o.status = :status WHERE o.rideRequest.id = :rideRequestId")
-    int rejectAllRideOffersForRideRequest(@Param("rideRequestId") Long id,
-                                          @Param("status") RideOfferStatus status);
+    @Query("UPDATE RideOffer o SET o.status = 'REJECTED' WHERE o.rideRequest.id = :rideRequestId")
+    int rejectAllRideOffersForRideRequest(@Param("rideRequestId") Long id);
 
     /**
      * Setzt den Status aller PENDING-Angebote auf REJECTED,
