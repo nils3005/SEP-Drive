@@ -26,8 +26,8 @@ public class RideRequestService {
 
     public List<RideRequestDto> getAllOpenRideRequestsForDriver() {
         List<RideRequestDto> result = new ArrayList<>();
-        Long driverId = userService.getCurrentUser().getId();
-        rideRepo.findActiveRideRequestsWithoutRejectedOrWithdrawnOfferByDriver(driverId).forEach(rideRequest -> {
+        User driver = userService.getCurrentUser();
+        rideRepo.findActiveRideRequestsWithoutRejectedOrWithdrawnOfferByDriver(driver.getId(), driver.getCarType()).forEach(rideRequest -> {
             result.add(RideRequestDto.fromEntity(rideRequest));
         });
         return result;

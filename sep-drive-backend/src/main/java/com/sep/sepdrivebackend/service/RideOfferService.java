@@ -160,8 +160,6 @@ public class RideOfferService {
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Angebot nicht gefunden"));
 
         RideRequest rideRequest = offerToAccept.getRideRequest();
-        // Nicht mehr active, weil sie angeommen wurde und es zu einer Ride geworden ist
-        rideRequest.setActive(false);
 
         if (!rideRequest.getCustomer().getId().equals(customerId)) {
             throw new ResponseStatusException(FORBIDDEN, "Du darfst nur Angebote zu deinen eigenen Fahranfragen verarbeiten");

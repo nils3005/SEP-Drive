@@ -156,7 +156,7 @@ export class RideRequestService {
           distance: parseFloat((jsonRoute.features[0].properties.summary.distance / 1000).toFixed(2)),
           duration: parseFloat((jsonRoute.features[0].properties.summary.duration / 60).toFixed(2)),
           price: price.body ? parseFloat(price.body.toFixed(2)) : 0,
-          carType: this.geoService.carType.getValue() ?? CarType.MEDIUM, // TODO BUG immer MEDIUM
+          carType: this.geoService.carType.getValue() ?? CarType.MEDIUM, // TODO BUG immer MEDIUM nach refresh
           stops: []
         };
       }
