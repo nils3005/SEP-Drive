@@ -118,6 +118,9 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
         this.rideSimulationStore.motionPolyLine.motionPause()
       }
       if (rideData.resuming && this.rideSimulationStore.motionPolyLine) {
+        this.rideSimulationStore.motionPolyLine.motionStart();
+        this.rideSimulationStore.motionPolyLine.motionResume();
+        this.rideSimulationStore.started = true
         this.started += 1;
       }
       if (this.started > 1) {

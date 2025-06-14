@@ -49,6 +49,11 @@ export class HomePageComponent implements OnInit {
         if (error.status === 400 || error.status === 401) {
           // this.errorService.showError(error.message);
           console.log("403 ERROR AUS HOMECOMPONENT:",error);
+          this.rideService.getActiveRide().subscribe({
+            next: (response)=> {
+              this.router.navigateByUrl("/simulation");
+            }
+          })
           if (!this.geoService.rideRequestSummaryData.getValue()) {
             this.geoService.showInput.next(true);
           }

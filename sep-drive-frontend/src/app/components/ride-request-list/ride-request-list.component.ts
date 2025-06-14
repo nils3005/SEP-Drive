@@ -23,6 +23,7 @@ import {MapService} from "../../services/map/map.service";
 import {UserService} from "../../services/user/user.service";
 import {getMatIconNameNotFoundError} from "@angular/material/icon";
 import {RideService} from "../../services/ride/ride.service";
+import { Router } from '@angular/router';
 
 export interface RideTableRow {
   fahrtid: number;
@@ -46,7 +47,7 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
   private openRouteService: OpenRouteServiceService = inject(OpenRouteServiceService);
   private errorService: ErrorService = inject(ErrorService);
   private mapService: MapService = inject(MapService);
-  private rideService: RideService = inject(RideService);
+  private router: Router = inject(Router);
 
   private webSocketService: WebsocketService = inject(WebsocketService);
   private authService: AuthService = inject(AuthService);
@@ -154,6 +155,7 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
                 this.updateDistanceAndData()
                 this.notificationSignal.set("Dein Angebot für Fahranfrage " + notification.rideRequestId + " wurde angenommen.");
                 this.selectedRideRequestId.set(notification.rideRequestId);
+                this.router.navigate(['/simulation']);
                 console.log("CUSTOMERID: ", notification.customerId, " DRIVERID:", notification.driverId)
                 break;
               case "REJECTED_OFFER":

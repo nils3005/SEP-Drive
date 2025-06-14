@@ -123,8 +123,18 @@ export class RideService {
     }
   }
 
-  rateUser(userId: number, rating: number): void {
-    this.httpClient.post(`http://localhost:8080/ratings/${userId}/${rating}`, {})
+  rateUser(userId: number, historyId: number, rating: number): void {
+    const ratingDto = {
+      rating: rating
+    };
+    this.httpClient.post(`http://localhost:8080/ratings/${userId}/${historyId}`, ratingDto).subscribe({
+      next: _ => {
+        console.log("Weiterleiten zu Simulation")
+      },
+      error: err => {
+        console.log("Error ", err)
+      }
+    })
   }
 
   calculateKmh(meters: number, seconds: number): number {
