@@ -33,11 +33,12 @@ public class UserDto {
                 .lastName(user.getLastName())
                 .birthdate(user.getBirthdate())
                 .profilePicture(user.getProfilePicture())
-                .rating(user.getRatings()
-                        .stream()
+                .rating(user.getRatings() != null
+                        ? user.getRatings().stream()
                         .mapToInt(Rating::getRating)
                         .average()
                         .orElse(0.0)
+                        : 0.0
                 )
                 .numberOfRides(user.getNumberOfRides())
                 .carType(user.getCarType())
