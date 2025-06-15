@@ -4,6 +4,11 @@ import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-s
 import {Coord, Ride, RideDto, RideResponse, RideUpdateDTO} from '../../types';
 import {ErrorService} from '../error/error.service';
 import {Observable} from 'rxjs';
+
+/**
+ * import in main.ts wird vor angular bootstraps evaluiert
+ * funktioniert bei ng serve, da das script injection verhalten nicht so strikt ist, wie bei ng build, was im docker benutzt wird
+ */
 declare const L: any;
 import {GeoService} from '../geo/geo.service';
 import {Router} from "@angular/router";
