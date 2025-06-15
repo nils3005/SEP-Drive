@@ -26,7 +26,7 @@
             }
         </td>
         <td>{{ offer.totalRides }}</td>
-        <td>{{ offer.totalDistance.toFixed(1) }} km</td>
+        <td>{{ (offer.totalDistance / 1000).toFixed(1) }} km</td>
         <td class="actions">
             <button class="accept" (click)="acceptOffer(offer.offerId)">
                 <i class="fa fa-check" aria-hidden="true"></i>
