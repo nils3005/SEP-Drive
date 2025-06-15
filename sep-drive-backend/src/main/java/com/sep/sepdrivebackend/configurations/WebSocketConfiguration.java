@@ -17,7 +17,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // Diese URL brauchen die Angular-Clients, um die WS-Verbindung aufzubauen
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("http://localhost:4200")
+                .setAllowedOriginPatterns("http://localhost")
                 .withSockJS();
     }
 
