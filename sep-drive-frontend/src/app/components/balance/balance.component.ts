@@ -50,7 +50,7 @@ export class BalanceComponent {
     }
 
     if (currentUser.role === 'CUSTOMER') {
-      if(this.user()?.financials.lastFourCreditCardNumber==null){
+      if(!this.user()?.financials.lastFourCreditCardNumber){
         this.errorMessage.showError("Keine Zahlungsmethode hinterlegt");
         this.router.navigate(['payment-method']);
         return;
@@ -67,7 +67,7 @@ export class BalanceComponent {
       });
 
     } else if (currentUser.role === 'DRIVER') {
-      if(this.user()?.financials.lastFourIban==null){
+      if(!this.user()?.financials.lastFourIban){
         this.errorMessage.showError("Keine Zahlungsmethode hinterlegt");
         this.router.navigate(['payment-method']);
         return;
