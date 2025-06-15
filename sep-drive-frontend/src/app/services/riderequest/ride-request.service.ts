@@ -172,34 +172,23 @@ export class RideRequestService {
     }
   }
 
-  public getRideRequestSummary(): RideRequestSummary | null
+  public async getRideRequestSummary(): Promise<RideRequestSummary | null>
   {
     const carType = this.geoService.carType.getValue();
     if (this.geoService.waypoints.getValue().length > 1 && this.geoService.route.getValue() && carType) {
       let jsonRoute: GeoJsonRoute = this.geoService.route.getValue();
       let waypointsLength = this.geoService.waypoints.getValue().length;
       let stops = this.geoService.waypoints.getValue().slice(1, waypointsLength - 1);
-      this.getRidePrice(parseFloat((jsonRoute.features[0].properties.summary.distance / 1000).toFixed(2)), carType).subscribe({
-        next: (result) => {
-          console.log(result.body);
-          return {
-            start: this.geoService.waypoints.getValue()[0].properties.label,
-            stops: stops,
-            end: this.geoService.waypoints.getValue()[this.geoService.waypoints.getValue().length-1].properties.label,
-            distance: parseFloat((jsonRoute.features[0].properties.summary.distance / 1000).toFixed(2)),
-            duration: parseFloat((jsonRoute.features[0].properties.summary.duration / 60).toFixed(2)),
-            price: result.body,
-            carType: carType
-          };
-        }
-      })
+      const price = await firstValueFrom(
+        this.getRidePrice(parseFloat(jsonRoute.features[0].properties.summary.distance.toFixed(2)), carType)
+      )
       return {
         start: this.geoService.waypoints.getValue()[0].properties.label,
         stops: stops,
         end: this.geoService.waypoints.getValue()[this.geoService.waypoints.getValue().length-1].properties.label,
         distance: parseFloat((jsonRoute.features[0].properties.summary.distance / 1000).toFixed(2)),
         duration: parseFloat((jsonRoute.features[0].properties.summary.duration / 60).toFixed(2)),
-        price: 0,
+        price: price.body ? parseFloat(price.body.toFixed(2)) : 0,
         carType: carType
       };
     }

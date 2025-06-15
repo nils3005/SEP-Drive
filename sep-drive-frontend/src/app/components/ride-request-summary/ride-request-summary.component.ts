@@ -26,12 +26,13 @@ export class RideRequestSummaryComponent {
       private errorService: ErrorService,
       private router: Router,
   ) {
-    if (!rideRequestService.getRideRequestSummary()) {
-      geoService.showInput.next(false);
-    } else {
-      this.summaryData = rideRequestService.getRideRequestSummary();
-      console.log(this.summaryData)
-    }
+    rideRequestService.getRideRequestSummary().then((data) => {
+      if (data == null) {
+        geoService.showInput.next(false);
+      } else {
+        this.summaryData = data;
+      }
+    });
     this.checkChanges();
   }
 
