@@ -4,8 +4,7 @@ import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-s
 import {Coord, Ride, RideDto, RideResponse, RideUpdateDTO} from '../../types';
 import {ErrorService} from '../error/error.service';
 import {Observable} from 'rxjs';
-import * as L from 'leaflet';
-import 'leaflet.motion/dist/leaflet.motion.js'
+declare const L: any;
 import {GeoService} from '../geo/geo.service';
 import {Router} from "@angular/router";
 
@@ -82,8 +81,6 @@ export class RideService {
         { responseType: 'text' }
     ).subscribe({
       next: _ => {
-        // weiterleiten
-        console.log("Weiterleiten zu Simulation")
         this.router.navigate(['/simulation']);
       },
       error: err =>
@@ -129,7 +126,6 @@ export class RideService {
     };
     this.httpClient.post(`http://localhost:8080/ratings/${userId}/${historyId}`, ratingDto).subscribe({
       next: _ => {
-        console.log("Weiterleiten zu Simulation")
       },
       error: err => {
         console.log("Error ", err)
