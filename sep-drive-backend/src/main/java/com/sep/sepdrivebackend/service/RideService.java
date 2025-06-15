@@ -119,6 +119,9 @@ public class RideService {
         history.setCustomer(ride.getCustomer());
         history.setDriver(ride.getDriver());
 
+        ride.getCustomer().setNumberOfRides(ride.getCustomer().getNumberOfRides() + 1);
+        ride.getDriver().setNumberOfRides(ride.getDriver().getNumberOfRides() + 1);
+
         historyService.save(history);
         rideUpdateDTO.setHistoryId(history.getHistoryId());
 
