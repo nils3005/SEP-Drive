@@ -3,6 +3,9 @@
   <div class="dataContainer">
     <app-data-display [label]="'Start'" [data]="rideSimulationStore.start()"/>
     <app-data-display [label]="'Ziel'" [data]="rideSimulationStore.destination()"/>
+    <app-data-display [label]="'Dauer'" [data]="(rideData.getValue()?.duration?.toString() ?? '') + ' min'"/>
+    <app-data-display [label]="'Distanz'" [data]="(rideData.getValue()?.distance?.toString() ?? '') + ' km'"/>
+    <app-data-display [label]="'Preis'" [data]="(rideData.getValue()?.price?.toString() ?? '') + ' €'"/>
   </div>
   <div class="sliderRow">
     <p>3 sek</p>

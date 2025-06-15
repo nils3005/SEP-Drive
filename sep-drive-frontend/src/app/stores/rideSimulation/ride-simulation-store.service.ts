@@ -1,5 +1,5 @@
 import {Injectable, signal, Signal} from '@angular/core';
-import {Ride, RideResponse, RideUpdateDTO} from '../../types';
+import {Ride, RideRequestSummary, RideResponse, RideUpdateDTO} from '../../types';
 import {BehaviorSubject} from 'rxjs';
 import * as L from 'leaflet';
 
@@ -15,6 +15,10 @@ export class RideSimulationStore {
   public started: boolean = false;
 
   public simulationLayer = L.layerGroup();
+
+  public rideSummary: BehaviorSubject<RideRequestSummary | null> = new BehaviorSubject<RideRequestSummary | null>(null);
+
+  public ridePrice: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
   public rideData : BehaviorSubject<RideUpdateDTO> = new BehaviorSubject<RideUpdateDTO>({
     rideId: this.ride.getValue()?.ride.rideId ?? -1,

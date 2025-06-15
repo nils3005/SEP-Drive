@@ -5,10 +5,11 @@ import {GeoJsonRoute, RideDto, RideOffer, RideOfferNotification} from '../../typ
 
 import {WebsocketService} from "../../services/websocket/websocket.service";
 import {RideRequestService} from "../../services/riderequest/ride-request.service";
-import {Subscription} from "rxjs";
+import {firstValueFrom, Subscription} from "rxjs";
 import { Router } from '@angular/router';
 import {GeoService} from '../../services/geo/geo.service';
 import {RideService} from '../../services/ride/ride.service';
+import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
 
 @Component({
   selector: 'app-rideoffers',
@@ -25,6 +26,7 @@ export class RideOffersComponent implements OnInit, OnDestroy {
   private rideRequestService: RideRequestService = inject(RideRequestService);
   private geoService = inject(GeoService);
   private rideService: RideService = inject(RideService);
+  private rideSimulationStore = inject(RideSimulationStore);
 
   /** Aktuelle Liste, vom Websocket-Stream befüllt */
   offers = signal<RideOffer[]>([]);
@@ -131,7 +133,7 @@ export class RideOffersComponent implements OnInit, OnDestroy {
   acceptOffer(offerId: number): void {
     if (confirm('Möchtest du dieses Angebot annehmen?')) {
       this.rideOfferService.acceptOffer(offerId).subscribe({
-        next: () => {
+        next: async () => {
 
           const start = this.geoService.getStart();
           const destination = this.geoService.getDestination();
@@ -140,11 +142,13 @@ export class RideOffersComponent implements OnInit, OnDestroy {
           let rideDto: RideDto;
 
           if (this.rideOfferNotification) {
+            const carType = this.geoService.carType.getValue();
+            console.log(carType);
             this.rideService.createRide({
               driverId: this.rideOfferNotification.driverId,
               customerId: this.rideOfferNotification.customerId,
               speed: 15,
-              price: 0,
+              price: this.rideSimulationStore.ridePrice.getValue(),
               duration: route.features[0].properties.summary.duration,
               distance: route.features[0].properties.summary.distance,
               geoJson: JSON.stringify(route)

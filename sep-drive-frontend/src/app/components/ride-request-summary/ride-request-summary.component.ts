@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {RideRequestSummary} from '../../types';
+import {Ride, RideRequestSummary} from '../../types';
 import {MapService} from '../../services/map/map.service';
 import {RideRequestService} from '../../services/riderequest/ride-request.service';
 import {GeoService} from '../../services/geo/geo.service';
@@ -8,6 +8,7 @@ import {ErrorService} from "../../services/error/error.service";
 import {Router} from "@angular/router";
 import {BehaviorSubject} from "rxjs";
 import {Util} from "leaflet";
+import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
 
 @Component({
   selector: 'app-ride-request-summary',
@@ -25,12 +26,14 @@ export class RideRequestSummaryComponent {
       public geoService: GeoService,
       private errorService: ErrorService,
       private router: Router,
+      private rideSimulationStore: RideSimulationStore,
   ) {
     rideRequestService.getRideRequestSummary().then((data) => {
       if (data == null) {
         geoService.showInput.next(false);
       } else {
         this.summaryData = data;
+        this.rideSimulationStore.ridePrice.next(this.summaryData.price)
       }
     });
     this.checkChanges();
