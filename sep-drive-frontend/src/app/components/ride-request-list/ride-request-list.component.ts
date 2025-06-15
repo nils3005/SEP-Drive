@@ -53,8 +53,6 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
   private authService: AuthService = inject(AuthService);
   private sub?: Subscription;
 
-  // TODO: create RideOffer
-  // TODO: cancel RideOffer
   dataSource = new MatTableDataSource<RideTableRow>();
   displayedColumns: string[] = ['fahrtid', 'entfernung', 'zeitpunkt', 'klasse', 'name', 'bewertung', 'annehmen'];
 
@@ -151,7 +149,6 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
           next: (notification) => {
             switch (notification.description) {
               case "ACCEPTED_OFFER":
-                // TODO Das passiert für den Driver, dessen Offer akzeptiert wurde
                 this.updateDistanceAndData()
                 this.notificationSignal.set("Dein Angebot für Fahranfrage " + notification.rideRequestId + " wurde angenommen.");
                 this.selectedRideRequestId.set(notification.rideRequestId);
@@ -159,7 +156,6 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
                 console.log("CUSTOMERID: ", notification.customerId, " DRIVERID:", notification.driverId)
                 break;
               case "REJECTED_OFFER":
-                // TODO Das passiert für den Driver, dessen Offer abgelehnt wurde
                 this.updateDistanceAndData()
                 this.notificationSignal.set("Dein Angebot für Fahranfrage " + notification.rideRequestId + " wurde abgelehnt.");
                 this.selectedRideRequestId.set(-1);

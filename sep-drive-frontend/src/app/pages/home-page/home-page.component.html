@@ -16,7 +16,6 @@
                 <app-ride-request-list class="ride-request-list"/>
             </div>
             <div class="right-container">
-                <!-- TODO Braucht der Fahrer überhaupt die Map? -->
                 <app-map class="map" />
             </div>
         } @else if(this.authService.user()?.role === "CUSTOMER") {
