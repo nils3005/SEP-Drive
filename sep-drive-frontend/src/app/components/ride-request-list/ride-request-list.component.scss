@@ -241,3 +241,27 @@
   margin-bottom: 10px;
 }
 
+.startSuggestions {
+  list-style: none;
+  margin-top: 250px;
+  padding: 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  position: absolute;
+  background: white;
+  width: 50%;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+
+  li {
+    padding: 10px;
+    cursor: pointer;
+    font-family: Roboto Condensed, sans-serif;
+  }
+
+  li:hover {
+    background: #f0f0f0;
+  }
+}
+
