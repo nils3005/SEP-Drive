@@ -42,7 +42,7 @@ public class RideRequestController {
     @PostMapping("/price")
     public ResponseEntity<?> getPrice(@RequestBody RidePriceDto ridePriceDto) {
         try{
-            float price = rideRequestService.ridePrice(ridePriceDto);
+            double price = rideRequestService.ridePrice(ridePriceDto);
             return new ResponseEntity<>(price, HttpStatus.OK);
         } catch (RuntimeException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

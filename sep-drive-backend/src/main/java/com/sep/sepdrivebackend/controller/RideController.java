@@ -6,6 +6,7 @@ import com.sep.sepdrivebackend.entities.Ride;
 import com.sep.sepdrivebackend.exception.GeoJsonParsingException;
 import com.sep.sepdrivebackend.exception.RideNotFoundException;
 import com.sep.sepdrivebackend.exception.UserHasRideExcpetion;
+import com.sep.sepdrivebackend.exception.UserNotFoundException;
 import com.sep.sepdrivebackend.service.RideRequestService;
 import com.sep.sepdrivebackend.service.RideService;
 import org.springframework.http.HttpStatus;
@@ -49,6 +50,8 @@ public class RideController {
             return ResponseEntity.ok("Ride added");
         } catch (UserHasRideExcpetion e){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (UserNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
@@ -59,8 +62,9 @@ public class RideController {
             return ResponseEntity.ok("Ride updated");
         } catch (RideNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-        catch (RuntimeException e){
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        } catch (RuntimeException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
