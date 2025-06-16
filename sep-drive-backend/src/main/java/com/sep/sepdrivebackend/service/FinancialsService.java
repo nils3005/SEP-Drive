@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class FinancialsService {
     private final FinancialsRepository financialsRepository;
+    private final UserService userService;
 
-    public FinancialsService(FinancialsRepository financialsRepository) {
+    public FinancialsService(FinancialsRepository financialsRepository, UserService userService) {
         this.financialsRepository = financialsRepository;
+        this.userService = userService;
     }
 
     public void transfer(User sender, User receiver, double amount) {
@@ -27,7 +29,10 @@ public class FinancialsService {
         }
         Financials senderFinancials = sender.getFinancials();
         if (null == senderFinancials) {
-            throw new IllegalArgumentException("Sender's money is null.");
+            Financials financials = new Financials();
+            financials.setBalance(0.0);
+            sender.setFinancials(financials);
+            userService.save(sender);
         }
         if (senderFinancials.getBalance() == null || amount > senderFinancials.getBalance()) {
             throw new IllegalArgumentException("Amount too big, Balance too small.");
@@ -41,7 +46,10 @@ public class FinancialsService {
         }
         Financials receiverFinancials = receiver.getFinancials();
         if (null == receiverFinancials) {
-            throw new IllegalArgumentException("Receiver's money is null.");
+            Financials financials = new Financials();
+            financials.setBalance(0.0);
+            receiver.setFinancials(financials);
+            userService.save(receiver);
         }
 
         senderFinancials.setBalance(senderFinancials.getBalance() - amount);
