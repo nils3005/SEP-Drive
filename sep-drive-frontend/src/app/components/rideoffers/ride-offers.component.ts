@@ -10,6 +10,8 @@ import { Router } from '@angular/router';
 import {GeoService} from '../../services/geo/geo.service';
 import {RideService} from '../../services/ride/ride.service';
 import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
+import {AuthService} from '../../services/auth/auth-service.service';
+import {ErrorService} from '../../services/error/error.service';
 
 @Component({
   selector: 'app-rideoffers',
@@ -27,6 +29,8 @@ export class RideOffersComponent implements OnInit, OnDestroy {
   private geoService = inject(GeoService);
   private rideService: RideService = inject(RideService);
   private rideSimulationStore = inject(RideSimulationStore);
+  private authService: AuthService = inject(AuthService);
+  private errorService: ErrorService = inject(ErrorService);
 
   /** Aktuelle Liste, vom Websocket-Stream befüllt */
   offers = signal<RideOffer[]>([]);
@@ -132,37 +136,42 @@ export class RideOffersComponent implements OnInit, OnDestroy {
    */
   acceptOffer(offerId: number): void {
     if (confirm('Möchtest du dieses Angebot annehmen?')) {
-      this.rideOfferService.acceptOffer(offerId).subscribe({
-        next: async () => {
+      if (this.authService.user()!.financials?.balance >= this.rideSimulationStore.ridePrice.getValue()) {
+        this.rideOfferService.acceptOffer(offerId).subscribe({
+          next: async () => {
 
-          const start = this.geoService.getStart();
-          const destination = this.geoService.getDestination();
-          const route: GeoJsonRoute = this.geoService.route.getValue()
+            const start = this.geoService.getStart();
+            const destination = this.geoService.getDestination();
+            const route: GeoJsonRoute = this.geoService.route.getValue()
 
-          let rideDto: RideDto;
+            let rideDto: RideDto;
 
-          if (this.rideOfferNotification) {
-            const carType = this.geoService.carType.getValue();
-            console.log(carType);
-            this.rideService.createRide({
-              driverId: this.rideOfferNotification.driverId,
-              customerId: this.rideOfferNotification.customerId,
-              speed: 15,
-              price: this.rideSimulationStore.ridePrice.getValue(),
-              duration: route.features[0].properties.summary.duration,
-              distance: route.features[0].properties.summary.distance,
-              geoJson: JSON.stringify(route)
-            });
-            console.log("Created ride")
-            this.router.navigate(['/simulation']);
+            if (this.rideOfferNotification) {
+              const carType = this.geoService.carType.getValue();
+              console.log(carType);
+              this.rideService.createRide({
+                driverId: this.rideOfferNotification.driverId,
+                customerId: this.rideOfferNotification.customerId,
+                speed: 15,
+                price: this.rideSimulationStore.ridePrice.getValue(),
+                duration: route.features[0].properties.summary.duration,
+                distance: route.features[0].properties.summary.distance,
+                geoJson: JSON.stringify(route)
+              });
+              console.log("Created ride")
+              this.router.navigate(['/simulation']);
+            }
+
+            this.loadOffers();
+          },
+          error: (err) => {
+            console.log('Fehler beim Annehmen: ' + err.message);
           }
-
-          this.loadOffers();
-        },
-        error: (err) => {
-          console.log('Fehler beim Annehmen: ' + err.message);
-        }
-      });
+        });
+      } else {
+        console.log(this.authService.user()!.financials);
+        this.errorService.showError("Bitte Lade zuerst genug Geld auf dein Konto")
+      }
     }
   }
 

@@ -41,6 +41,22 @@ export class AuthService {
         });
     }
 
+    updateUserData(): void
+    {
+        const jwt = localStorage.getItem('jwt');
+        if (jwt) {
+          const name = this.decodeUsernameFromToken(jwt);
+          if (name) {
+            this.userService.getUserByUsername(name)
+              .pipe(catchError(() => {
+                this.clearSession();
+                return throwError(() => new Error());
+              }))
+              .subscribe(u => this.user.set(u));
+          }
+        }
+    }
+
     /**
      * @brief Sendet eine Login Request mit username und password an das Backend.
      *

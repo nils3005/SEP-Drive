@@ -49,7 +49,6 @@ export class ProfileComponent {
   /**
    * @brief Gibt die CSS Klasse für den entsprechenden Durchschnitt zurück.
    *
-   * @param rating - der Durchschnitt aller Ratings.
    * @param star - der Index des Sterns, dem eine CSS Klasse zugeordnet werden soll.
    *
    * @return die CSS Klasse von Fontawesome.

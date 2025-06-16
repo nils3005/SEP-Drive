@@ -60,8 +60,9 @@ export class BalanceComponent {
       }
       this.userService.deposit(this.balance.balance).subscribe({
         next: () => {
-          this.errorMessage.showError("Guthaben wurde erfolgreich aufgeladen"),
-            this.router.navigate(['/social/user', this.user()?.id]);
+          this.errorMessage.showError("Guthaben wurde erfolgreich aufgeladen");
+          this.auth.updateUserData();
+          this.router.navigate(['/social/user', this.user()?.id]);
         },
         error: err => this.errorMessage.showError("Fehler beim Aufladen : " + err.error.message)
       });
