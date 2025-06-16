@@ -95,6 +95,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
                         this.geoService.updateDestination(data.body.features[0], false)
                         this.geoService.route.next(JSON.parse(rideResponse.ride.geoJson))
                         this.rideData.next(this.getRideSummaryFromRide(rideResponse.ride, this.rideSimulationStore.start(), this.rideSimulationStore.destination()))
+                        this.started = 0;
                         this.rideService.simulateRide()
                         this.checkUpdates()
                       }
@@ -125,9 +126,12 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
         this.rideSimulationStore.motionPolyLine.motionPause()
       }
       if (rideData.resuming && this.rideSimulationStore.motionPolyLine) {
-        this.rideSimulationStore.motionPolyLine.motionStart();
-        this.rideSimulationStore.motionPolyLine.motionResume();
-        this.rideSimulationStore.started = true
+        if (this.started === 0) {
+          this.rideSimulationStore.motionPolyLine.motionStart();
+          this.rideSimulationStore.started = true
+        } else {
+          this.rideSimulationStore.motionPolyLine.motionResume();
+        }
         this.started += 1;
       }
       if (this.started > 1) {
