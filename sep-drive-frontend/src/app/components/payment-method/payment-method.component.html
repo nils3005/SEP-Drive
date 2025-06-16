@@ -43,7 +43,8 @@
                  type="text"
                  id="cvc"
                  name="cvc"
-                 maxlength="4"
+                 maxlength="3"
+                 minlength="3"
                  pattern="^[0-9]{3,4}$"
                  [(ngModel)]="paymentMethodCustomerData.cvc"
                  required>
