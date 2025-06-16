@@ -70,6 +70,7 @@ export class BalanceComponent {
     } else if (currentUser.role === 'DRIVER') {
       if(!this.user()?.financials.lastFourIban){
         this.errorMessage.showError("Keine Zahlungsmethode hinterlegt");
+        this.auth.updateUserData();
         this.router.navigate(['payment-method']);
         return;
       }

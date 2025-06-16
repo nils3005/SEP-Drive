@@ -83,6 +83,7 @@ export class PaymentMethodComponent {
       this.userService.addCreditCard(dto).subscribe({
         next: () => {
           this.errorMessage.showError("Zahlungsmethode erfolgreich gespeichert.");
+          this.auth.updateUserData();
           this.router.navigate(['/social/user', this.user()?.id]);
         },
         error: err => this.errorMessage.showError("Fehler beim Speichern der Kreditkarte: " + err.error.message)
@@ -103,6 +104,7 @@ export class PaymentMethodComponent {
       this.userService.addBankAccount(dto).subscribe({
         next: () => {
           this.errorMessage.showError("Bankkonto erfolgreich gespeichert.");
+          this.auth.updateUserData();
           this.router.navigate(['/social/user', this.user()?.id]);
         },
         error: err => this.errorMessage.showError("Fehler beim Speichern des Bankkontos: " + err.error.message)
