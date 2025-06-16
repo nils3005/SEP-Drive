@@ -136,43 +136,38 @@ export class RideOffersComponent implements OnInit, OnDestroy {
    */
   acceptOffer(offerId: number): void {
     if (confirm('Möchtest du dieses Angebot annehmen?')) {
-      if (this.authService.user()!.financials?.balance >= this.rideSimulationStore.ridePrice.getValue()) {
-        this.rideOfferService.acceptOffer(offerId).subscribe({
-          next: (rideOffer) => {
+      this.rideOfferService.acceptOffer(offerId).subscribe({
+        next: (rideOffer) => {
 
-            const start = this.geoService.getStart();
-            const destination = this.geoService.getDestination();
-            const route: GeoJsonRoute = this.geoService.route.getValue()
+          const start = this.geoService.getStart();
+          const destination = this.geoService.getDestination();
+          const route: GeoJsonRoute = this.geoService.route.getValue()
 
-            let rideDto: RideDto = {
-              driverId: rideOffer.driverId,
-              customerId: rideOffer.customerId,
-              speed: 15,
-              duration: route.features[0].properties.summary.duration,
-              distance: route.features[0].properties.summary.distance,
-              geoJson: JSON.stringify(route)
-            };
+          let rideDto: RideDto = {
+            driverId: rideOffer.driverId,
+            customerId: rideOffer.customerId,
+            speed: 15,
+            duration: route.features[0].properties.summary.duration,
+            distance: route.features[0].properties.summary.distance,
+            geoJson: JSON.stringify(route)
+          };
 
-            console.log("customerId from acceptOffer: ", rideDto.customerId);
-            console.log("driverid from acceptOffer: ", rideDto.driverId);
+          console.log("customerId from acceptOffer: ", rideDto.customerId);
+          console.log("driverid from acceptOffer: ", rideDto.driverId);
 
-            const carType = this.geoService.carType.getValue();
-            console.log(carType);
+          const carType = this.geoService.carType.getValue();
+          console.log(carType);
 
-            this.rideService.createRide(rideDto);
-            console.log("Created ride")
-            this.router.navigate(['/simulation']);
+          this.rideService.createRide(rideDto);
+          console.log("Created ride")
+          this.router.navigate(['/simulation']);
 
-            this.loadOffers();
-          },
-          error: (err) => {
-            console.log('Fehler beim Annehmen: ' + err.message);
-          }
-        });
-      } else {
-        console.log(this.authService.user()!.financials);
-        this.errorService.showError("Bitte Lade zuerst genug Geld auf dein Konto")
-      }
+          this.loadOffers();
+        },
+        error: (err) => {
+          console.log('Fehler beim Annehmen: ' + err.message);
+        }
+      });
     }
   }
 
