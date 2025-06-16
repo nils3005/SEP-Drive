@@ -41,6 +41,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
           if (ride) {
             this.webSocketService.subscribe<RideUpdateDTO>('/topic/ride/' + ride.ride.rideId).subscribe((data) => {
               if (ride.ride.rideId === data.rideId) {
+                console.log("historyId aus Websocket: ", data.historyId)
                 this.rideSimulationStore.rideData.next(data);
                 this.speedValue = data.speed;
               }
