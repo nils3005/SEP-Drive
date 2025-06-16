@@ -9,6 +9,7 @@ import com.sep.sepdrivebackend.dto.RideUpdateDto;
 import com.sep.sepdrivebackend.entities.*;
 import com.sep.sepdrivebackend.exception.RideNotFoundException;
 import com.sep.sepdrivebackend.exception.UserHasRideExcpetion;
+import com.sep.sepdrivebackend.exception.UserNotFoundException;
 import com.sep.sepdrivebackend.repository.RideRepository;
 import com.sep.sepdrivebackend.repository.RideRequestRepository;
 import jakarta.transaction.Transactional;
@@ -27,8 +28,9 @@ public class RideService {
     private final HistoryService historyService;
     private final RideRequestService rideRequestService;
     private final RideRequestRepository rideRequestRepository;
+    private final FinancialsService financialsService;
 
-    public RideService(RideRepository rideRepository, RideWebSocketController rideWebSocketController, UserService userService, GeoJsonRouteParser geoJsonRouteParser, HistoryService historyService, RideRequestService rideRequestService, RideRequestRepository rideRequestRepository) {
+    public RideService(RideRepository rideRepository, RideWebSocketController rideWebSocketController, UserService userService, GeoJsonRouteParser geoJsonRouteParser, HistoryService historyService, RideRequestService rideRequestService, RideRequestRepository rideRequestRepository, FinancialsService financialsService) {
         this.rideRepository = rideRepository;
         this.rideWebSocketController = rideWebSocketController;
         this.userService = userService;
@@ -36,20 +38,24 @@ public class RideService {
         this.historyService = historyService;
         this.rideRequestService = rideRequestService;
         this.rideRequestRepository = rideRequestRepository;
+        this.financialsService = financialsService;
     }
 
     @Transactional
     public void addRide(RideDto rideDto) {
         User driver = userService.findByUserId(rideDto.getDriverId());
         User customer = userService.findByUserId(rideDto.getCustomerId());
-        if(rideRepository.findRideByUsername(customer.getUsername()).isPresent() || rideRepository.findRideByUsername(driver.getUsername()).isPresent()) {
-            throw new UserHasRideExcpetion("One or more users already part of another ride");
-        }
+
+        if(driver==null || customer==null) throw new UserNotFoundException("Driver or Customer not found");
+        if(rideRepository.findRideByUsername(customer.getUsername()).isPresent() || rideRepository.findRideByUsername(driver.getUsername()).isPresent()) throw new UserHasRideExcpetion("One or more users already part of another ride");
+
         RideRequest activeRideRequest = rideRequestService.getActiveRide();
         RidePriceDto ridePriceDto = new RidePriceDto(rideDto.getDistance(), activeRideRequest.getCarType());
-        float price = rideRequestService.ridePrice(ridePriceDto);
+        double price = rideRequestService.ridePrice(ridePriceDto);
+
         Ride ride = new Ride(driver, customer, rideDto.getSpeed(), price, rideDto.getDistance(), rideDto.getGeoJson(), rideDto.getDuration());
         rideRepository.save(ride);
+
         activeRideRequest.setActive(false);
         rideRequestRepository.save(activeRideRequest);
     }
@@ -135,7 +141,6 @@ public class RideService {
     public void payment(Ride ride){
         User customer = ride.getCustomer();
         User driver = ride.getDriver();
-        userService.decreaseBalance(customer.getId(), ride.getPrice());
-        userService.increaseBalance(driver.getId(), ride.getPrice());
+        financialsService.transfer(customer, driver, ride.getPrice());
     }
 }

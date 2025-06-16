@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -50,7 +52,6 @@ public class RideRequestService {
         if (hasActiveRide) {
             throw new IllegalStateException("You already have an active ride request!");
         }
-
         rideRequest.setCustomer(customer);
         rideRequest.setCreatedAt(LocalDateTime.now());
         rideRequest.setActive(true);
@@ -89,12 +90,17 @@ public class RideRequestService {
         return rideRepo.findById(id);
     }
 
-    public float ridePrice(RidePriceDto ridePriceDto) {
+    public double ridePrice(RidePriceDto ridePriceDto) {
         if(ridePriceDto.getDistance() <= 0) {throw new RuntimeException("Distance must be greater than 0");}
         return switch (ridePriceDto.getCarType().toString()) {
-            case "SMALL" -> ridePriceDto.getDistance() / 1000;
-            case "MEDIUM" -> ridePriceDto.getDistance() / 1000 * 2;
-            default -> ridePriceDto.getDistance() / 1000 * 10;
+            case "SMALL" -> round(ridePriceDto.getDistance()/1000);
+            case "MEDIUM" -> round(ridePriceDto.getDistance() / 1000 * 2);
+            case "DELUXE" -> round(ridePriceDto.getDistance() / 1000 * 10);
+            default -> throw new RuntimeException("Invalid car type");
         };
+    }
+
+    private double round(double value) {
+        return new BigDecimal(value).setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
 }
