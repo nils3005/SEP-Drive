@@ -4,6 +4,7 @@ import com.sep.sepdrivebackend.component.GeoJsonRouteParser;
 import com.sep.sepdrivebackend.controller.RideWebSocketController;
 import com.sep.sepdrivebackend.dto.ActiveRideDto;
 import com.sep.sepdrivebackend.dto.RideDto;
+import com.sep.sepdrivebackend.dto.RidePriceDto;
 import com.sep.sepdrivebackend.dto.RideUpdateDto;
 import com.sep.sepdrivebackend.entities.*;
 import com.sep.sepdrivebackend.exception.RideNotFoundException;
@@ -44,9 +45,11 @@ public class RideService {
         if(rideRepository.findRideByUsername(customer.getUsername()).isPresent() || rideRepository.findRideByUsername(driver.getUsername()).isPresent()) {
             throw new UserHasRideExcpetion("One or more users already part of another ride");
         }
-        Ride ride = new Ride(driver, customer, rideDto.getSpeed(), rideDto.getPrice(), rideDto.getDistance(), rideDto.getGeoJson(), rideDto.getDuration());
-        rideRepository.save(ride);
         RideRequest activeRideRequest = rideRequestService.getActiveRide();
+        RidePriceDto ridePriceDto = new RidePriceDto(rideDto.getDistance(), activeRideRequest.getCarType());
+        float price = rideRequestService.ridePrice(ridePriceDto);
+        Ride ride = new Ride(driver, customer, rideDto.getSpeed(), price, rideDto.getDistance(), rideDto.getGeoJson(), rideDto.getDuration());
+        rideRepository.save(ride);
         activeRideRequest.setActive(false);
         rideRequestRepository.save(activeRideRequest);
     }
