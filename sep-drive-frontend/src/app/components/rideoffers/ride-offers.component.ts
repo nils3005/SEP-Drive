@@ -148,7 +148,6 @@ export class RideOffersComponent implements OnInit, OnDestroy {
               driverId: rideOffer.driverId,
               customerId: rideOffer.customerId,
               speed: 15,
-              price: this.rideSimulationStore.ridePrice.getValue(),
               duration: route.features[0].properties.summary.duration,
               distance: route.features[0].properties.summary.distance,
               geoJson: JSON.stringify(route)

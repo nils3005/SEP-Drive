@@ -188,7 +188,6 @@ export type Ride = {
 export type RideDto = {
   driverId: number,
   customerId: number
-  price: number,
   duration: number,
   speed: number,
   distance: number,

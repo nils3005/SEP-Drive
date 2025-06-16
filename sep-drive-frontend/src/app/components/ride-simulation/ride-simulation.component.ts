@@ -153,7 +153,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
       end: end,
       distance: parseFloat((ride.distance / 1000).toFixed(2)),
       duration: parseFloat((ride.duration / 60).toFixed(2)),
-      price: ride.price,
+      price: parseFloat(ride.price.toFixed(2)),
       carType: ""
     }
   }

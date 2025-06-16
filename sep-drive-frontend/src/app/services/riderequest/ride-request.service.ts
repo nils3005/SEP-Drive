@@ -147,7 +147,7 @@ export class RideRequestService {
         console.log(jsonRoute.features[0].properties.summary.distance)
 
         const price = await firstValueFrom(
-          this.getRidePrice(jsonRoute.features[0].properties.summary.distance, this.geoService.carType.getValue() ?? CarType.MEDIUM)
+          this.getRidePrice(jsonRoute.features[0].properties.summary.distance, rideRequest.carType)
         );
 
         return {
