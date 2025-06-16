@@ -138,29 +138,31 @@ export class RideOffersComponent implements OnInit, OnDestroy {
     if (confirm('Möchtest du dieses Angebot annehmen?')) {
       if (this.authService.user()!.financials?.balance >= this.rideSimulationStore.ridePrice.getValue()) {
         this.rideOfferService.acceptOffer(offerId).subscribe({
-          next: async () => {
+          next: (rideOffer) => {
 
             const start = this.geoService.getStart();
             const destination = this.geoService.getDestination();
             const route: GeoJsonRoute = this.geoService.route.getValue()
 
-            let rideDto: RideDto;
+            let rideDto: RideDto = {
+              driverId: rideOffer.driverId,
+              customerId: rideOffer.customerId,
+              speed: 15,
+              price: this.rideSimulationStore.ridePrice.getValue(),
+              duration: route.features[0].properties.summary.duration,
+              distance: route.features[0].properties.summary.distance,
+              geoJson: JSON.stringify(route)
+            };
 
-            if (this.rideOfferNotification) {
-              const carType = this.geoService.carType.getValue();
-              console.log(carType);
-              this.rideService.createRide({
-                driverId: this.rideOfferNotification.driverId,
-                customerId: this.rideOfferNotification.customerId,
-                speed: 15,
-                price: this.rideSimulationStore.ridePrice.getValue(),
-                duration: route.features[0].properties.summary.duration,
-                distance: route.features[0].properties.summary.distance,
-                geoJson: JSON.stringify(route)
-              });
-              console.log("Created ride")
-              this.router.navigate(['/simulation']);
-            }
+            console.log("customerId from acceptOffer: ", rideDto.customerId);
+            console.log("driverid from acceptOffer: ", rideDto.driverId);
+
+            const carType = this.geoService.carType.getValue();
+            console.log(carType);
+
+            this.rideService.createRide(rideDto);
+            console.log("Created ride")
+            this.router.navigate(['/simulation']);
 
             this.loadOffers();
           },

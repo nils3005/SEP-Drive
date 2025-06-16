@@ -136,6 +136,7 @@ public class RideOfferController {
     public static class RideOfferDto {
         private Long offerId;
         private Long driverId;
+        private Long customerId;
         private Long rideRequestId;
         private String status;
 
@@ -143,6 +144,7 @@ public class RideOfferController {
             return RideOfferDto.builder()
                     .offerId(offer.getId())
                     .driverId(offer.getDriver().getId())
+                    .customerId(offer.getRideRequest().getCustomer().getId())
                     .rideRequestId(offer.getRideRequest().getId())
                     .status(offer.getStatus().name())
                     .build();

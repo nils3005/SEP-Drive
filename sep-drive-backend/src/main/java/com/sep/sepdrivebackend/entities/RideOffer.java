@@ -25,7 +25,7 @@ public class RideOffer {
     /**
      * Fahranfrage, auf die sich dieses Angebot bezieht.
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "ride_request_id")
     private RideRequest rideRequest;
 
