@@ -69,8 +69,8 @@ export class PaymentMethodComponent {
         return;
       }
 
-      if (data.cvc.length < 3 || data.cvc.length > 4) {
-        this.errorMessage.showError("CVC muss 3 oder 4 Zeichen lang sein.");
+      if (data.cvc.length < 3 || data.cvc.length > 3) {
+        this.errorMessage.showError("CVC muss 3 Zeichen lang sein.");
         return;
       }
 
