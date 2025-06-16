@@ -33,6 +33,7 @@ public class FinancialsService {
             financials.setBalance(0.0);
             sender.setFinancials(financials);
             userService.save(sender);
+            senderFinancials = sender.getFinancials();
         }
         if (senderFinancials.getBalance() == null || amount > senderFinancials.getBalance()) {
             throw new IllegalArgumentException("Amount too big, Balance too small.");
@@ -50,6 +51,7 @@ public class FinancialsService {
             financials.setBalance(0.0);
             receiver.setFinancials(financials);
             userService.save(receiver);
+            receiverFinancials = receiver.getFinancials();
         }
 
         senderFinancials.setBalance(senderFinancials.getBalance() - amount);
