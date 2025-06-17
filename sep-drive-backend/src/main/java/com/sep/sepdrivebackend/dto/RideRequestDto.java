@@ -19,7 +19,7 @@ public class RideRequestDto {
     private CarType carType;
     private boolean active;
     private LocalDateTime createdAt;
-    private String username; // Ich weiß, dass das unschön ist, aber ich habe keine Lust das Frontend umzuschreiben
+    private String username;
     private Double userRating;
     // Liste der RideOffers nicht mitschicken => kann man über RideOfferController mit rrId holen
 
