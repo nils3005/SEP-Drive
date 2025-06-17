@@ -45,7 +45,7 @@ export class SimulationPageComponent {
     if (historyId && otherUserId && thisUserId && rating) {
       this.rideService.rateUser(otherUserId, historyId, rating);
       this.mapService.resetMap();
-      this.router.navigate(['/']);
     }
+    this.router.navigate(['/']);
   }
 }
