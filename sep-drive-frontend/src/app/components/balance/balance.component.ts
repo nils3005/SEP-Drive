@@ -50,7 +50,7 @@ export class BalanceComponent {
     }
 
     if (currentUser.role === 'CUSTOMER') {
-      if(!this.user()?.financials.lastFourCreditCardNumber){
+      if(!this.user()?.financials?.lastFourCreditCardNumber){
         this.errorMessage.showError("Keine Zahlungsmethode hinterlegt");
         this.router.navigate(['payment-method']);
         return;
@@ -58,17 +58,18 @@ export class BalanceComponent {
       if (this.balance.balance > 1000){
         this.errorMessage.showError("Zu hoher Betrag. Bitte wähle einen Betrag unter 1000€");
       }
-      this.userService.deposit(this.balance.balance).subscribe({
-        next: () => {
-          this.errorMessage.showError("Guthaben wurde erfolgreich aufgeladen");
-          this.auth.updateUserData();
-          this.router.navigate(['/social/user', this.user()?.id]);
-        },
-        error: err => this.errorMessage.showError("Fehler beim Aufladen : " + err.error.message)
-      });
-
-    } else if (currentUser.role === 'DRIVER') {
-      if(!this.user()?.financials.lastFourIban){
+      else{
+        this.userService.deposit(this.balance.balance).subscribe({
+          next: () => {
+            this.errorMessage.showError("Guthaben wurde erfolgreich aufgeladen");
+            this.auth.updateUserData();
+            this.router.navigate(['/social/user', this.user()?.id]);
+          },
+          error: err => this.errorMessage.showError("Fehler beim Aufladen : " + err.error.message)
+        });
+      }
+    }else if (currentUser.role === 'DRIVER') {
+      if(!this.user()?.financials?.lastFourIban){
         this.errorMessage.showError("Keine Zahlungsmethode hinterlegt");
         this.auth.updateUserData();
         this.router.navigate(['payment-method']);
@@ -85,16 +86,16 @@ export class BalanceComponent {
       // @ts-ignore
       if (this.balance.balance > userBalance) {
         this.errorMessage.showError("Nicht genügend Guthaben auf dem Konto.");
-        return;
       }
-      this.userService.disburse(this.balance.balance).subscribe({
-        next: () => {
-          this.errorMessage.showError("Guthaben wurde erfolgreich abgebucht"),
-            this.router.navigate(['/social/user', this.user()?.id]);
-        },
-        error: err => this.errorMessage.showError("Fehler bei der Abbuchung: " + err.error.message)
-      });
-
+      else{
+        this.userService.disburse(this.balance.balance).subscribe({
+          next: () => {
+            this.errorMessage.showError("Guthaben wurde erfolgreich abgebucht"),
+              this.router.navigate(['/social/user', this.user()?.id]);
+          },
+          error: err => this.errorMessage.showError("Fehler bei der Abbuchung: " + err.error.message)
+        });
+      }
     } else {
       this.errorMessage.showError("Unbekannte Rolle.");
     }
