@@ -1,14 +1,20 @@
 package com.sep.sepdrivebackend.controller;
 
+import com.sep.sepdrivebackend.dto.RideRequestForDriverDto;
 import com.sep.sepdrivebackend.dto.RideUpdateDto;
 import com.sep.sepdrivebackend.entities.Ride;
+import com.sep.sepdrivebackend.entities.RideRequest;
 import com.sep.sepdrivebackend.exception.GeoJsonParsingException;
 import com.sep.sepdrivebackend.exception.RideNotFoundException;
 import com.sep.sepdrivebackend.exception.UserHasRideExcpetion;
+import com.sep.sepdrivebackend.service.RideRequestService;
 import com.sep.sepdrivebackend.service.RideService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/ride")
@@ -60,6 +66,29 @@ public class RideController {
         }
         catch (RuntimeException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @RestController
+    @RequestMapping("/api/ride-requests-driver")
+    public static class RideRequestDriverController {
+
+        @Autowired
+        private RideRequestService rideRequestService;
+
+        @GetMapping("/available")
+        public ResponseEntity<List<RideRequestForDriverDto>> getAvailableRideRequests(
+                @RequestParam double driverLat,
+                @RequestParam double driverLon,
+                @RequestParam(defaultValue = "rideId") String sortBy,
+                @RequestParam(defaultValue = "true") boolean ascending) {
+
+            List<RideRequest> availableRides = rideRequestService.getAllAvailableRideRequests();
+
+            List<RideRequestForDriverDto> dtos = rideRequestService.getAvailableRideRequestsForDriver(
+                    driverLat, driverLon, sortBy, ascending, availableRides);
+
+            return ResponseEntity.ok(dtos);
         }
     }
 }
