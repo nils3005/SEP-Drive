@@ -122,6 +122,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
   checkUpdates(): void
   {
     this.rideSimulationStore.rideData.asObservable().subscribe((rideData) => {
+      console.log("Update");
       if (rideData.paused && this.rideSimulationStore.motionPolyLine) {
         // this.rideSimulationStore.motionPolyLine.motionToggle();
         this.rideSimulationStore.motionPolyLine.motionPause()
