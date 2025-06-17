@@ -34,6 +34,11 @@ export class SimulationPageComponent {
   }
 
   submit(rating: number | null) {
+    if (rating === null) {
+      console.log("No rating");
+      this.mapService.resetMap();
+      this.router.navigate(['/']);
+    }
     const historyId = this.rideSimulationStore.rideData.getValue().historyId;
     const thisUserId = this.authService.user()?.id;
     const otherUserId = this.rideSimulationStore.ride.getValue()?.ride.customer.id == thisUserId ? this.rideSimulationStore.ride.getValue()?.ride.driver.id : this.rideSimulationStore.ride.getValue()?.ride.customer.id
@@ -46,6 +51,7 @@ export class SimulationPageComponent {
       this.rideService.rateUser(otherUserId, historyId, rating);
       this.mapService.resetMap();
     }
+    console.log("Weiterleiten")
     this.router.navigate(['/']);
   }
 }
