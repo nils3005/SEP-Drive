@@ -60,10 +60,6 @@ public class RideService {
         rideRequestRepository.save(activeRideRequest);
     }
 
-    //Methode nur zum testen
-    public List<Ride> allRides() {
-        return rideRepository.findAll();
-    }
 
     @Transactional
     public ActiveRideDto getRide(){

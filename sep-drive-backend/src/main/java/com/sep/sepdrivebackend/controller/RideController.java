@@ -22,16 +22,6 @@ public class RideController {
         this.rideService = rideService;
     }
 
-    //Methode nur zum testen
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllRides() {
-        try{
-            return ResponseEntity.ok(rideService.allRides());
-        } catch (Exception e){
-            return ResponseEntity.notFound().build();
-        }
-    }
-
     @GetMapping("/active")
     public ResponseEntity<?> getActiveRide() {
         try{
