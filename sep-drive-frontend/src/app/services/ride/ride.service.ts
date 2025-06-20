@@ -1,12 +1,17 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
 import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
-import {Coord, RideResponse, RideUpdateDTO} from '../../types';
+import {Coord, Ride, RideDto, RideResponse, RideUpdateDTO} from '../../types';
 import {ErrorService} from '../error/error.service';
 import {Observable} from 'rxjs';
-import * as L from 'leaflet';
-import 'leaflet.motion/dist/leaflet.motion.js'
+
+/**
+ * import in main.ts wird vor angular bootstraps evaluiert
+ * funktioniert bei ng serve, da das script injection verhalten nicht so strikt ist, wie bei ng build, was im docker benutzt wird
+ */
+declare const L: any;
 import {GeoService} from '../geo/geo.service';
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +19,7 @@ import {GeoService} from '../geo/geo.service';
 export class RideService {
 
   private httpClient: HttpClient = inject(HttpClient);
+  private router: Router = inject(Router);
 
 
   constructor(
@@ -73,6 +79,20 @@ export class RideService {
     })
   }
 
+  createRide(ride: RideDto): void {
+    this.httpClient.post(
+        'http://localhost:8080/ride/add',
+        ride,
+        { responseType: 'text' }
+    ).subscribe({
+      next: _ => {
+        this.router.navigate(['/simulation']);
+      },
+      error: err =>
+          console.log(err)
+    })
+  }
+
   updateRideData(paused: boolean | null, resuming: boolean | null, speed: number | null, completed: boolean |null): void
   {
     let rideData: RideUpdateDTO = this.rideSimulationStore.rideData.getValue();
@@ -105,8 +125,17 @@ export class RideService {
     }
   }
 
-  rateUser(userId: number, rating: number): void {
-    this.httpClient.post(`http://localhost:8080/ratings/${userId}/${rating}`, {})
+  rateUser(userId: number, historyId: number, rating: number): void {
+    const ratingDto = {
+      rating: rating
+    };
+    this.httpClient.post(`http://localhost:8080/ratings/${userId}/${historyId}`, ratingDto).subscribe({
+      next: _ => {
+      },
+      error: err => {
+        console.log("Error ", err)
+      }
+    })
   }
 
   calculateKmh(meters: number, seconds: number): number {

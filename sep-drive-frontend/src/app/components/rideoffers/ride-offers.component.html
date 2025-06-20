@@ -1,0 +1,54 @@
+<table class="ride-table">
+    <thead>
+    <tr>
+        <th (click)="sortBy('rating')">
+            Bewertung Fahrer&nbsp;
+            <i [ngClass]="arrow('rating')" aria-hidden="true"></i>
+        </th>
+        <th (click)="sortBy('totalRides')">
+            Gesamtanzahl Fahrten&nbsp;
+            <i [ngClass]="arrow('totalRides')" aria-hidden="true"></i>
+        </th>
+        <th (click)="sortBy('distance')">
+            Distanz (insgesamt)&nbsp;
+            <i [ngClass]="arrow('distance')" aria-hidden="true"></i>
+        </th>
+        <th></th> <!-- Aktionen-Spalte -->
+        <th></th> <!-- Aktionen-Spalte -->
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let offer of offers()">
+        <!-- Sterne für Bewertung -->
+        <td class="rating">
+            @for (star of [1,2,3,4,5]; track star) {
+                <i [class]="this.averageClass(star, offer.rating)"></i>
+            }
+        </td>
+        <td>{{ offer.totalRides }}</td>
+        <td>{{ (offer.totalDistance / 1000).toFixed(1) }} km</td>
+        <td class="actions">
+            <button class="accept" (click)="acceptOffer(offer.offerId)">
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </button>
+        </td>
+        <td class="actions">
+            <button class="decline" (click)="rejectOffer(offer.offerId)">
+                <i class="fa fa-ban" aria-hidden="true"></i>
+            </button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+@if (offers().length === 0) {
+    <div class="notification">
+        Es gibt keine offenen Angebote für deine Fahranfrage.
+    </div>
+}
+
+@if (notification()) {
+    <div class="notification">
+        <p>{{ notification() }}</p>
+    </div>
+}

@@ -6,10 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class Ride {
     @Id
@@ -20,11 +22,23 @@ public class Ride {
     @OneToOne
     private User customer;
     private float speed;
-    private float price;
+    private double price;
     private float distance;
     private float duration;
     private RideStatus status;
     private int coordsIndex;
     @Lob
     private String geoJson;
+
+    public Ride(User driver, User customer, float speed, double price, float distance, String geoJson, float duration) {
+        this.driver = driver;
+        this.customer = customer;
+        this.speed = speed;
+        this.price = new BigDecimal(price).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        this.distance = distance;
+        this.geoJson = geoJson;
+        this.duration = duration;
+        this.status = RideStatus.PAUSED;
+        this.coordsIndex = 0;
+    }
 }

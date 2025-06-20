@@ -86,3 +86,8 @@
   justify-content: center;
   font-weight: 600;
 }
+.form-actions {
+  grid-column: span 2;
+  display: flex;
+  justify-content: start;
+}

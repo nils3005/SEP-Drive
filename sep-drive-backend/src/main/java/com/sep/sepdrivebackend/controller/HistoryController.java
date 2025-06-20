@@ -71,6 +71,10 @@ public class HistoryController {
         }
         history.setDriver(driver);
         history.setCustomer(customer);
+        driver.setNumberOfRides(driver.getNumberOfRides() + 1);
+        customer.setNumberOfRides(customer.getNumberOfRides() + 1);
+        userService.save(customer);
+        userService.save(driver);
         historyService.save(history);
         return ResponseEntity.ok(history.getHistoryId());
     }

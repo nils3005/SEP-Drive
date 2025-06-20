@@ -1,11 +1,10 @@
 import {inject, Injectable} from '@angular/core';
-import {Coordinates, GeocodeFeature, GeoJsonRoute, RideRequest, RideRequestSummary} from '../../types';
-import {BehaviorSubject, firstValueFrom, Observable} from 'rxjs';
+import {GeocodeFeature, GeoJsonRoute, RideRequest, RideRequestSummary} from '../../types';
+import {BehaviorSubject, firstValueFrom, Observable, of} from 'rxjs';
 import {GeoService} from '../geo/geo.service';
 import {CarType} from "../../enums/car-type";
 import {HttpClient, HttpResponse} from "@angular/common/http";
 import {OpenRouteServiceService} from "../openroute/open-route-service.service";
-import {ErrorService} from "../error/error.service";
 
 @Injectable({
   providedIn: 'root'
@@ -56,10 +55,24 @@ export class RideRequestService {
     )
   }
 
-  public getActiveRide(): Observable<HttpResponse<any>>
+  public getActiveRideRequest(): Observable<HttpResponse<any>>
   {
     return this.http.get<RideRequest>(
         'http://localhost:8080/api/ride-requests/active',
+        {
+          headers: {
+            accept: 'application/json',
+          }
+          ,
+          observe: 'response'
+        }
+    )
+  }
+
+  public getRideRequestById(id: number): Observable<HttpResponse<RideRequest>>
+  {
+    return this.http.get<RideRequest>(
+        `http://localhost:8080/api/ride-requests/${id}`,
         {
           headers: {
             accept: 'application/json',
@@ -134,7 +147,7 @@ export class RideRequestService {
         console.log(jsonRoute.features[0].properties.summary.distance)
 
         const price = await firstValueFrom(
-          this.getRidePrice(jsonRoute.features[0].properties.summary.distance, this.geoService.carType.getValue() ?? CarType.MEDIUM)
+          this.getRidePrice(jsonRoute.features[0].properties.summary.distance, rideRequest.carType)
         );
 
         return {
@@ -143,7 +156,7 @@ export class RideRequestService {
           distance: parseFloat((jsonRoute.features[0].properties.summary.distance / 1000).toFixed(2)),
           duration: parseFloat((jsonRoute.features[0].properties.summary.duration / 60).toFixed(2)),
           price: price.body ? parseFloat(price.body.toFixed(2)) : 0,
-          carType: this.geoService.carType.getValue() ?? CarType.MEDIUM,
+          carType: rideRequest.carType[0] + rideRequest.carType.slice(1).toLowerCase(),
           stops: []
         };
       }
@@ -159,37 +172,40 @@ export class RideRequestService {
     }
   }
 
-  public getRideRequestSummary(): RideRequestSummary | null
+  public async getRideRequestSummary(): Promise<RideRequestSummary | null>
   {
     const carType = this.geoService.carType.getValue();
     if (this.geoService.waypoints.getValue().length > 1 && this.geoService.route.getValue() && carType) {
       let jsonRoute: GeoJsonRoute = this.geoService.route.getValue();
       let waypointsLength = this.geoService.waypoints.getValue().length;
       let stops = this.geoService.waypoints.getValue().slice(1, waypointsLength - 1);
-      this.getRidePrice(parseFloat((jsonRoute.features[0].properties.summary.distance / 1000).toFixed(2)), carType).subscribe({
-        next: (result) => {
-          console.log(result.body);
-          return {
-            start: this.geoService.waypoints.getValue()[0].properties.label,
-            stops: stops,
-            end: this.geoService.waypoints.getValue()[this.geoService.waypoints.getValue().length-1].properties.label,
-            distance: parseFloat((jsonRoute.features[0].properties.summary.distance / 1000).toFixed(2)),
-            duration: parseFloat((jsonRoute.features[0].properties.summary.duration / 60).toFixed(2)),
-            price: result.body,
-            carType: carType
-          };
-        }
-      })
+      const price = await firstValueFrom(
+        this.getRidePrice(parseFloat(jsonRoute.features[0].properties.summary.distance.toFixed(2)), carType)
+      )
       return {
         start: this.geoService.waypoints.getValue()[0].properties.label,
         stops: stops,
         end: this.geoService.waypoints.getValue()[this.geoService.waypoints.getValue().length-1].properties.label,
         distance: parseFloat((jsonRoute.features[0].properties.summary.distance / 1000).toFixed(2)),
         duration: parseFloat((jsonRoute.features[0].properties.summary.duration / 60).toFixed(2)),
-        price: 0,
+        price: price.body ? parseFloat(price.body.toFixed(2)) : 0,
         carType: carType
       };
     }
     return null;
+  }
+
+  public getAllRideRequests(): Observable<HttpResponse<RideRequest[]>>
+  {
+    return this.http.get<RideRequest[]>(
+      'http://localhost:8080/api/ride-requests/all',
+      {
+        headers: {
+          accept: 'application/json',
+        }
+        ,
+        observe: 'response'
+      }
+    )
   }
 }

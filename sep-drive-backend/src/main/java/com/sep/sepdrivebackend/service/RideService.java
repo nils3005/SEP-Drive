@@ -3,14 +3,15 @@ package com.sep.sepdrivebackend.service;
 import com.sep.sepdrivebackend.component.GeoJsonRouteParser;
 import com.sep.sepdrivebackend.controller.RideWebSocketController;
 import com.sep.sepdrivebackend.dto.ActiveRideDto;
+import com.sep.sepdrivebackend.dto.RideDto;
+import com.sep.sepdrivebackend.dto.RidePriceDto;
 import com.sep.sepdrivebackend.dto.RideUpdateDto;
-import com.sep.sepdrivebackend.entities.History;
-import com.sep.sepdrivebackend.entities.Ride;
-import com.sep.sepdrivebackend.entities.RideStatus;
-import com.sep.sepdrivebackend.entities.User;
+import com.sep.sepdrivebackend.entities.*;
 import com.sep.sepdrivebackend.exception.RideNotFoundException;
 import com.sep.sepdrivebackend.exception.UserHasRideExcpetion;
+import com.sep.sepdrivebackend.exception.UserNotFoundException;
 import com.sep.sepdrivebackend.repository.RideRepository;
+import com.sep.sepdrivebackend.repository.RideRequestRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,29 +26,40 @@ public class RideService {
     private final UserService userService;
     private final GeoJsonRouteParser geoJsonRouteParser;
     private final HistoryService historyService;
+    private final RideRequestService rideRequestService;
+    private final RideRequestRepository rideRequestRepository;
+    private final FinancialsService financialsService;
 
-    public RideService(RideRepository rideRepository, RideWebSocketController rideWebSocketController, UserService userService, GeoJsonRouteParser geoJsonRouteParser, HistoryService historyService) {
+    public RideService(RideRepository rideRepository, RideWebSocketController rideWebSocketController, UserService userService, GeoJsonRouteParser geoJsonRouteParser, HistoryService historyService, RideRequestService rideRequestService, RideRequestRepository rideRequestRepository, FinancialsService financialsService) {
         this.rideRepository = rideRepository;
         this.rideWebSocketController = rideWebSocketController;
         this.userService = userService;
         this.geoJsonRouteParser = geoJsonRouteParser;
         this.historyService = historyService;
+        this.rideRequestService = rideRequestService;
+        this.rideRequestRepository = rideRequestRepository;
+        this.financialsService = financialsService;
     }
 
     @Transactional
-    public void addRide(Ride ride) {
-        User driver = userService.findByUserId(ride.getDriver().getId());
-        User customer = userService.findByUserId(ride.getCustomer().getId());
-        if(rideRepository.findRideByUsername(customer.getUsername()).isPresent() || rideRepository.findRideByUsername(driver.getUsername()).isPresent()) {
-            throw new UserHasRideExcpetion("One or more users already part of another ride");
-        }
+    public void addRide(RideDto rideDto) {
+        User driver = userService.findByUserId(rideDto.getDriverId());
+        User customer = userService.findByUserId(rideDto.getCustomerId());
+
+        if(driver==null || customer==null) throw new UserNotFoundException("Driver or Customer not found");
+        if(rideRepository.findRideByUsername(customer.getUsername()).isPresent() || rideRepository.findRideByUsername(driver.getUsername()).isPresent()) throw new UserHasRideExcpetion("One or more users already part of another ride");
+
+        RideRequest activeRideRequest = rideRequestService.getActiveRide();
+        RidePriceDto ridePriceDto = new RidePriceDto(rideDto.getDistance(), activeRideRequest.getCarType());
+        double price = rideRequestService.ridePrice(ridePriceDto);
+
+        Ride ride = new Ride(driver, customer, rideDto.getSpeed(), price, rideDto.getDistance(), rideDto.getGeoJson(), rideDto.getDuration());
         rideRepository.save(ride);
+
+        activeRideRequest.setActive(false);
+        rideRequestRepository.save(activeRideRequest);
     }
 
-    //Methode nur zum testen
-    public List<Ride> allRides() {
-        return rideRepository.findAll();
-    }
 
     @Transactional
     public ActiveRideDto getRide(){
@@ -79,6 +91,18 @@ public class RideService {
         }
     }
 
+    public void updateIndex(Long rideId, int index) {
+        Ride ride = rideRepository.findById(rideId).orElseThrow(()->new RideNotFoundException("Ride not found"));
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if(!ride.getCustomer().getUsername().equals(username) && !ride.getDriver().getUsername().equals(username)) {
+            throw new RuntimeException("User is not part of ride");
+        }
+        ride.setCoordsIndex(index);
+        rideRepository.save(ride);
+    }
+
+
     public void updateRideStatus(Ride ride, RideUpdateDto rideUpdateDTO) {
         if (rideUpdateDTO.isPaused()) {
             ride.setStatus(RideStatus.PAUSED);
@@ -100,6 +124,9 @@ public class RideService {
         history.setCustomer(ride.getCustomer());
         history.setDriver(ride.getDriver());
 
+        ride.getCustomer().setNumberOfRides(ride.getCustomer().getNumberOfRides() + 1);
+        ride.getDriver().setNumberOfRides(ride.getDriver().getNumberOfRides() + 1);
+
         historyService.save(history);
         rideUpdateDTO.setHistoryId(history.getHistoryId());
 
@@ -110,7 +137,6 @@ public class RideService {
     public void payment(Ride ride){
         User customer = ride.getCustomer();
         User driver = ride.getDriver();
-        userService.decreaseBalance(customer.getId(), ride.getPrice());
-        userService.increaseBalance(driver.getId(), ride.getPrice());
+        financialsService.transfer(customer, driver, ride.getPrice());
     }
 }

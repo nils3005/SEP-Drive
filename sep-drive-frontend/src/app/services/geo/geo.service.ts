@@ -100,4 +100,14 @@ export class GeoService {
       }
     )
   }
+
+  public getStart(): GeocodeFeature | null
+  {
+    return this.waypoints.getValue()[0];
+  }
+
+  public getDestination(): GeocodeFeature | null
+  {
+    return this.waypoints.getValue()[this.waypoints.getValue().length - 1];
+  }
 }

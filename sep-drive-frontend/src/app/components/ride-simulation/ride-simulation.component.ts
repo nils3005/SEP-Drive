@@ -1,13 +1,16 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, Signal} from '@angular/core';
 import {DataDisplayComponent} from '../core/data-display/data-display.component';
 import {MapService} from '../../services/map/map.service';
 import {RideService} from '../../services/ride/ride.service';
 import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
-import {Coordinates, RideUpdateDTO} from '../../types';
+import {Coordinates, Ride, RideRequestSummary, RideResponse, RideUpdateDTO} from '../../types';
 import {OpenRouteServiceService} from '../../services/openroute/open-route-service.service';
 import {GeoService} from '../../services/geo/geo.service';
 import {WebsocketService} from '../../services/websocket/web-socket.service';
 import {Router} from '@angular/router';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {RideRequestService} from '../../services/riderequest/ride-request.service';
+import {BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'app-ride-simulation',
@@ -20,10 +23,13 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
 
   private started: number = 0;
 
+  public rideData: BehaviorSubject<RideRequestSummary | null> = new BehaviorSubject<RideRequestSummary | null>(null);
+
   constructor(
     private mapService: MapService,
     private rideService: RideService,
     public rideSimulationStore: RideSimulationStore,
+    private rideRequestService: RideRequestService,
     private openRouteService: OpenRouteServiceService,
     private geoService: GeoService,
     private webSocketService: WebsocketService,
@@ -35,6 +41,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
           if (ride) {
             this.webSocketService.subscribe<RideUpdateDTO>('/topic/ride/' + ride.ride.rideId).subscribe((data) => {
               if (ride.ride.rideId === data.rideId) {
+                console.log("historyId aus Websocket: ", data.historyId)
                 this.rideSimulationStore.rideData.next(data);
                 this.speedValue = data.speed;
               }
@@ -88,6 +95,8 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
                         this.rideSimulationStore.destination.set(data.body.features[0].properties.label)
                         this.geoService.updateDestination(data.body.features[0], false)
                         this.geoService.route.next(JSON.parse(rideResponse.ride.geoJson))
+                        this.rideData.next(this.getRideSummaryFromRide(rideResponse.ride, this.rideSimulationStore.start(), this.rideSimulationStore.destination()))
+                        this.started = 0;
                         this.rideService.simulateRide()
                         this.checkUpdates()
                       }
@@ -113,11 +122,18 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
   checkUpdates(): void
   {
     this.rideSimulationStore.rideData.asObservable().subscribe((rideData) => {
+      console.log("Update");
       if (rideData.paused && this.rideSimulationStore.motionPolyLine) {
         // this.rideSimulationStore.motionPolyLine.motionToggle();
         this.rideSimulationStore.motionPolyLine.motionPause()
       }
       if (rideData.resuming && this.rideSimulationStore.motionPolyLine) {
+        if (this.started === 0) {
+          this.rideSimulationStore.motionPolyLine.motionStart();
+          this.rideSimulationStore.started = true
+        } else {
+          this.rideSimulationStore.motionPolyLine.motionResume();
+        }
         this.started += 1;
       }
       if (this.started > 1) {
@@ -128,6 +144,20 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
         }
       }
     })
+  }
+
+  getRideSummaryFromRide(ride: Ride, start: string, end: string): RideRequestSummary
+  {
+    console.log(ride)
+    return {
+      start: start,
+      stops: [],
+      end: end,
+      distance: parseFloat((ride.distance / 1000).toFixed(2)),
+      duration: parseFloat((ride.duration / 60).toFixed(2)),
+      price: parseFloat(ride.price.toFixed(2)),
+      carType: ""
+    }
   }
 
   onSpeedBlur() {
@@ -146,6 +176,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
   toggleRideStatus() {
     // console.log("Button press")
     this.rideSimulationStore.motionPolyLine.motionToggle();
+    this.rideSimulationStore.started = true;
     let rideData = this.rideSimulationStore.rideData.getValue();
     this.rideService.updateRideData(!rideData.paused, !rideData.resuming, null, null);
   }

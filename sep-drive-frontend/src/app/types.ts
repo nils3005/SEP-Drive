@@ -53,9 +53,19 @@ export type User = {
   email: string;
   birthdate: string;
   numberOfRides: number;
-  ratings: number[];
+  rating: number;
   carType: string;
   profilePicture: string;
+  financials: Financial
+}
+export type Financial = {
+  creditCardNumber: string | null;
+  expiryDate: string | null;
+  cvc: string | null;
+  iban: string | null;
+  balance: number;
+  lastFourIban: number | null;
+  lastFourCreditCardNumber: number | null;
 }
 
 export type Coordinates = {
@@ -70,6 +80,29 @@ export type RideRequest = {
   destination: Coordinates
   carType: CarType
   active: boolean
+  createdAt: string
+  username: string
+  userRating: number
+}
+
+export type RideOffer = {
+  offerId: number;
+  driverId: number;
+  customerId: number;
+  rideRequestId: number
+  driverName: string;
+  rating: number;
+  totalRides: number;
+  totalDistance: number;
+}
+
+export type RideOfferNotification = {
+  rideOfferId: number;
+  rideRequestId: number;
+  driverId: number;
+  driverName: string;
+  customerId: number
+  description: string;
 }
 
 export type RideRequestSummary = {
@@ -96,6 +129,24 @@ export type DriveUser = {
   carType: string
 }
 
+export type paymentMethodDriver ={
+  firstName: string,
+  lastName: string,
+  iban: string,
+}
+
+export type paymentMethodCustomer = {
+  firstName: string,
+  lastName: string,
+  creditCardNumber: string,
+  expiryDate: string,
+  cvc: string
+}
+
+export type Balance = {
+  balance: number
+}
+
 export interface fahrt {
   historyId: number;
   finishDate: string;
@@ -111,6 +162,7 @@ export interface fahrt {
   lastNameDriver: string;
   firstNameDriver: string
 }
+
 
 export type RideResponse = {
   ride: Ride
@@ -133,6 +185,15 @@ export type Ride = {
   speeds: number[]
 }
 
+export type RideDto = {
+  driverId: number,
+  customerId: number
+  duration: number,
+  speed: number,
+  distance: number,
+  geoJson: any
+}
+
 export type RideCords = [[number, number]]
 
 export type Speeds = number[]
@@ -148,3 +209,4 @@ export type RideUpdateDTO = {
 }
 
 export type Coord = [number, number]
+

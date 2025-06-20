@@ -6,16 +6,21 @@ import {HomePageComponent} from './pages/home-page/home-page.component';
 import {SocialComponent} from './components/social/social.component';
 import {ProfileComponent} from './components/profile/profile.component';
 import { RegistrierungComponent } from './components/registrierung/registrierung.component';
+import { PaymentMethodComponent } from './components/payment-method/payment-method.component';
+import {BalanceComponent} from './components/balance/balance.component';
 import {DrivinghistoryComponent} from './components/drivinghistory/drivinghistory.component';
 import {SimulationPageComponent} from "./pages/simulation-page/simulation-page.component";
 
 export const routes: Routes = [{ path: 'login', component: LoginComponent },
   { path: 'password', component: PasswordComponent },
-  {path: 'authentication', component: AuthenticationComponent},
-  {path: 'register', component: RegistrierungComponent},
+  { path: 'authentication', component: AuthenticationComponent},
+  { path: 'register', component: RegistrierungComponent},
   { path: '', component: HomePageComponent },
   { path: 'social', component: SocialComponent },
   { path: 'social/user/:id', component: ProfileComponent },
   { path: 'history', component: DrivinghistoryComponent },
+  { path: 'payment-method', component: PaymentMethodComponent },
+  { path: 'balance' , component: BalanceComponent },
   { path: 'simulation', component: SimulationPageComponent },
-  { path: '**', redirectTo: '' }];
+  { path: '**', redirectTo: '' }
+];

@@ -2,7 +2,7 @@
   <div class="col-start-2">
     <span class="text-[#914141] text-2xl flex">
       Registrierung
-  </span>
+    </span>
     <form class="flex flex-col" #registrierungsform="ngForm" (ngSubmit)="onSubmit()">
       <label for="username">Benutzername<span class="text-red-600">*</span> </label>
       <input class="form-control bg-gray-200 mb-1 h-8 rounded" #username="ngModel" [(ngModel)]="registrierungsUser.username"

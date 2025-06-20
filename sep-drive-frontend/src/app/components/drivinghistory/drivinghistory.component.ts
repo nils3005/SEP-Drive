@@ -38,6 +38,7 @@ export class DrivinghistoryComponent implements OnInit, AfterViewInit  {
   dataSource!: HistoryDataSource;
 
   constructor(private router: Router, private historyService: HistoryService) {
+    //Weil Signal
     effect(() => {
       this.dataSource.filter$.next(this.searchTerm());
     });
@@ -49,13 +50,16 @@ export class DrivinghistoryComponent implements OnInit, AfterViewInit  {
 
   searchTerm = signal<string>('');
 
+  //Bei Initialisierung, mache ...
   ngOnInit(): void {
     this.dataSource = new HistoryDataSource(this.historyService);
     // @ts-ignore
     this.dataSource.loadHistory()
   }
 
+  //Verbindung html => So dass ich Änderungen an der Tabelle mitbekomme (weil sort, filter)
   @ViewChild('sort') sort!: MatSort;
+    //Weil ViewChild => Ich will Änderungen mitbekommen
     ngAfterViewInit() {
       if (this.sort) {
         setTimeout(() => {
@@ -64,21 +68,21 @@ export class DrivinghistoryComponent implements OnInit, AfterViewInit  {
           this.sort!.sortChange.emit({ active: 'historyId', direction: 'desc' });
           this.dataSource.sort = this.sort!;
         });
-      } else {
+      }/* else {
         console.warn('MatSort nicht initialisiert.');
-      }
+      }*/
     }
 
-
+  //Sternchen laden.
   getStars(rating: number): string[] {
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 >= 0.5;
-    const stars = Array(fullStars).fill('star');
+    const stars = Array(fullStars).fill('star'); //Kommen von Google fonts Material-Icons
     if (halfStar) stars.push('star_half');
     while (stars.length < 5) stars.push('star_border');
     return stars;
   }
-
+  //Wenn Pfeil gedrückt,...
   announceSortChange(sortState: Sort) {
     if (sortState.direction) {
       this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);

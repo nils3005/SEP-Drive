@@ -14,7 +14,7 @@ export class HistoryService {
   private url: string = 'http://localhost:8080/history';
 
 
-
+//Gibt die abgeschlossenen Fahrten eines Users zurück
   getHistory(): Observable<fahrt[]> {
     return this.http.get<fahrt[]>(this.url);
   }

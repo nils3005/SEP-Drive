@@ -1,0 +1,62 @@
+<div class="grid grid-cols-3 grid-rows-1 gap-1 font-sans" xmlns="http://www.w3.org/1999/html">
+  <p></p>
+  <div *ngIf="auth.isLoggedIn()">
+    <div *ngIf="user()?.role === 'CUSTOMER'">
+      <div class="min-h-screen flex items-center justify-center bg-white">
+        <form class="flex flex-col items-center space-y-4" #balanceCustomer="ngForm" (ngSubmit)="onSubmit()">
+          <label class="text-[#914141] text-2xl mb-2 flex text-center">
+            Welchen Betrag wollen Sie auf Ihr Konto laden?
+          </label>
+          <div class="relative inline-block">
+            <input
+              type="number"
+              min="1"
+              step="0.5"
+              name="balance"
+              [(ngModel)]="balance.balance"
+              (keydown)="blockMinus($event)"
+              class="form-control pr-8 pl-2 py-1.5 bg-gray-200 mb-2 h-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <span class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">€</span>
+          </div>
+
+          <button [disabled]="balanceCustomer.invalid" class="btn btn-info bg-[#914141] text-white hover:bg-[#733C3C] rounded h-8
+                disabled:bg-gray-400 disabled:text-black disabled:cursor-not-allowed w-50"
+                  type="submit">Submit
+          </button>
+
+
+        </form>
+      </div>
+    </div>
+    <div *ngIf="user()?.role === 'DRIVER'">
+      <div class="min-h-screen flex items-center justify-center bg-white">
+        <form class="flex flex-col items-center space-y-4" #balanceDriver="ngForm" (ngSubmit)="onSubmit()">
+          <label class="text-[#914141] text-2xl mb-2 flex text-center">
+            Welchen Betrag wollen Sie von Ihrem Konto abbuchen?
+          </label>
+          <div class="relative inline-block">
+            <input
+              type="number"
+              min="1"
+              step="0.5"
+              name="balance"
+              [(ngModel)]="balance.balance"
+              (keydown)="blockMinus($event)"
+              class="form-control pr-8 pl-2 py-1.5 bg-gray-200 mb-2 h-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <span class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">€</span>
+          </div>
+
+          <button [disabled]="balanceDriver.invalid" class="btn btn-info bg-[#914141] text-white hover:bg-[#733C3C] rounded h-8
+                disabled:bg-gray-400 disabled:text-black disabled:cursor-not-allowed w-50"
+                  type="submit">Submit
+          </button>
+
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+

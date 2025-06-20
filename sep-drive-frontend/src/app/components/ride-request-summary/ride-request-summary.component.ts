@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {RideRequestSummary} from '../../types';
+import {Ride, RideRequestSummary} from '../../types';
 import {MapService} from '../../services/map/map.service';
 import {RideRequestService} from '../../services/riderequest/ride-request.service';
 import {GeoService} from '../../services/geo/geo.service';
@@ -8,6 +8,8 @@ import {ErrorService} from "../../services/error/error.service";
 import {Router} from "@angular/router";
 import {BehaviorSubject} from "rxjs";
 import {Util} from "leaflet";
+import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
+import {AuthService} from '../../services/auth/auth-service.service';
 
 @Component({
   selector: 'app-ride-request-summary',
@@ -25,13 +27,17 @@ export class RideRequestSummaryComponent {
       public geoService: GeoService,
       private errorService: ErrorService,
       private router: Router,
+      private rideSimulationStore: RideSimulationStore,
+      private authService: AuthService
   ) {
-    if (!rideRequestService.getRideRequestSummary()) {
-      geoService.showInput.next(false);
-    } else {
-      this.summaryData = rideRequestService.getRideRequestSummary();
-      console.log(this.summaryData)
-    }
+    rideRequestService.getRideRequestSummary().then((data) => {
+      if (data == null) {
+        geoService.showInput.next(false);
+      } else {
+        this.summaryData = data;
+        this.rideSimulationStore.ridePrice.next(this.summaryData.price)
+      }
+    });
     this.checkChanges();
   }
 
@@ -52,27 +58,31 @@ export class RideRequestSummaryComponent {
   onSubmit() {
     const carType = this.geoService.carType.getValue();
     if (this.geoService.waypoints.getValue().length > 1 && carType) {
-      this.rideRequestService.requestRide(
-          this.geoService.waypoints.getValue()[0],
-          this.geoService.waypoints.getValue()[1],
-          carType.toUpperCase()
-      ).subscribe({
-        next: () => {
-          this.geoService.isSubmitted.next(true);
-        },
-        error: (error) => {
-          if (error.status === 400) {
-            this.errorService.showError("Du hast bereits eine aktive Fahranfrage")
-            return
-          } else if (error.status === 401 || error.status === 403) {
-            this.router.navigate(['/login']);
-            return
-          } else {
-            this.errorService.showError(error.error.message);
-            return;
+      if (this.summaryData && this.authService.user()!.financials?.balance >= this.summaryData?.price) {
+        this.rideRequestService.requestRide(
+            this.geoService.waypoints.getValue()[0],
+            this.geoService.waypoints.getValue()[1],
+            carType.toUpperCase()
+        ).subscribe({
+          next: () => {
+            this.geoService.isSubmitted.next(true);
+          },
+          error: (error) => {
+            if (error.status === 400) {
+              this.errorService.showError("Du hast bereits eine aktive Fahranfrage")
+              return
+            } else if (error.status === 401 || error.status === 403) {
+              this.router.navigate(['/login']);
+              return
+            } else {
+              this.errorService.showError(error.error.message);
+              return;
+            }
           }
-        }
-      });
+        });
+      } else {
+        this.errorService.showError("Bitte lade zuerst genügend Geld auf dein Konto")
+      }
     } else {
       this.onCancel()
     }

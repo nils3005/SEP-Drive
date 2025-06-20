@@ -4,6 +4,9 @@ import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {User} from "../../types";
 import {Router} from "@angular/router";
 import {UserService} from "../user/user.service";
+import {GeoService} from '../geo/geo.service';
+import {RideRequestService} from '../riderequest/ride-request.service';
+import {MapService} from '../map/map.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -11,6 +14,10 @@ export class AuthService {
     private router: Router = inject(Router);
     private userService: UserService = inject(UserService);
     private api: string = 'http://localhost:8080/auth';
+    private geoService: GeoService = inject(GeoService);
+    private rideRequestService: RideRequestService = inject(RideRequestService);
+    private mapService: MapService = inject(MapService);
+
 
     token = signal<string|null>(localStorage.getItem('jwt'));
     user = signal<User|null>(null);
@@ -39,6 +46,22 @@ export class AuthService {
                 this.user.set(null);
             }
         });
+    }
+
+    updateUserData(): void
+    {
+        const jwt = localStorage.getItem('jwt');
+        if (jwt) {
+          const name = this.decodeUsernameFromToken(jwt);
+          if (name) {
+            this.userService.getUserByUsername(name)
+              .pipe(catchError(() => {
+                this.clearSession();
+                return throwError(() => new Error());
+              }))
+              .subscribe(u => this.user.set(u));
+          }
+        }
     }
 
     /**
@@ -111,6 +134,10 @@ export class AuthService {
      */
     logout(): void {
         this.http.post(`${this.api}/logout`, null, {responseType: 'text'}).subscribe();
+        this.geoService.isSubmitted.next(false);
+        this.geoService.rideRequestSummaryData.next(null);
+        this.rideRequestService.rideRequest.next(null);
+        this.mapService.resetMap()
         this.clearSession();
         this.router.navigate(['/login']);
     }
