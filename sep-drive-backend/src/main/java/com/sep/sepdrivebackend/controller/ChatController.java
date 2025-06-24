@@ -1,0 +1,104 @@
+package com.sep.sepdrivebackend.controller;
+
+import com.sep.sepdrivebackend.entities.Chat;
+import com.sep.sepdrivebackend.exception.*;
+import com.sep.sepdrivebackend.service.ChatService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/chat")
+public class ChatController {
+    private final ChatService chatService;
+
+    public ChatController(ChatService chatService) {
+        this.chatService = chatService;
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<?> createChat(@RequestBody long customerId) {
+        try{
+            chatService.createChat(customerId);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (UserNotFoundException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (UsersHaveChatException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllChats(){
+        try{
+            return new ResponseEntity<>(chatService.getChats(), HttpStatus.OK);
+        } catch (UserNotFoundException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+
+    }
+
+    @GetMapping("/{chatId}")
+    public ResponseEntity<?> getChat(@PathVariable long chatId) {
+        try{
+            Chat chat = chatService.getChatById(chatId);
+            return new ResponseEntity<>(chat, HttpStatus.OK);
+        } catch(Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/send/{chatId}")
+    public ResponseEntity<?> sendMessage(@RequestBody String message, @PathVariable long chatId) {
+        try{
+            chatService.addMessageToChat(chatId, message);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch(ChatNotFoundException | UserNotFoundException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch(UserNotPartOfChatException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @DeleteMapping("/deleteMessage/{chatId}/{messageId}")
+    public ResponseEntity<?> deleteMessage(@PathVariable long chatId, @PathVariable long messageId) {
+        try{
+            chatService.deleteMessage(chatId, messageId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch(Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/editMessage/{chatId}/{messageId}")
+    public ResponseEntity<?> editMessage(@PathVariable long chatId, @PathVariable long messageId, @RequestBody String message) {
+        try{
+            chatService.editMessage(chatId, messageId, message);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch(ChatNotFoundException | UserNotFoundException | ChatMessageNotFoundException | MessageNotInChatException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch(RuntimeException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PostMapping("/markAsRead/{chatId}/{messageId}")
+    public ResponseEntity<?> markAsRead(@PathVariable long chatId, @PathVariable long messageId) {
+        try{
+            chatService.markAsRead(chatId, messageId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch(Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/delete/{chatId}")
+    public ResponseEntity<?> deleteChat(@PathVariable long chatId) {
+        try{
+            chatService.deleteChat(chatId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+}
