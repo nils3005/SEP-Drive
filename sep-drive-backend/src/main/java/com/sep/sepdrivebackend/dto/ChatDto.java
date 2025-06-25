@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatDto {
-    private long chatId;
-    private User user1;
-    private User user2;
+    private Long chatId;
+    private Long customerId;
+    private Long driverId;
 }

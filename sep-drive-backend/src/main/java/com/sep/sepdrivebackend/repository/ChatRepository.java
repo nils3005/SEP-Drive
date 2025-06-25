@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface ChatRepository extends JpaRepository<Chat, Long> {
-    @Query("SELECT new com.sep.sepdrivebackend.dto.ChatDto(c.id, c.customer, c.driver) from Chat c where c.customer.username = :username or c.driver.username = :username")
+    @Query("SELECT new com.sep.sepdrivebackend.dto.ChatDto(c.id, c.customer.id, c.driver.id) from Chat c where c.customer.username = :username or c.driver.username = :username")
     List<ChatDto> findAllChatsByUsername(@Param("username") String username);
 
     @Query("SELECT c from Chat c where c.customer.id = :customerId and c.driver.id = :driverId")

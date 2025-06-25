@@ -20,9 +20,9 @@ public class ChatController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createChat(@RequestParam long customerId) {
+    public ResponseEntity<?> createChat(@RequestParam Long customerId, @RequestParam Long driverId) {
         try{
-            chatService.createChat(customerId);
+            chatService.createChat(customerId, driverId);
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (UserNotFoundException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);

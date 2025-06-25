@@ -30,12 +30,11 @@ public class ChatService {
         this.chatWebSocketController = chatWebSocketController;
     }
 
-    public void createChat(long customerId) throws UserNotFoundException, UsersHaveChatException{
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User driver = userRepository.findByUsername(username).orElseThrow( () -> new UserNotFoundException("Driver not found"));
+    public void createChat(Long customerId, Long driverId) throws UserNotFoundException, UsersHaveChatException{
+        User driver = userRepository.findById(driverId).orElseThrow( () -> new UserNotFoundException("Driver not found"));
         User customer = userRepository.findById(customerId).orElseThrow( () -> new UserNotFoundException("Customer not found"));
-        if(driver.getId() == customerId) throw new UsersHaveChatException("Cant make chat between the same user");
-        if(chatRepository.findChatByBothUsers(customerId, driver.getId()).isPresent()) throw new UsersHaveChatException("These users already have a chat");
+        if(Objects.equals(customerId, driverId)) throw new UsersHaveChatException("Cant make chat between the same user");
+        if(chatRepository.findChatByBothUsers(customerId, driverId).isPresent()) throw new UsersHaveChatException("These users already have a chat");
         Chat chat = new Chat();
         chat.setDriver(driver);
         chat.setCustomer(customer);
