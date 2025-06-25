@@ -72,8 +72,8 @@ public class ChatService {
         if(chatMessage.getChat().getId() != chatId) throw new MessageNotInChatException("Message does not belong to chat");
         if(chatMessage.isSeen()) throw new MessageSeenException("Message already seen");
         Long expectedSenderId = (chatMessage.getSenderRole() == Role.CUSTOMER)
-                ? chatMessage.getChat().getDriver().getId()
-                : chatMessage.getChat().getCustomer().getId();
+                ? chatMessage.getChat().getCustomer().getId()
+                : chatMessage.getChat().getDriver().getId();
         if (!Objects.equals(expectedSenderId, sender.getId())) throw new RuntimeException("Only sender can delete message");
 
         chatMessageRepository.delete(chatMessage);
@@ -85,8 +85,8 @@ public class ChatService {
         if(chatMessage.getChat().getId() != chatId) throw new MessageNotInChatException("Message does not belong to chat");
         if(chatMessage.isSeen()) throw new MessageSeenException("Message already seen");
         Long expectedSenderId = (chatMessage.getSenderRole() == Role.CUSTOMER)
-                ? chatMessage.getChat().getDriver().getId()
-                : chatMessage.getChat().getCustomer().getId();
+                ? chatMessage.getChat().getCustomer().getId()
+                : chatMessage.getChat().getDriver().getId();
         if (!Objects.equals(expectedSenderId, sender.getId())) throw new RuntimeException("Only sender can edit  message");
         chatMessage.setMessage(message);
         chatMessageRepository.save(chatMessage);
