@@ -2,7 +2,6 @@ package com.sep.sepdrivebackend.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,10 +17,7 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //@ManyToOne
-    private long senderId;
-    //@ManyToOne
-    private long recipientId;
+    private Role senderRole; // Wenn eine Message erstellt wird, wird nur gespeichert von welcher Rolle sie erstellt wurde. Mit den Änderungen in Chat kann man dann die Nachricht eindeutig Driver oder Customer zuordnen
 
     private String message;
 
@@ -34,9 +30,8 @@ public class ChatMessage {
     @JsonIgnore
     private Chat chat;
 
-    public ChatMessage(long sender, long recipient, String message, Chat chat) {
-        this.senderId = sender;
-        this.recipientId = recipient;
+    public ChatMessage(Role senderRole, String message, Chat chat) {
+        this.senderRole = senderRole;
         this.message = message;
         this.chat = chat;
         this.timestamp = LocalDateTime.now();

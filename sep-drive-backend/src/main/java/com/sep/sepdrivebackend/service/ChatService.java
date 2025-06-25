@@ -4,6 +4,7 @@ import com.sep.sepdrivebackend.controller.ChatWebSocketController;
 import com.sep.sepdrivebackend.dto.ChatDto;
 import com.sep.sepdrivebackend.entities.Chat;
 import com.sep.sepdrivebackend.entities.ChatMessage;
+import com.sep.sepdrivebackend.entities.Role;
 import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.exception.*;
 import com.sep.sepdrivebackend.repository.ChatMessageRepository;
@@ -13,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ChatService {
@@ -32,10 +34,10 @@ public class ChatService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User driver = userRepository.findByUsername(username).orElseThrow( () -> new UserNotFoundException("Driver not found"));
         User customer = userRepository.findById(customerId).orElseThrow( () -> new UserNotFoundException("Customer not found"));
-        if(chatRepository.findChatByBothUsers(driver.getUsername(), customer.getUsername()).isPresent()) throw new UsersHaveChatException("These users already have a chat");
+        if(chatRepository.findChatByBothUsers(customerId, driver.getId()).isPresent()) throw new UsersHaveChatException("These users already have a chat");
         Chat chat = new Chat();
-        chat.setUser1(driver);
-        chat.setUser2(customer);
+        chat.setDriver(driver);
+        chat.setCustomer(customer);
         chatRepository.save(chat);
     }
 
@@ -54,7 +56,11 @@ public class ChatService {
         User recipient = userPartOfChat(chatId);
         ChatMessage chatMessage = chatMessageRepository.findById(messageId).orElseThrow( () -> new ChatMessageNotFoundException("ChatMessage not found"));
         if(chatMessage.getChat().getId() != chatId) throw new MessageNotInChatException("Message does not belong to chat");
-        if(chatMessage.getRecipientId() != recipient.getId()) throw new RuntimeException("Message can only be marked as read by recipient");
+        Long expectedRecipientId = (chatMessage.getSenderRole() == Role.CUSTOMER)
+                ? chatMessage.getChat().getDriver().getId()
+                : chatMessage.getChat().getCustomer().getId();
+        if (!Objects.equals(expectedRecipientId, recipient.getId())) throw new RuntimeException("Message can only be marked as read by recipient");
+
         chatMessage.setSeen(true);
         chatMessageRepository.save(chatMessage);
     }
@@ -64,7 +70,11 @@ public class ChatService {
         ChatMessage chatMessage = chatMessageRepository.findById(messageId).orElseThrow( () -> new ChatMessageNotFoundException("ChatMessage not found"));
         if(chatMessage.getChat().getId() != chatId) throw new MessageNotInChatException("Message does not belong to chat");
         if(chatMessage.isSeen()) throw new MessageSeenException("Message already seen");
-        if(chatMessage.getSenderId() != sender.getId()) throw new RuntimeException("Only sender can delete message");
+        Long expectedSenderId = (chatMessage.getSenderRole() == Role.CUSTOMER)
+                ? chatMessage.getChat().getDriver().getId()
+                : chatMessage.getChat().getCustomer().getId();
+        if (!Objects.equals(expectedSenderId, sender.getId())) throw new RuntimeException("Only sender can delete message");
+
         chatMessageRepository.delete(chatMessage);
     }
 
@@ -73,7 +83,10 @@ public class ChatService {
         ChatMessage chatMessage = chatMessageRepository.findById(messageId).orElseThrow( () -> new ChatMessageNotFoundException("ChatMessage not found"));
         if(chatMessage.getChat().getId() != chatId) throw new MessageNotInChatException("Message does not belong to chat");
         if(chatMessage.isSeen()) throw new MessageSeenException("Message already seen");
-        if(chatMessage.getSenderId() != sender.getId()) throw new RuntimeException("Only sender can edit message");
+        Long expectedSenderId = (chatMessage.getSenderRole() == Role.CUSTOMER)
+                ? chatMessage.getChat().getDriver().getId()
+                : chatMessage.getChat().getCustomer().getId();
+        if (!Objects.equals(expectedSenderId, sender.getId())) throw new RuntimeException("Only sender can edit  message");
         chatMessage.setMessage(message);
         chatMessageRepository.save(chatMessage);
     }
@@ -81,10 +94,7 @@ public class ChatService {
     public void addMessageToChat(long chatId, String message) {
         User sender = userPartOfChat(chatId);
         Chat chat = chatRepository.findById(chatId).orElseThrow( () -> new ChatNotFoundException("Chat not found"));
-        User recipient = chat.getUser1().equals(sender)
-                         ? chat.getUser2()
-                         : chat.getUser1();
-        ChatMessage chatMessage = new ChatMessage(sender.getId(), recipient.getId(), message, chat);
+        ChatMessage chatMessage = new ChatMessage(sender.getRole(), message, chat);
         chatMessageRepository.save(chatMessage);
 
         chatWebSocketController.sendMessage(chatMessage);
@@ -100,7 +110,7 @@ public class ChatService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username).orElseThrow( () -> new UserNotFoundException("User not found"));
         long userId = user.getId();
-        if(chat.getUser1().getId() != userId && chat.getUser2().getId() != userId){throw new UserNotPartOfChatException("This user is not part of the chat");}
+        if(chat.getCustomer().getId() != userId && chat.getDriver().getId() != userId) throw new UserNotPartOfChatException("This user is not part of the chat");
         return user;
     }
 }

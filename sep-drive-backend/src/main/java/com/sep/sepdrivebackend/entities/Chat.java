@@ -17,9 +17,9 @@ public class Chat {
     private Long id;
 
     @ManyToOne
-    private User user1;
+    private User customer; // Vielleicht besser, weil konkreter (Chats können nur zwischen einem Fahrer und einem Kunden existieren)
     @ManyToOne
-    private User user2;
+    private User driver;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMessage> messages;
