@@ -22,5 +22,6 @@ public class Chat {
     private User driver;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
     private List<ChatMessage> messages;
 }

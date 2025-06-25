@@ -7,9 +7,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/chat")
 public class ChatController {
+    public record Message(String message){}
     private final ChatService chatService;
 
     public ChatController(ChatService chatService) {
@@ -17,7 +20,7 @@ public class ChatController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createChat(@RequestBody long customerId) {
+    public ResponseEntity<?> createChat(@RequestParam long customerId) {
         try{
             chatService.createChat(customerId);
             return new ResponseEntity<>(HttpStatus.CREATED);
@@ -30,6 +33,7 @@ public class ChatController {
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllChats(){
+        chatService.getChats();
         try{
             return new ResponseEntity<>(chatService.getChats(), HttpStatus.OK);
         } catch (UserNotFoundException e){
@@ -49,9 +53,9 @@ public class ChatController {
     }
 
     @PostMapping("/send/{chatId}")
-    public ResponseEntity<?> sendMessage(@RequestBody String message, @PathVariable long chatId) {
+    public ResponseEntity<?> sendMessage(@RequestBody Message msg, @PathVariable long chatId) {
         try{
-            chatService.addMessageToChat(chatId, message);
+            chatService.addMessageToChat(chatId, msg.message());
             return new ResponseEntity<>(HttpStatus.OK);
         } catch(ChatNotFoundException | UserNotFoundException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -71,9 +75,9 @@ public class ChatController {
     }
 
     @PutMapping("/editMessage/{chatId}/{messageId}")
-    public ResponseEntity<?> editMessage(@PathVariable long chatId, @PathVariable long messageId, @RequestBody String message) {
+    public ResponseEntity<?> editMessage(@PathVariable long chatId, @PathVariable long messageId, @RequestBody Message msg) {
         try{
-            chatService.editMessage(chatId, messageId, message);
+            chatService.editMessage(chatId, messageId, msg.message());
             return new ResponseEntity<>(HttpStatus.OK);
         } catch(ChatNotFoundException | UserNotFoundException | ChatMessageNotFoundException | MessageNotInChatException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);

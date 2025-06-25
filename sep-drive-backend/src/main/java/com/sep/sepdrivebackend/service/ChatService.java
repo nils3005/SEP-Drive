@@ -30,10 +30,11 @@ public class ChatService {
         this.chatWebSocketController = chatWebSocketController;
     }
 
-    public void createChat(long customerId){
+    public void createChat(long customerId) throws UserNotFoundException, UsersHaveChatException{
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User driver = userRepository.findByUsername(username).orElseThrow( () -> new UserNotFoundException("Driver not found"));
         User customer = userRepository.findById(customerId).orElseThrow( () -> new UserNotFoundException("Customer not found"));
+        if(driver.getId() == customerId) throw new UsersHaveChatException("Cant make chat between the same user");
         if(chatRepository.findChatByBothUsers(customerId, driver.getId()).isPresent()) throw new UsersHaveChatException("These users already have a chat");
         Chat chat = new Chat();
         chat.setDriver(driver);
@@ -41,18 +42,18 @@ public class ChatService {
         chatRepository.save(chat);
     }
 
-    public List<ChatDto> getChats(){
+    public List<ChatDto> getChats() throws UserNotFoundException, UsersHaveChatException {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if(username == null) throw new UserNotFoundException("User not found");
         return chatRepository.findAllChatsByUsername(username);
     }
 
-    public Chat getChatById(long chatId) {
+    public Chat getChatById(long chatId) throws ChatNotFoundException, UserNotFoundException, UserNotPartOfChatException {
         userPartOfChat(chatId);
         return chatRepository.findById(chatId).orElseThrow( () -> new ChatNotFoundException("Chat not found"));
     }
 
-    public void markAsRead(long chatId, long messageId) {
+    public void markAsRead(long chatId, long messageId) throws ChatNotFoundException, UserNotFoundException, UserNotPartOfChatException {
         User recipient = userPartOfChat(chatId);
         ChatMessage chatMessage = chatMessageRepository.findById(messageId).orElseThrow( () -> new ChatMessageNotFoundException("ChatMessage not found"));
         if(chatMessage.getChat().getId() != chatId) throw new MessageNotInChatException("Message does not belong to chat");
@@ -65,7 +66,7 @@ public class ChatService {
         chatMessageRepository.save(chatMessage);
     }
 
-    public void deleteMessage(long chatId, long messageId) {
+    public void deleteMessage(long chatId, long messageId)  throws ChatNotFoundException, UserNotFoundException, UserNotPartOfChatException, ChatMessageNotFoundException, MessageNotInChatException, MessageSeenException {
         User sender = userPartOfChat(chatId);
         ChatMessage chatMessage = chatMessageRepository.findById(messageId).orElseThrow( () -> new ChatMessageNotFoundException("ChatMessage not found"));
         if(chatMessage.getChat().getId() != chatId) throw new MessageNotInChatException("Message does not belong to chat");
@@ -78,7 +79,7 @@ public class ChatService {
         chatMessageRepository.delete(chatMessage);
     }
 
-    public void editMessage(long chatId, long messageId, String message) {
+    public void editMessage(long chatId, long messageId, String message) throws ChatNotFoundException, UserNotFoundException, UserNotPartOfChatException, ChatMessageNotFoundException, MessageNotInChatException, MessageSeenException {
         User sender = userPartOfChat(chatId);
         ChatMessage chatMessage = chatMessageRepository.findById(messageId).orElseThrow( () -> new ChatMessageNotFoundException("ChatMessage not found"));
         if(chatMessage.getChat().getId() != chatId) throw new MessageNotInChatException("Message does not belong to chat");
@@ -91,7 +92,7 @@ public class ChatService {
         chatMessageRepository.save(chatMessage);
     }
 
-    public void addMessageToChat(long chatId, String message) {
+    public void addMessageToChat(long chatId, String message) throws ChatNotFoundException, UserNotFoundException, UserNotPartOfChatException{
         User sender = userPartOfChat(chatId);
         Chat chat = chatRepository.findById(chatId).orElseThrow( () -> new ChatNotFoundException("Chat not found"));
         ChatMessage chatMessage = new ChatMessage(sender.getRole(), message, chat);
@@ -100,12 +101,12 @@ public class ChatService {
         chatWebSocketController.sendMessage(chatMessage);
     }
 
-    public void deleteChat(long chatId) {
+    public void deleteChat(long chatId) throws ChatNotFoundException, UserNotPartOfChatException, UserNotFoundException{
         userPartOfChat(chatId);
         chatRepository.deleteById(chatId);
     }
 
-    private User userPartOfChat(long chatId) {
+    private User userPartOfChat(long chatId) throws ChatNotFoundException, UserNotPartOfChatException, UserNotFoundException {
         Chat chat = chatRepository.findById(chatId).orElseThrow( () -> new ChatNotFoundException("Chat not found"));
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username).orElseThrow( () -> new UserNotFoundException("User not found"));
