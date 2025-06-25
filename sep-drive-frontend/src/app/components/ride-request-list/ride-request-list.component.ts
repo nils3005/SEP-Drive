@@ -89,6 +89,7 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
           console.log("PENDING rideOffer:", rideOffer);
           this.selectedRideRequestId.set(rideOffer.rideRequestId);
           this.subscribeToTopic(rideOffer.offerId);
+          this.rideOfferService.driverHasOpenOffer.set(true);
         }
       })
     } else {
@@ -122,6 +123,7 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
       next: (rideOffer: RideOffer) => {
         this.selectedRideRequestId.set(rideRequestId);
         this.subscribeToTopic(rideOffer.offerId);
+        this.rideOfferService.driverHasOpenOffer.set(true);
       },
       error: err => {
         console.log(err);
@@ -135,6 +137,7 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
       next: _ => {
         this.selectedRideRequestId.set(-1);
         this.updateDistanceAndData()
+        this.rideOfferService.driverHasOpenOffer.set(false);
       },
       error: err => {
         console.log(err);

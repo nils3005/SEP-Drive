@@ -1,4 +1,4 @@
-import {Component, Inject, inject, OnInit} from '@angular/core';
+import {Component, effect, Inject, inject, OnInit, signal} from '@angular/core';
 import {RouteInputComponent} from "../../components/route-input/route-input.component";
 import {MapComponent} from "../../components/map/map.component";
 import {RideRequestService} from "../../services/riderequest/ride-request.service";
@@ -10,6 +10,8 @@ import {AuthService} from "../../services/auth/auth-service.service";
 import {Router, RouterLink} from "@angular/router";
 import {UserService} from "../../services/user/user.service";
 import {RideService} from '../../services/ride/ride.service';
+import {RideofferService} from "../../services/rideoffer/rideoffer.service";
+import {ChatComponent} from "../../components/chat/chat.component";
 
 @Component({
   selector: 'app-home-page',
@@ -19,7 +21,8 @@ import {RideService} from '../../services/ride/ride.service';
     RideRequestSummaryComponent,
     RideOffersComponent,
     RideRequestListComponent,
-    RouterLink
+    RouterLink,
+    ChatComponent
   ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'
@@ -31,8 +34,7 @@ export class HomePageComponent implements OnInit {
   private userService: UserService = inject(UserService)
   private rideService: RideService = inject(RideService)
   private router: Router = inject(Router)
-  public isAccepted: boolean = false;
-  public showOnlyMap = false;
+  public rideOfferService: RideofferService = inject(RideofferService);
 
   ngOnInit(): void {
     this.rideRequestService.getActiveRideRequest().subscribe({

@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, signal} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {RideOffer} from "../../types";
 import {Observable} from "rxjs";
@@ -9,6 +9,8 @@ import {Observable} from "rxjs";
 export class RideofferService {
   private baseUrl = 'http://localhost:8080/api';
   private http: HttpClient = inject(HttpClient);
+  public driverHasOpenOffer = signal(false);
+
 
   /**
    * Neue Angebot erstellen (als Fahrer).
