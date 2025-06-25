@@ -7,7 +7,7 @@ import {Chat} from "../types";
   providedIn: 'root'
 })
 export class ChatService {
-  private apiUrl = 'http://localhost:8080/api/chats';
+  private apiUrl = 'http://localhost:8080/chat';
   private http: HttpClient = inject(HttpClient);
 
   /**
