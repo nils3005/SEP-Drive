@@ -28,9 +28,9 @@ public class RideOfferController {
     private final HistoryService historyService;
 
     @GetMapping("/rideoffer/{rideOfferId}")
-    public ResponseEntity<RideOffer> getRideOffer(@PathVariable Long rideOfferId) {
+    public ResponseEntity<RideOfferDto> getRideOffer(@PathVariable Long rideOfferId) {
         RideOffer result = rideOfferService.findRideOfferById(rideOfferId);
-        return result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();
+        return result != null ? ResponseEntity.ok(RideOfferDto.fromEntity(result)) : ResponseEntity.notFound().build();
     }
 
     /**

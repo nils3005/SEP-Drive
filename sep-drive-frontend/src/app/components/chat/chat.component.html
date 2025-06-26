@@ -1,19 +1,23 @@
 <div class="main">
     <div class="title">
-        Chat mit name
+        @if (this.authService.user()?.role === 'DRIVER') {
+            <p>Chat mit dem Kunden</p>
+        } @else {
+            <p>Chat mit dem Fahrer</p>
+        }
     </div>
     <div class="messages">
         @if (this.messages()) {
             @for (message of this.messages(); track message.id) {
-                @if (message.senderId === this.authService.user()?.id) {
+                @if (message.senderRole === this.authService.user()?.role) {
                     <!-- Message ist vom eingeloggten User also rechtsbündig -->
                     <div class="message-right">
-                        {{ message.content }}
+                        {{ message.message }}
                     </div>
                 } @else {
                     <!-- Message ist von anderem User also linksbündig -->
                     <div class="message-left">
-                        {{ message.content }}
+                        {{ message.message }}
                     </div>
                 }
             }
@@ -22,8 +26,6 @@
                 Der Chat ist leer
             </div>
         }
-
-        <!-- Flexbox flexdirection column und wenn auth.user gleich message.sender ist, dann justify-content right, sonst left -->
     </div>
     <div class="input">
             <textarea

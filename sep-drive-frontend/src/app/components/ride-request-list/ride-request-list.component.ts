@@ -86,7 +86,6 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
       this.rideOfferService.getPendingOfferForDriver(this.authService.user()!.id).subscribe({
         // Wenn ein PENDING Angebot existiert, dann setze die Buttons entsprechend
         next: rideOffer => {
-          console.log("PENDING rideOffer:", rideOffer);
           this.selectedRideRequestId.set(rideOffer.rideRequestId);
           this.subscribeToTopic(rideOffer.offerId);
         }

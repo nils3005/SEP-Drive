@@ -18,7 +18,7 @@ export class RideofferService {
   }
 
   getRideOfferById(rideOffer: number): Observable<RideOffer> {
-    return this.http.get<RideOffer>(`${this.baseUrl}/${rideOffer}`);
+    return this.http.get<RideOffer>(`${this.baseUrl}/rideoffer/${rideOffer}`);
   }
 
   /**

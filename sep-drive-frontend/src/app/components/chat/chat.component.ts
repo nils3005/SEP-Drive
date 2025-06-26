@@ -2,7 +2,7 @@ import {AfterViewInit, Component, ElementRef, inject, Input, OnInit, signal, Vie
 import {ChatService} from "../../services/chat.service";
 import {FormsModule} from "@angular/forms";
 import {WebsocketService} from "../../services/websocket/web-socket.service";
-import {Message, RideOffer} from "../../types";
+import {Chat, Message, RideOffer} from "../../types";
 import {AuthService} from "../../services/auth/auth-service.service";
 import {RideofferService} from "../../services/rideoffer/rideoffer.service";
 import {switchMap} from "rxjs";
@@ -23,44 +23,69 @@ export class ChatComponent implements OnInit, AfterViewInit {
   private webSocketService = inject(WebsocketService);
   private rideOfferService: RideofferService = inject(RideofferService);
   public authService: AuthService = inject(AuthService);
+
   public newMessage = signal('');
-  public chatId = signal(-1);
+  public chatId = signal<number | null>(null);
   public messages = signal<Message[] | null>(null);
 
   ngOnInit(): void {
+    console.log('Hello from chatOnInit');
+    // Aus der RideOffer holt man sich entsprechend die Id des anderen Users
     if (this.authService.user()?.role === 'CUSTOMER') {
-      // über authService userId
-      const customerId = this.authService.user()!.id;
-
-      // über lastclickedRideOfferId die rideOffer
-      // Wenn der wir vom Customer kommen ist rideOfferId immer gesetzt daher rideOfferId!
-      // über rideOffer driverId
-      // checken ob chat existiert mit customerId und driverId
-      this.rideOfferService.getRideOfferById(this.rideOfferId!).pipe(
-          switchMap((rideOffer: RideOffer) =>
-              this.chatService.getChatsByUsers(customerId, rideOffer.driverId)
-          )
-      ).subscribe({
-        next: result => {
-          this.chatId.set(result.id);
-        },
-        error: err => {
-          console.log('Fehler beim Laden des RideOffer oder Chat', err);
-
-        }
-      });
-      // sonst createChat
-    } else { // Driver
-      // über userId openRideOffer
-      // über rideOffer customerId
-      // checken ob chat existiert mit customerId und driverId
-      // sonst createChat
+      this.handleChatForCustomer()
+    } else {
+      // Driver
+      this.handleChatForDriver()
     }
+  }
 
-    // websocket topic subscriben - für alle gleich
-    this.webSocketService.subscribe(`topic/chat/${this.chatId()}`).subscribe(chat => {
+  private handleChatForCustomer(): void {
+    // this.rideOfferId ist nur gesetzt, wenn der Kunde den Chat öffnet
+    this.rideOfferService.getRideOfferById(this.rideOfferId!).subscribe({
+      next: (rideOffer: RideOffer) => {
+        this.handleChatForAllUsers(rideOffer.customerId, rideOffer.driverId);
+      }
+    })
+  }
 
+  private handleChatForDriver(): void {
+    // Wenn der Fahrer den Chat öffnet müssen wir die rideOfferId vom Server mit der driverId holen
+    this.rideOfferService.getPendingOfferForDriver(this.authService.user()!.id).subscribe({
+      next: (rideOffer: RideOffer) => {
+        this.handleChatForAllUsers(rideOffer.customerId, rideOffer.driverId);
+      }
     });
+  }
+
+  private handleChatForAllUsers(customerId: number, driverId: number): void {
+    this.chatService.getChatsByUsers(customerId, driverId).subscribe({
+      next: chat => {
+        // Chat existiert
+        this.chatId.set(chat.id);
+        this.loadMessages(chat);
+        this.webSocketService.subscribe('topic/chat/' + chat.id);
+      },
+      error: err => {
+        // Chat existiert nicht
+        this.chatService.createChat(customerId, driverId).subscribe({
+          next: chat => {
+            // Chat existiert nach dem Erstellen
+            this.chatId.set(chat.id);
+            this.loadMessages(chat);
+            this.webSocketService.subscribe<Chat>('topic/chat/' + chat.id).subscribe({
+              next: (chat: Chat) => {
+                this.loadMessages(chat);
+              }
+            });
+          },
+          error: err => {
+            console.log('Chat konnte nicht erstellt werden', err)
+            this.chatId.set(null);
+          }
+        });
+
+      }
+    })
   }
 
   ngAfterViewInit(): void {
@@ -69,8 +94,21 @@ export class ChatComponent implements OnInit, AfterViewInit {
   }
 
   sendMessage(message: string) {
-    console.log(message);
-    //this.chatService.sendMessage(0, message); // TODO ChatId bekommen
+    console.log(message, this.chatId()!);
+    this.chatService.sendMessage(this.chatId()!, message).subscribe({
+      next: _ => {
+        this.chatService.getChat(this.chatId()!).subscribe({
+          next: chat => {
+            this.loadMessages(chat);
+          }
+        })
+      }
+    });
+  }
+
+  private loadMessages(chat: Chat): void {
+    console.log('Messages:', chat.messages);
+    this.messages.set(chat.messages);
   }
 
   // Damit Enter die Nachricht sendet und kein Zeilenumbruch hinzufügt und Shift + Enter eine neue Zeile hinzufügt

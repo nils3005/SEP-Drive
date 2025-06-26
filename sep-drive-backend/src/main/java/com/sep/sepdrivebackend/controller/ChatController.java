@@ -59,7 +59,7 @@ public class ChatController {
         try {
             return ResponseEntity.ok(chatService.getChatByUsers(customerId, driverId));
         } catch (UserNotFoundException | ChatNotFoundException e){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
     }
 

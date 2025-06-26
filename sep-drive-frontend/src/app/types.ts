@@ -214,12 +214,12 @@ export type Chat = {
   id: number;
   customerId: number;
   driverId: number;
+  messages: Message[]
 }
 
 export type Message = {
   id: number;
-  senderId: number;
-  content: string;
-  read: boolean;
-  timestamp: string;
+  senderRole: 'DRIVER' | 'CUSTOMER';
+  message: string;
+  seen: boolean;
 }
