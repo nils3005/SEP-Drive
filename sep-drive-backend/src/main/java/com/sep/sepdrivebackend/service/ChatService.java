@@ -10,6 +10,7 @@ import com.sep.sepdrivebackend.exception.*;
 import com.sep.sepdrivebackend.repository.ChatMessageRepository;
 import com.sep.sepdrivebackend.repository.ChatRepository;
 import com.sep.sepdrivebackend.repository.UserRepository;
+import org.springframework.boot.autoconfigure.websocket.servlet.TomcatWebSocketServletWebServerCustomizer;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -23,13 +24,15 @@ public class ChatService {
     private final UserRepository userRepository;
     private final UserService userService;
     private final ChatWebSocketController chatWebSocketController;
+    private final TomcatWebSocketServletWebServerCustomizer websocketServletWebServerCustomizer;
 
-    public ChatService(ChatRepository chatRepository, ChatMessageRepository chatMessageRepository, UserRepository userRepository, UserService userService, ChatWebSocketController chatWebSocketController) {
+    public ChatService(ChatRepository chatRepository, ChatMessageRepository chatMessageRepository, UserRepository userRepository, UserService userService, ChatWebSocketController chatWebSocketController, TomcatWebSocketServletWebServerCustomizer websocketServletWebServerCustomizer) {
         this.chatRepository = chatRepository;
         this.chatMessageRepository = chatMessageRepository;
         this.userRepository = userRepository;
         this.userService = userService;
         this.chatWebSocketController = chatWebSocketController;
+        this.websocketServletWebServerCustomizer = websocketServletWebServerCustomizer;
     }
 
     public Long createChat(Long customerId, Long driverId) throws UserNotFoundException, UsersHaveChatException{
@@ -73,6 +76,7 @@ public class ChatService {
 
         chatMessage.setSeen(true);
         chatMessageRepository.save(chatMessage);
+        chatWebSocketController.sendMessage(chatMessage.getChat());
     }
 
     public void deleteMessage(long chatId, long messageId)  throws ChatNotFoundException, UserNotFoundException, UserNotPartOfChatException, ChatMessageNotFoundException, MessageNotInChatException, MessageSeenException {
