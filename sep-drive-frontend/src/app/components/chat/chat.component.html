@@ -6,13 +6,39 @@
             <p>Chat mit dem Fahrer</p>
         }
     </div>
-    <div class="messages">
+    <div class="messages" #messagesContainer>
         @if (this.messages()) {
             @for (message of this.messages(); track message.id) {
                 @if (message.senderRole === this.authService.user()?.role) {
                     <!-- Message ist vom eingeloggten User also rechtsbündig -->
                     <div class="message-right">
-                        {{ message.message }}
+
+                        @if (editingMessage?.id === message.id) {
+                            <input
+                                    type="text"
+                                    [(ngModel)]="editedMessageText"
+                                    (keydown.enter)="saveEditedMessage(message)"
+                                    style="width: 80%"
+                                    #editInput
+                            />
+                            <button (click)="saveEditedMessage(message)">
+                                <i class="fas fa-save" aria-hidden="true"></i>
+                            </button>
+                            <button (click)="cancelEdit()">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                            </button>
+                        } @else {
+                            {{ message.message }}
+                            @if (!message.seen) {
+                                <button (click)="startEdit(message)">
+                                    <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+                                </button>
+                                <button (click)="deleteMessage(message)">
+                                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                </button>
+                            }
+                        }
+
                     </div>
                 } @else {
                     <!-- Message ist von anderem User also linksbündig -->

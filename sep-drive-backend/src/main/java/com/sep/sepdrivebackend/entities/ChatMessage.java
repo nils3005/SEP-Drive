@@ -17,6 +17,7 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     private Role senderRole; // Wenn eine Message erstellt wird, wird nur gespeichert von welcher Rolle sie erstellt wurde. Mit den Änderungen in Chat kann man dann die Nachricht eindeutig Driver oder Customer zuordnen
 
     private String message;
