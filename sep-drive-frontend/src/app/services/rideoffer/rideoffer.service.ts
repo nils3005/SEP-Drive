@@ -9,14 +9,16 @@ import {Observable} from "rxjs";
 export class RideofferService {
   private baseUrl = 'http://localhost:8080/api';
   private http: HttpClient = inject(HttpClient);
-  public driverHasOpenOffer = signal(false);
-
 
   /**
    * Neue Angebot erstellen (als Fahrer).
    */
   createOffer(rideRequestId: number): Observable<RideOffer> {
         return this.http.post<RideOffer>(`${this.baseUrl}/offers/${rideRequestId}`, {});
+  }
+
+  getRideOfferById(rideOffer: number): Observable<RideOffer> {
+    return this.http.get<RideOffer>(`${this.baseUrl}/${rideOffer}`);
   }
 
   /**

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 @RestController
@@ -22,8 +23,8 @@ public class ChatController {
     @PostMapping("/create")
     public ResponseEntity<?> createChat(@RequestParam Long customerId, @RequestParam Long driverId) {
         try{
-            chatService.createChat(customerId, driverId);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            Long chatId = chatService.createChat(customerId, driverId);
+            return ResponseEntity.ok(chatId);
         } catch (UserNotFoundException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (UsersHaveChatException e){
@@ -49,6 +50,16 @@ public class ChatController {
             return new ResponseEntity<>(chat, HttpStatus.OK);
         } catch(Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/forusers")
+    public ResponseEntity<Chat> getChatsByUser(@RequestParam(name = "customerId") Long customerId,
+                                            @RequestParam(name = "driverId") Long driverId) {
+        try {
+            return ResponseEntity.ok(chatService.getChatByUsers(customerId, driverId));
+        }catch (UserNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

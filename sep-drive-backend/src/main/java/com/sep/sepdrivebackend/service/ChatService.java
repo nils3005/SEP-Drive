@@ -21,16 +21,18 @@ public class ChatService {
     private final ChatRepository chatRepository;
     public final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final ChatWebSocketController chatWebSocketController;
 
-    public ChatService(ChatRepository chatRepository, ChatMessageRepository chatMessageRepository, UserRepository userRepository, ChatWebSocketController chatWebSocketController) {
+    public ChatService(ChatRepository chatRepository, ChatMessageRepository chatMessageRepository, UserRepository userRepository, UserService userService, ChatWebSocketController chatWebSocketController) {
         this.chatRepository = chatRepository;
         this.chatMessageRepository = chatMessageRepository;
         this.userRepository = userRepository;
+        this.userService = userService;
         this.chatWebSocketController = chatWebSocketController;
     }
 
-    public void createChat(Long customerId, Long driverId) throws UserNotFoundException, UsersHaveChatException{
+    public Long createChat(Long customerId, Long driverId) throws UserNotFoundException, UsersHaveChatException{
         User driver = userRepository.findById(driverId).orElseThrow( () -> new UserNotFoundException("Driver not found"));
         User customer = userRepository.findById(customerId).orElseThrow( () -> new UserNotFoundException("Customer not found"));
         if(Objects.equals(customerId, driverId)) throw new UsersHaveChatException("Cant make chat between the same user");
@@ -39,6 +41,7 @@ public class ChatService {
         chat.setDriver(driver);
         chat.setCustomer(customer);
         chatRepository.save(chat);
+        return chat.getId();
     }
 
     public List<ChatDto> getChats() throws UserNotFoundException, UsersHaveChatException {
@@ -50,6 +53,13 @@ public class ChatService {
     public Chat getChatById(long chatId) throws ChatNotFoundException, UserNotFoundException, UserNotPartOfChatException {
         userPartOfChat(chatId);
         return chatRepository.findById(chatId).orElseThrow( () -> new ChatNotFoundException("Chat not found"));
+    }
+
+    public Chat getChatByUsers(Long customerId, Long driverId) throws UserNotFoundException {
+        if (userService.findByUserId(customerId) == null || userService.findByUserId(driverId) == null) {
+            throw new UserNotFoundException("User not found");
+        }
+        chatRepository.findChatByBothUsers(customerId, driverId);
     }
 
     public void markAsRead(long chatId, long messageId) throws ChatNotFoundException, UserNotFoundException, UserNotPartOfChatException {

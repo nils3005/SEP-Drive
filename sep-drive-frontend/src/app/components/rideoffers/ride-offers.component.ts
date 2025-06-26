@@ -42,6 +42,7 @@ export class RideOffersComponent implements OnInit, OnDestroy {
 
   // Signal für Banner-Anzeige
   notification = signal("");
+  lastClickedRideOfferId = signal<number | null>(null);
 
   private rideOfferNotification: RideOfferNotification | null = null;
 
@@ -192,11 +193,13 @@ export class RideOffersComponent implements OnInit, OnDestroy {
 
   showChat(rideOfferId: number): void {
     this.isListVisible.set(false);
+    this.lastClickedRideOfferId.set(rideOfferId);
 
   }
 
   closeChat(): void {
     this.isListVisible.set(true);
+    this.lastClickedRideOfferId.set(null);
   }
 
   /**

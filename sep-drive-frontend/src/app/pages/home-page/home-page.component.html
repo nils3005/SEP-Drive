@@ -15,7 +15,7 @@
             <div class="left-container">
                 <app-ride-request-list class="ride-request-list"/>
             </div>
-            @if (this.rideOfferService.driverHasOpenOffer()) {
+            @if (this.hasRideOffer$ | async) {
                 <div class="right-container">
                     <app-chat></app-chat>
                 </div>

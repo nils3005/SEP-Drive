@@ -35,6 +35,17 @@ export class ChatService {
   }
 
   /**
+   * Holt den Chat für die angegebenen User (customerId & driverId)
+   */
+  getChatsByUsers(customerId: number, driverId: number): Observable<Chat> {
+    const params = new HttpParams()
+        .set('customerId', customerId)
+        .set('driverId', driverId);
+
+    return this.http.get<Chat>(`${this.apiUrl}/forusers`, { params });
+  }
+
+  /**
    * Sendet eine neue Nachricht in den Chat
    */
   sendMessage(chatId: number, message: string): Observable<any> {
