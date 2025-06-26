@@ -107,7 +107,7 @@ public class ChatService {
         ChatMessage chatMessage = new ChatMessage(sender.getRole(), message, chat);
         chatMessageRepository.save(chatMessage);
 
-        chatWebSocketController.sendMessage(chatMessage);
+        chatWebSocketController.sendMessage(chat);
     }
 
     public void deleteChat(long chatId) throws ChatNotFoundException, UserNotPartOfChatException, UserNotFoundException{

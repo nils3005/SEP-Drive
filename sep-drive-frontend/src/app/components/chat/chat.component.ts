@@ -63,7 +63,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
         // Chat existiert
         this.chatId.set(chat.id);
         this.loadMessages(chat);
-        this.webSocketService.subscribe('topic/chat/' + chat.id);
+        this.subscribeToChat(chat);
       },
       error: err => {
         // Chat existiert nicht
@@ -72,11 +72,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
             // Chat existiert nach dem Erstellen
             this.chatId.set(chat.id);
             this.loadMessages(chat);
-            this.webSocketService.subscribe<Chat>('topic/chat/' + chat.id).subscribe({
-              next: (chat: Chat) => {
-                this.loadMessages(chat);
-              }
-            });
+            this.subscribeToChat(chat);
           },
           error: err => {
             console.log('Chat konnte nicht erstellt werden', err)
@@ -86,6 +82,14 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
       }
     })
+  }
+
+  private subscribeToChat(chat: Chat): void {
+    this.webSocketService.subscribe<Chat>('/topic/chat/' + chat.id).subscribe({
+      next: (chat) => {
+        this.loadMessages(chat);
+      }
+    });
   }
 
   ngAfterViewInit(): void {

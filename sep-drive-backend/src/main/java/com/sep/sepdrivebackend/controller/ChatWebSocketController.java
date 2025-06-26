@@ -1,6 +1,7 @@
 package com.sep.sepdrivebackend.controller;
 
 import com.sep.sepdrivebackend.dto.ChatDto;
+import com.sep.sepdrivebackend.entities.Chat;
 import com.sep.sepdrivebackend.entities.ChatMessage;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -13,7 +14,7 @@ public class ChatWebSocketController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    public void sendMessage(ChatMessage chatMessage) {
-        messagingTemplate.convertAndSend("/topic/chat/"+chatMessage.getChat().getId(),chatMessage);
+    public void sendMessage(Chat chat) {
+        messagingTemplate.convertAndSend("/topic/chat/"+chat.getId(), chat);
     }
 }
