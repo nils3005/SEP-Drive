@@ -58,7 +58,7 @@ public class ChatController {
                                             @RequestParam(name = "driverId") Long driverId) {
         try {
             return ResponseEntity.ok(chatService.getChatByUsers(customerId, driverId));
-        }catch (UserNotFoundException e){
+        } catch (UserNotFoundException | ChatNotFoundException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

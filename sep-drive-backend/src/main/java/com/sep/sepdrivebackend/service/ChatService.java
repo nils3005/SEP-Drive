@@ -59,7 +59,7 @@ public class ChatService {
         if (userService.findByUserId(customerId) == null || userService.findByUserId(driverId) == null) {
             throw new UserNotFoundException("User not found");
         }
-        chatRepository.findChatByBothUsers(customerId, driverId);
+        return chatRepository.findChatByBothUsers(customerId, driverId).orElseThrow( () -> new ChatNotFoundException("Chat not found"));
     }
 
     public void markAsRead(long chatId, long messageId) throws ChatNotFoundException, UserNotFoundException, UserNotPartOfChatException {
