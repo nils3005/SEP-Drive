@@ -1,7 +1,7 @@
 package com.sep.sepdrivebackend.controller;
 
+import com.sep.sepdrivebackend.dto.LeaderboardDTO;
 import com.sep.sepdrivebackend.entities.History;
-import com.sep.sepdrivebackend.entities.Leaderboard;
 import com.sep.sepdrivebackend.entities.Role;
 import com.sep.sepdrivebackend.entities.User;
 import com.sep.sepdrivebackend.service.HistoryService;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +27,15 @@ public class LeaderboardController {
     }
 
     @GetMapping("/leaderboard")
-    public ResponseEntity<List<Leaderboard>> getLeaderboard() {
+    public ResponseEntity<List<LeaderboardDTO>> getLeaderboard() {
+        List<LeaderboardDTO> leaderboardList = userService.getLeaderboard();
+        return new ResponseEntity<>(leaderboardList, HttpStatus.OK);
+    }
 
-        List <Leaderboard> leaderboardList = new ArrayList<>();
+    @GetMapping("/leaderboard2") //Version 1 = ineffizient
+    public ResponseEntity<List<LeaderboardDTO>> getLeaderboard2() {
+
+        List <LeaderboardDTO> leaderboardList = new ArrayList<>();
         List<History> history = this.historyService.findAllHistory();
         List<User> user = this.userService.findAllUsers();
 
@@ -38,7 +43,7 @@ public class LeaderboardController {
             if (u.getUsername() != null
                     && u.getRole() == Role.DRIVER) {
 
-                leaderboardList.add(new Leaderboard(
+                leaderboardList.add(new LeaderboardDTO(
                         u.getUsername(),
                         u.getFirstName() + " " + u.getLastName(),
                         0.0,
@@ -51,7 +56,7 @@ public class LeaderboardController {
         }
         for (History h : history) {
             if(h.getUsernameDriver() != null) {
-                for (Leaderboard l: leaderboardList) {
+                for (LeaderboardDTO l: leaderboardList) {
                     if (h.getUsernameDriver().equals(l.getUsername())) {
                         l.setMoney(l.getMoney() + h.getPrice());
                         l.setDriveTime(l.getDriveTime() + h.getDrivenTime());
@@ -62,4 +67,5 @@ public class LeaderboardController {
         }
         return new ResponseEntity<>(leaderboardList, HttpStatus.OK);
     }
+
 }
