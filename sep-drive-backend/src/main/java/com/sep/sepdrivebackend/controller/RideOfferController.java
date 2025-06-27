@@ -27,6 +27,12 @@ public class RideOfferController {
     private final UserService userService;
     private final HistoryService historyService;
 
+    @GetMapping("/rideoffer/{rideOfferId}")
+    public ResponseEntity<RideOfferDto> getRideOffer(@PathVariable Long rideOfferId) {
+        RideOffer result = rideOfferService.findRideOfferById(rideOfferId);
+        return result != null ? ResponseEntity.ok(RideOfferDto.fromEntity(result)) : ResponseEntity.notFound().build();
+    }
+
     /**
      * Fahrer legt ein neues Angebot an.
      */
