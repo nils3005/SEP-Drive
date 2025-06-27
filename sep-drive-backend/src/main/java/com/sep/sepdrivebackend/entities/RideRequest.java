@@ -29,6 +29,13 @@ public class RideRequest{
             @AttributeOverride(name = "latitude", column = @Column(name = "destination_latitude")),
             @AttributeOverride(name = "longitude", column = @Column(name = "destination_longitude"))
     })
+
+    /*
+
+    @ElementCollection
+    @CollectionTable(name = "ride_request_waypoints", joinColumns = @JoinColumn(name = "ride_request_id"))
+    private List<Location> waypoints = new ArrayList<>();
+   */
     private Location destination;
 
     @Enumerated(EnumType.STRING)
