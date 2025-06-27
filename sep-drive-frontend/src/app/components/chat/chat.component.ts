@@ -87,16 +87,23 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         // Chat existiert
         this.chatId.set(chat.id);
         this.loadMessages(chat);
+        console.log('subcribe to chat line 90', chat);
         this.subscribeToChat(chat);
       },
       error: err => {
         // Chat existiert nicht
         this.chatService.createChat(customerId, driverId).subscribe({
-          next: chat => {
+          next: (chatId: number) => {
             // Chat existiert nach dem Erstellen
-            this.chatId.set(chat.id);
-            this.loadMessages(chat);
-            this.subscribeToChat(chat);
+            this.chatService.getChat(chatId).subscribe({
+              next: (chat: Chat) => {
+                console.log('chat objekt aus chat existiert nicht chat component:', chat); // Gibt die korrekte Id zurück
+                this.chatId.set(chat.id);
+                this.loadMessages(chat);
+                console.log('subcribe to chat line 101', chat);
+                this.subscribeToChat(chat);
+              }
+            })
           },
           error: err => {
             console.log('Chat konnte nicht erstellt werden', err)
@@ -108,6 +115,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private subscribeToChat(chat: Chat): void {
+    console.log('/topic/chat/' + chat.id);
     this.sub = this.webSocketService.subscribe<Chat>('/topic/chat/' + chat.id).subscribe({
       next: (chat) => {
         this.loadMessages(chat);
@@ -126,6 +134,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   sendMessage(message: string) {
+    if (!this.chatId()) {
+      console.warn('Sendeverhinderung: chatId noch nicht gesetzt!');
+      return;
+    }
     console.log(message, this.chatId()!);
     this.chatService.sendMessage(this.chatId()!, message).subscribe({
       next: _ => {
@@ -133,7 +145,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
           next: chat => {
             this.loadMessages(chat);
           }
-        })
+        });
+        this.newMessage.set('');
       }
     });
   }
@@ -205,7 +218,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     if(!kEvent.shiftKey) {
       event.preventDefault();
       this.sendMessage(this.newMessage());
-      this.newMessage.set('');
     }
   }
 }
