@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, signal} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {RideOffer} from "../../types";
 import {Observable} from "rxjs";
@@ -15,6 +15,10 @@ export class RideofferService {
    */
   createOffer(rideRequestId: number): Observable<RideOffer> {
         return this.http.post<RideOffer>(`${this.baseUrl}/offers/${rideRequestId}`, {});
+  }
+
+  getRideOfferById(rideOffer: number): Observable<RideOffer> {
+    return this.http.get<RideOffer>(`${this.baseUrl}/rideoffer/${rideOffer}`);
   }
 
   /**

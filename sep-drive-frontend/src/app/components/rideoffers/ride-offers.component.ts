@@ -12,12 +12,14 @@ import {RideService} from '../../services/ride/ride.service';
 import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
 import {AuthService} from '../../services/auth/auth-service.service';
 import {ErrorService} from '../../services/error/error.service';
+import {ChatComponent} from "../chat/chat.component";
 
 @Component({
   selector: 'app-rideoffers',
   standalone: true,
   imports: [
-    CommonModule
+    CommonModule,
+    ChatComponent
   ],
   templateUrl: './ride-offers.component.html',
   styleUrls: ['./ride-offers.component.scss']
@@ -40,6 +42,7 @@ export class RideOffersComponent implements OnInit, OnDestroy {
 
   // Signal für Banner-Anzeige
   notification = signal("");
+  lastClickedRideOfferId = signal<number | null>(null);
 
   private rideOfferNotification: RideOfferNotification | null = null;
 
@@ -49,6 +52,7 @@ export class RideOffersComponent implements OnInit, OnDestroy {
   private sub?: Subscription;
 
   private router: Router = inject(Router);
+  public isListVisible = signal(true);
 
   ngOnInit(): void {
     // active RideRequest holen
@@ -185,6 +189,17 @@ export class RideOffersComponent implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  showChat(rideOfferId: number): void {
+    this.isListVisible.set(false);
+    this.lastClickedRideOfferId.set(rideOfferId);
+
+  }
+
+  closeChat(): void {
+    this.isListVisible.set(true);
+    this.lastClickedRideOfferId.set(null);
   }
 
   /**
