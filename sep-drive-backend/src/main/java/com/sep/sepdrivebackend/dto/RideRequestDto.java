@@ -18,10 +18,7 @@ public class RideRequestDto {
     private Location startLocation;
     private Location destination;
     private CarType carType;
-    /*
-    private List<Location> waypoints;  // add this field
-
-     */
+    private List<Location> waypoints;
     private boolean active;
     private LocalDateTime createdAt;
     private String username;
@@ -35,10 +32,7 @@ public class RideRequestDto {
                 .customerId(rideRequest.getId())
                 .startLocation(rideRequest.getStartLocation())
                 .destination(rideRequest.getDestination())
-                /*
                 .waypoints(rideRequest.getWaypoints())
-                */
-
                 .carType(rideRequest.getCarType())
                 .active(rideRequest.isActive())
                 .createdAt(rideRequest.getCreatedAt())
