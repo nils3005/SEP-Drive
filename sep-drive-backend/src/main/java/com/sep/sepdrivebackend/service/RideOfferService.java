@@ -21,6 +21,11 @@ public class RideOfferService {
     private final RideRequestService rideRequestService;
     private final SimpMessagingTemplate messagingTemplate;
 
+    @Transactional
+    public RideOffer findRideOfferById(Long id) {
+        return rideOfferRepository.findById(id).orElse(null);
+    }
+
     /**
      * Fahrer legt ein neues Angebot auf eine Fahranfrage.
      */

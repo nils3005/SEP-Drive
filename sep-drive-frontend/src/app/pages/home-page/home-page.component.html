@@ -15,9 +15,15 @@
             <div class="left-container">
                 <app-ride-request-list class="ride-request-list"/>
             </div>
-            <div class="right-container">
-                <app-map class="map" />
-            </div>
+            @if (this.hasRideOffer()) {
+                <div class="right-container">
+                    <app-chat></app-chat>
+                </div>
+            } @else {
+                <div class="right-container">
+                    <app-map class="map" />
+                </div>
+            }
         } @else if(this.authService.user()?.role === "CUSTOMER") {
             <!-- Loading State während HTTP-Call -->
             @if (geoService.showInput.getValue()) { <!-- Wenn keine aktive RideRequest -->

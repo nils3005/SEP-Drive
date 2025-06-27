@@ -210,3 +210,16 @@ export type RideUpdateDTO = {
 
 export type Coord = [number, number]
 
+export type Chat = {
+  id: number;
+  customerId: number;
+  driverId: number;
+  messages: Message[]
+}
+
+export type Message = {
+  id: number;
+  senderRole: 'DRIVER' | 'CUSTOMER';
+  message: string;
+  seen: boolean;
+}

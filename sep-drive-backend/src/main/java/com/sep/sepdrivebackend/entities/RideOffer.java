@@ -18,7 +18,7 @@ public class RideOffer {
     /**
      * Fahrer, der das Angebot gemacht hat.
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "driver_id")
     private User driver;
 
