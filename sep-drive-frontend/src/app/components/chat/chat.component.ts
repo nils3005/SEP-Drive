@@ -10,7 +10,7 @@ import {
   signal,
   ViewChild
 } from '@angular/core';
-import {ChatService} from "../../services/chat.service";
+import {ChatService} from "../../services/chat/chat.service";
 import {FormsModule} from "@angular/forms";
 import {WebsocketService} from "../../services/websocket/web-socket.service";
 import {Chat, Message, RideOffer} from "../../types";
