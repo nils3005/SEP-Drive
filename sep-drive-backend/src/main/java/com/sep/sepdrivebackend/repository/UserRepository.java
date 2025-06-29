@@ -2,7 +2,6 @@ package com.sep.sepdrivebackend.repository;
 
 import com.sep.sepdrivebackend.dto.LeaderboardDTO;
 import com.sep.sepdrivebackend.dto.StatisticsDto;
-import com.sep.sepdrivebackend.entities.Chat;
 import com.sep.sepdrivebackend.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -38,7 +37,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
            LEFT JOIN Rating AS r
            ON h.ratingDriver.id = r.id
            WHERE u.role = 'DRIVER'
-           GROUP BY 1, 2, 6
+           GROUP BY
+                u.username,
+                concat(u.firstName, ' ', u.lastName),
+                u.numberOfRides
            """)
     List<LeaderboardDTO> getLeaderboard();
 

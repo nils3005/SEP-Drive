@@ -9,13 +9,13 @@ public class LeaderboardDTO {
 
     private String username;
     private String name;
-    private double distance;
-    private double money;
-    private double rating;
+    private Double distance;
+    private Double money;
+    private Double rating;
     private long numberOfRides;
-    private double driveTime;
+    private Double driveTime;
 
-    public LeaderboardDTO(String username, String name, double distance, double money, double rating, long numberOfRides, double driveTime) {
+    public LeaderboardDTO(String username, String name, Double distance, Double money, Double rating, long numberOfRides, Double driveTime) {
         this.username = username;
         this.name = name;
         this.distance = distance;

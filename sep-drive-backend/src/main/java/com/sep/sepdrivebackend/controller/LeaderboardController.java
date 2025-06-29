@@ -48,9 +48,9 @@ public class LeaderboardController {
                         u.getFirstName() + " " + u.getLastName(),
                         0.0,
                         0.0,
-                        u.getAvgRating(),
+                        (double) u.getAvgRating(),
                         u.getNumberOfRides(),
-                        0
+                        0.0
                 ));
             }
         }
