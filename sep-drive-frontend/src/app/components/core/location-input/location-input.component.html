@@ -1,0 +1,53 @@
+<form [formGroup]="locationForm"  class="inputRow">
+  <button class="imageButton" type="button" (click)="useCoords = !useCoords">
+    <i class="fa-solid fa-pencil"></i>
+  </button>
+  @if (!useCoords) {
+    <div class="textInputContainer">
+      <input
+        type="text"
+        id="locationInput"
+        formControlName="locationInput"
+        placeholder="{{ placeholder }}"
+        class="textInput"
+        (blur)="onBlur()"
+        (focus)="onFocus()"
+      >
+      <button type="button" class="imageButton" (click)="getLocation()">
+        <i class="fa-solid fa-location-dot"></i>
+      </button>
+    </div>
+    @if(showSuggestions && suggestions.length > 0) {
+      <ul class="suggestions">
+        @for (suggestion of suggestions; track suggestion.properties.id) {
+          <li (mousedown)="onSelect(suggestion)">
+            {{ suggestion.properties.label }}
+          </li>
+        }
+      </ul>
+    }
+  } @else {
+    <div class="textInputContainer">
+      <input
+        type="number"
+        id="lon"
+        formControlName="longitudeInput"
+        placeholder="50.000000"
+        class="textInput"
+      >
+    </div>
+    <div class="textInputContainer">
+      <input
+        type="number"
+        id="lat"
+        formControlName="latitudeInput"
+        placeholder="50.000000"
+        class="textInput"
+      >
+    </div>
+    <button class="imageButton" type="button" (click)="checkCoordinates()">
+      <i class="fa-solid fa-check"></i>
+    </button>
+  }
+</form>
+
