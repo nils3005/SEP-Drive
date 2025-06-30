@@ -1,6 +1,7 @@
 package com.sep.sepdrivebackend.service;
 
-import com.sep.sepdrivebackend.entities.Rating;
+import com.sep.sepdrivebackend.dto.LeaderboardDTO;
+import com.sep.sepdrivebackend.dto.StatisticsDto;
 import com.sep.sepdrivebackend.repository.UserRepository;
 import com.sep.sepdrivebackend.entities.User;
 import org.springframework.http.HttpStatus;
@@ -9,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -62,5 +62,17 @@ public class UserService {
 
     public String getCurrentUserName() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
+    public List<LeaderboardDTO> getLeaderboard() {
+        return userRepository.getLeaderboard();
+    }
+
+    public List<StatisticsDto> getDailyStatistics(long id, long start, long end) {
+        return userRepository.getDailyStatistics(id, start, end);
+    }
+
+    public List<StatisticsDto> getMonthlyStatistics(long id, long start, long end) {
+        return userRepository.getMonthlyStatistics(id, start, end);
     }
 }
