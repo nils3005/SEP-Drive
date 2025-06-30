@@ -54,8 +54,8 @@ public class RideService {
         double price = rideRequestService.ridePrice(ridePriceDto);
 
         Ride ride = new Ride(driver, customer, rideDto.getSpeed(), price, rideDto.getDistance(), rideDto.getGeoJson(), rideDto.getDuration());
+        ride.setWaypoints(rideDto.getWaypoints());
         rideRepository.save(ride);
-
         activeRideRequest.setActive(false);
         rideRequestRepository.save(activeRideRequest);
     }

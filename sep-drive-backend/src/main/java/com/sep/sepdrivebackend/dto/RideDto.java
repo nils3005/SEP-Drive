@@ -4,6 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import com.sep.sepdrivebackend.entities.Location;
+
+import java.util.List;
+
 
 @Getter
 @Setter
@@ -16,4 +20,5 @@ public class RideDto {
     private float distance;
     private float duration;
     private String geoJson;
+    private List<Location> waypoints;
 }

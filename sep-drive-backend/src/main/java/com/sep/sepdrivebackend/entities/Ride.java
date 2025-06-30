@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 @Entity
 @Getter
@@ -41,4 +42,8 @@ public class Ride {
         this.status = RideStatus.PAUSED;
         this.coordsIndex = 0;
     }
+
+    @ElementCollection
+    @CollectionTable(name = "ride_waypoints", joinColumns = @JoinColumn(name = "ride_id"))
+    private List<Location> waypoints;
 }
