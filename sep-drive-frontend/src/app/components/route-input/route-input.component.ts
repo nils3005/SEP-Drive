@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {OpenRouteServiceService} from "../../services/openroute/open-route-service.service";
-import {AddressAutocompleteSuggestion, Coordinates, GeocodeFeature} from "../../types";
+import {Coordinates, GeocodeFeature} from "../../types";
 import {GeoService} from "../../services/geo/geo.service";
 import {CarType} from "../../enums/car-type";
 import {ErrorService} from "../../services/error/error.service";
@@ -233,7 +233,7 @@ export class RouteInputComponent {
             }
           },
           error: error => {
-            this.errorService.showError("Position konnte nicht gefunden")
+            this.errorService.showError("Position wurde nicht gefunden")
           }
         })
       } else {
@@ -253,7 +253,7 @@ export class RouteInputComponent {
             }
           },
           error: error => {
-            this.errorService.showError("Position konnte nicht gefunden")
+            this.errorService.showError("Position wurde nicht gefunden")
           }
         })
       } else {
