@@ -2,12 +2,7 @@ package com.sep.sepdrivebackend.controller;
 
 import com.sep.sepdrivebackend.dto.RideDto;
 import com.sep.sepdrivebackend.dto.RideUpdateDto;
-import com.sep.sepdrivebackend.entities.Ride;
-import com.sep.sepdrivebackend.exception.GeoJsonParsingException;
-import com.sep.sepdrivebackend.exception.RideNotFoundException;
-import com.sep.sepdrivebackend.exception.UserHasRideExcpetion;
-import com.sep.sepdrivebackend.exception.UserNotFoundException;
-import com.sep.sepdrivebackend.service.RideRequestService;
+import com.sep.sepdrivebackend.exception.*;
 import com.sep.sepdrivebackend.service.RideService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +49,22 @@ public class RideController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        } catch (RuntimeException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/updateRoute")
+    public ResponseEntity<?> updateRoute(@RequestBody RideUpdateDto rideUpdateDTO) {
+        try{
+            rideService.editRide(rideUpdateDTO);
+            return ResponseEntity.ok("Route updated");
+        } catch (RideNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (UserNotPartOfRideException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (InsufficientFundsException e){
+            return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(e.getMessage());
         } catch (RuntimeException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
