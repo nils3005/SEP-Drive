@@ -36,6 +36,7 @@ export class RideRequestSummaryComponent {
       if (data == null) {
         geoService.showInput.next(false);
       } else {
+        console.log(data);
         this.summaryData = data;
         this.rideSimulationStore.ridePrice.next(this.summaryData.price)
       }
@@ -53,7 +54,7 @@ export class RideRequestSummaryComponent {
 
   public minutesToHHMM(minutes: number): string {
     const hours = Math.floor(minutes / 60);
-    const mins = Math.floor(minutes % 60); // Ensure no fractions here
+    const mins = Math.floor(minutes % 60);
     return `${hours}:${mins.toString().padStart(2, '0')}`;
   }
 
@@ -111,7 +112,4 @@ export class RideRequestSummaryComponent {
     this.mapService.resetMap()
     this.geoService.showInput.next(true);
   }
-
-  protected readonly parseFloat = parseFloat;
-  protected readonly Util = Util;
 }

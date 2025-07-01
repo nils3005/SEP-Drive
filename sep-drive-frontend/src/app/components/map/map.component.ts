@@ -58,7 +58,7 @@ export class MapComponent implements AfterViewInit {
   }
 
   checkChanges(): void {
-    this.geoStoreService.stopps.asObservable().subscribe(stopps => {
+    this.geoStoreService.stops.asObservable().subscribe(stopps => {
         this.geoStoreService.routeLayer.clearLayers()
         this.geoStoreService.stoppsLayer.clearLayers()
         for (const stopp of stopps) {

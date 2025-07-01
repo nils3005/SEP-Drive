@@ -14,26 +14,37 @@ export class MapService {
     private geoStoreService: GeoStoreService
   ) { }
 
+
+  public flyMapTo(latitude: number, longitude: number, zoom: number, duration: number): void
+  {
+    this.geoStoreService.map?.flyTo([latitude, longitude],
+      zoom,
+      {
+        duration: duration
+      }
+    )
+  }
+
   public resetMap(): void
   {
     this.geoService.showInput.next(true)
     this.geoStoreService.start.next(null)
-    this.geoStoreService.stopps.next([])
+    this.geoStoreService.stops.next([])
     this.geoStoreService.destination.next(null)
     this.geoStoreService.route.next(undefined)
     this.geoStoreService.carType.next(null)
     this.geoStoreService.currentPoint.next(null)
-    this.geoService.flyMapTo(51.1657, 10.4515, 6, 1)
+    this.flyMapTo(51.1657, 10.4515, 6, 1)
   }
 
   public clearMap(): void
   {
     this.geoStoreService.start.next(null)
-    this.geoStoreService.stopps.next([])
+    this.geoStoreService.stops.next([])
     this.geoStoreService.destination.next(null)
     this.geoStoreService.route.next(undefined)
     this.geoStoreService.carType.next(null)
     this.rideSimulationStore.simulationLayer.clearLayers()
-    this.geoService.flyMapTo(51.1657, 10.4515, 6, 1)
+    this.flyMapTo(51.1657, 10.4515, 6, 1)
   }
 }
