@@ -1,7 +1,7 @@
 <form [formGroup]="routeForm" (ngSubmit)="onSubmit()" class="routeInputForm">
     <app-location-input placeholder="Start" [showGpsLocationButton]="true" (onLocationSelected)="onStartSelect($event)" [location]="this.geoStoreService.start.getValue()"/>
     @if (showStopInput) {
-      <app-location-stop-input />
+      <app-location-stop-input (onStopsChange)="onStopChange($event)"/>
     } @else {
       <div class="inputRow">
         <i class="fa-solid fa-plus" (click)="showStopInput = !showStopInput"></i>

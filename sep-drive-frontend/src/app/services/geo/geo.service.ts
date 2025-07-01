@@ -11,7 +11,6 @@ import {GeoStoreService} from '../../stores/geo/geo-store.service';
 export class GeoService {
   public showInput: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public rideRequestSummaryData: BehaviorSubject<RideRequestSummary | null> = new BehaviorSubject<RideRequestSummary | null>(null);
-
   public isSubmitted: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   constructor(
@@ -48,14 +47,14 @@ export class GeoService {
 
   public getCompleteCoordsArray(): number[][]
   {
-    let stops: GeocodeFeature[] = []
-    stops.concat(this.geoStoreService.stops.getValue());
+    let waypoints: GeocodeFeature[] = []
     const start = this.geoStoreService.start.getValue();
     const destination = this.geoStoreService.destination.getValue();
     if (start && destination) {
-      stops.unshift(start);
-      stops.push(destination);
+      waypoints.push(start);
+      waypoints = waypoints.concat(this.geoStoreService.stops.getValue());
+      waypoints.push(destination);
     }
-    return this.getCoordinateArray(stops);
+    return this.getCoordinateArray(waypoints);
   }
 }

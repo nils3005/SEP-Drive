@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Output} from '@angular/core';
 import {LocationInputComponent} from '../location-input/location-input.component';
-import {GeocodeFeature} from '../../../types';
+import {GeocodeFeature, RouteStopEventEmitterDto} from '../../../types';
 
 @Component({
   selector: 'app-location-stop-input',
@@ -11,7 +11,7 @@ import {GeocodeFeature} from '../../../types';
   styleUrl: './location-stop-input.component.scss'
 })
 export class LocationStopInputComponent {
-  @Output() onStopsChange: EventEmitter<GeocodeFeature[]> = new EventEmitter();
+  @Output() onStopsChange: EventEmitter<RouteStopEventEmitterDto> = new EventEmitter();
 
   public inputLocation: GeocodeFeature | null = null;
   public stops: GeocodeFeature[] = [];
@@ -19,11 +19,19 @@ export class LocationStopInputComponent {
   addStop($event: GeocodeFeature) {
     this.stops.push($event);
     this.inputLocation = null
-    this.onStopsChange.emit(this.stops);
+    this.onStopsChange.emit({
+      stops: this.stops,
+      changedStop: $event,
+      removed: false
+    });
   }
 
   removeStop($event: GeocodeFeature) {
     this.stops.splice(this.stops.indexOf($event), 1);
-    this.onStopsChange.emit(this.stops);
+    this.onStopsChange.emit({
+      stops: this.stops,
+      changedStop: $event,
+      removed: true
+    });
   }
 }

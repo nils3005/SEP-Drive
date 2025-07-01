@@ -223,3 +223,9 @@ export type Message = {
   message: string;
   seen: boolean;
 }
+
+export type RouteStopEventEmitterDto = {
+  stops: GeocodeFeature[],
+  changedStop: GeocodeFeature,
+  removed: boolean,
+}

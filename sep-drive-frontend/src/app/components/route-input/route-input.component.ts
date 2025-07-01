@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {GeocodeFeature} from "../../types";
+import {GeocodeFeature, RouteStopEventEmitterDto} from "../../types";
 import {GeoService} from "../../services/geo/geo.service";
 import {CarType} from "../../enums/car-type";
 import {ErrorService} from "../../services/error/error.service";
@@ -64,6 +64,13 @@ export class RouteInputComponent {
       this.geoService.calculateRoute()
     } else {
       this.errorService.showError("Alle Felder müssen ausgefüllt sein")
+    }
+  }
+
+  onStopChange($event: RouteStopEventEmitterDto) {
+    this.geoStoreService.stops.next($event.stops);
+    if (!$event.removed) {
+      this.geoStoreService.currentPoint.next($event.changedStop);
     }
   }
 }
