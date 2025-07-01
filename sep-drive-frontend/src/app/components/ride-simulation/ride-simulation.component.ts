@@ -11,6 +11,7 @@ import {Router} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {RideRequestService} from '../../services/riderequest/ride-request.service';
 import {BehaviorSubject} from 'rxjs';
+import {GeoStoreService} from '../../stores/geo/geo-store.service';
 
 @Component({
   selector: 'app-ride-simulation',
@@ -32,6 +33,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
     private rideRequestService: RideRequestService,
     private openRouteService: OpenRouteServiceService,
     private geoService: GeoService,
+    private geoStoreService: GeoStoreService,
     private webSocketService: WebsocketService,
     private router: Router
     ) {
@@ -84,7 +86,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
               next: data => {
                 if (data.body) {
                   this.rideSimulationStore.start.set(data.body.features[0].properties.label)
-                  this.geoService.updateStart(data.body.features[0], false)
+                  // this.geoService.updateStart(data.body.features[0], false)
                   const endCords: Coordinates = {
                     latitude: rideResponse.coords[rideResponse.coords.length - 1][0],
                     longitude: rideResponse.coords[rideResponse.coords.length - 1][1]
@@ -93,8 +95,8 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
                     next: data => {
                       if (data.body) {
                         this.rideSimulationStore.destination.set(data.body.features[0].properties.label)
-                        this.geoService.updateDestination(data.body.features[0], false)
-                        this.geoService.route.next(JSON.parse(rideResponse.ride.geoJson))
+                        // this.geoService.updateDestination(data.body.features[0], false)
+                        this.geoStoreService.route.next(JSON.parse(rideResponse.ride.geoJson))
                         this.rideData.next(this.getRideSummaryFromRide(rideResponse.ride, this.rideSimulationStore.start(), this.rideSimulationStore.destination()))
                         this.started = 0;
                         this.rideService.simulateRide()

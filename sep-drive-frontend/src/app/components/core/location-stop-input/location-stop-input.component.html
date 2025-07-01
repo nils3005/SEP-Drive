@@ -1,0 +1,10 @@
+<div>
+  <app-location-input placeholder="Zwischenstopp" [clearAfterSelect]="true" (onLocationSelected)="addStop($event)"/>
+
+  @for (stop of stops; track stop) {
+    <div class="stopRow">
+      <p>{{ stop.properties.label }}</p>
+      <i class="fa-solid fa-xmark" (click)="removeStop(stop)"></i>
+    </div>
+  }
+</div>

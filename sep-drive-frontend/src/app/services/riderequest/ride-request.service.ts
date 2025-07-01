@@ -5,6 +5,7 @@ import {GeoService} from '../geo/geo.service';
 import {CarType} from "../../enums/car-type";
 import {HttpClient, HttpResponse} from "@angular/common/http";
 import {OpenRouteServiceService} from "../openroute/open-route-service.service";
+import {GeoStoreService} from '../../stores/geo/geo-store.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,17 +16,18 @@ export class RideRequestService {
 
   constructor(
       private geoService:  GeoService,
-      private openRouteService: OpenRouteServiceService
+      private openRouteService: OpenRouteServiceService,
+      private geoStoreService:  GeoStoreService,
   ) { }
 
   public getRideData()
   {
     return {
-      start: this.geoService.waypoints.getValue()[0].properties.name,
-      destination: this.geoService.waypoints.getValue()[1].properties.name,
-      carType: this.geoService.carType.value,
-      distance: this.geoService.route.getValue().features[0].properties.summary.distance,
-      duration: this.geoService.route.getValue().features[0].properties.summary.duration,
+      start: this.geoStoreService.start.getValue()?.properties.name,
+      destination: this.geoStoreService.destination.getValue()?.properties.name,
+      carType: this.geoStoreService.carType.value,
+      distance: this.geoStoreService.route.getValue().features[0].properties.summary.distance,
+      duration: this.geoStoreService.route.getValue().features[0].properties.summary.duration,
     }
   }
 
@@ -139,9 +141,9 @@ export class RideRequestService {
       );
       const route = routeResponse.body;
       if (route) {
-        this.geoService.updateStart(startFeature)
-        this.geoService.updateDestination(endFeature)
-        this.geoService.route.next(route)
+        this.geoStoreService.start.next(startFeature)
+        this.geoStoreService.destination.next(endFeature)
+        this.geoStoreService.route.next(route)
         let jsonRoute: GeoJsonRoute = route;
 
         console.log(jsonRoute.features[0].properties.summary.distance)
@@ -151,8 +153,8 @@ export class RideRequestService {
         );
 
         return {
-          start: this.geoService.waypoints.getValue()[0].properties.label,
-          end: this.geoService.waypoints.getValue()[1].properties.label,
+          start: this.geoStoreService.start.getValue()?.properties.label ?? '',
+          end: this.geoStoreService.destination.getValue()?.properties.label ?? '',
           distance: parseFloat((jsonRoute.features[0].properties.summary.distance / 1000).toFixed(2)),
           duration: parseFloat((jsonRoute.features[0].properties.summary.duration / 60).toFixed(2)),
           price: price.body ? parseFloat(price.body.toFixed(2)) : 0,
@@ -174,18 +176,16 @@ export class RideRequestService {
 
   public async getRideRequestSummary(): Promise<RideRequestSummary | null>
   {
-    const carType = this.geoService.carType.getValue();
-    if (this.geoService.waypoints.getValue().length > 1 && this.geoService.route.getValue() && carType) {
-      let jsonRoute: GeoJsonRoute = this.geoService.route.getValue();
-      let waypointsLength = this.geoService.waypoints.getValue().length;
-      let stops = this.geoService.waypoints.getValue().slice(1, waypointsLength - 1);
+    const carType = this.geoStoreService.carType.getValue();
+    if (this.geoStoreService.start.getValue() && this.geoStoreService.destination.getValue() && this.geoStoreService.route.getValue() && carType) {
+      let jsonRoute: GeoJsonRoute = this.geoStoreService.route.getValue();
       const price = await firstValueFrom(
         this.getRidePrice(parseFloat(jsonRoute.features[0].properties.summary.distance.toFixed(2)), carType)
       )
       return {
-        start: this.geoService.waypoints.getValue()[0].properties.label,
-        stops: stops,
-        end: this.geoService.waypoints.getValue()[this.geoService.waypoints.getValue().length-1].properties.label,
+        start: this.geoStoreService.start.getValue()?.properties.label ?? '',
+        stops: this.geoStoreService.stopps.getValue(),
+        end: this.geoStoreService.destination.getValue()?.properties.label ?? '',
         distance: parseFloat((jsonRoute.features[0].properties.summary.distance / 1000).toFixed(2)),
         duration: parseFloat((jsonRoute.features[0].properties.summary.duration / 60).toFixed(2)),
         price: price.body ? parseFloat(price.body.toFixed(2)) : 0,

@@ -12,6 +12,7 @@ import {Observable} from 'rxjs';
 declare const L: any;
 import {GeoService} from '../geo/geo.service';
 import {Router} from "@angular/router";
+import {GeoStoreService} from '../../stores/geo/geo-store.service';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,8 @@ export class RideService {
   constructor(
     private rideSimulationStore: RideSimulationStore,
     private errorService: ErrorService,
-    private geoService: GeoService
+    private geoService: GeoService,
+    private geoStoreService: GeoStoreService
   ) {
   }
 
@@ -45,7 +47,7 @@ export class RideService {
           iconSize: L.point(27.5, 24)
         })
       });
-      this.rideSimulationStore.motionPolyLine.addTo(this.geoService.map);
+      this.rideSimulationStore.motionPolyLine.addTo(this.geoStoreService.map);
       this.checkUpdates()
     }
   }

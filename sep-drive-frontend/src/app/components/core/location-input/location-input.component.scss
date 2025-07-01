@@ -1,0 +1,42 @@
+.suggestions {
+  list-style: none;
+  margin-top: 250px;
+  padding: 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  position: absolute;
+  background: white;
+  width: 20%;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+li {
+  padding: 10px;
+  cursor: pointer;
+  font-family: Roboto Condensed, sans-serif;
+}
+
+li:hover {
+  background: #f0f0f0;
+}
+
+.imageButton {
+  height: 100%;
+  border: none;
+  background: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+}

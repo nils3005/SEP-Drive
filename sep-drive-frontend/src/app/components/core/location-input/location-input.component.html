@@ -13,9 +13,11 @@
         (blur)="onBlur()"
         (focus)="onFocus()"
       >
-      <button type="button" class="imageButton" (click)="getLocation()">
-        <i class="fa-solid fa-location-dot"></i>
-      </button>
+      @if (showGpsLocationButton) {
+        <button type="button" class="imageButton" (click)="getLocation()">
+          <i class="fa-solid fa-location-dot"></i>
+        </button>
+      }
     </div>
     @if(showSuggestions && suggestions.length > 0) {
       <ul class="suggestions">

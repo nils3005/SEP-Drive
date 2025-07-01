@@ -14,7 +14,9 @@ import {ErrorService} from '../../../services/error/error.service';
 })
 export class LocationInputComponent implements OnInit {
   @Input({required: true}) placeholder: string = ""
+  @Input() showGpsLocationButton: boolean = false;
   @Input() location: GeocodeFeature | null = null;
+  @Input() clearAfterSelect: boolean = false;
   @Output() onLocationSelected = new EventEmitter<GeocodeFeature>()
   public useCoords: boolean = false;
 
@@ -67,7 +69,11 @@ export class LocationInputComponent implements OnInit {
 
   onSelect(suggestion: GeocodeFeature) {
     this.suppressSuggestions = true;
-    this.locationForm.controls.locationInput.setValue(suggestion.properties.label);
+    if (this.clearAfterSelect) {
+      this.locationForm.controls.locationInput.setValue('');
+    } else {
+      this.locationForm.controls.locationInput.setValue(suggestion.properties.label);
+    }
     this.showSuggestions = false;
     this.onLocationSelected.emit(suggestion);
   }

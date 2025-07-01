@@ -5,7 +5,7 @@ import {GeoJsonRoute, RideDto, RideOffer, RideOfferNotification} from '../../typ
 
 import {WebsocketService} from "../../services/websocket/websocket.service";
 import {RideRequestService} from "../../services/riderequest/ride-request.service";
-import {firstValueFrom, Subscription} from "rxjs";
+import {Subscription} from "rxjs";
 import { Router } from '@angular/router';
 import {GeoService} from '../../services/geo/geo.service';
 import {RideService} from '../../services/ride/ride.service';
@@ -13,6 +13,7 @@ import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-s
 import {AuthService} from '../../services/auth/auth-service.service';
 import {ErrorService} from '../../services/error/error.service';
 import {ChatComponent} from "../chat/chat.component";
+import {GeoStoreService} from '../../stores/geo/geo-store.service';
 
 @Component({
   selector: 'app-rideoffers',
@@ -30,9 +31,7 @@ export class RideOffersComponent implements OnInit, OnDestroy {
   private rideRequestService: RideRequestService = inject(RideRequestService);
   private geoService = inject(GeoService);
   private rideService: RideService = inject(RideService);
-  private rideSimulationStore = inject(RideSimulationStore);
-  private authService: AuthService = inject(AuthService);
-  private errorService: ErrorService = inject(ErrorService);
+  private geoStoreService: GeoStoreService = inject(GeoStoreService);
 
   /** Aktuelle Liste, vom Websocket-Stream befüllt */
   offers = signal<RideOffer[]>([]);
@@ -143,9 +142,9 @@ export class RideOffersComponent implements OnInit, OnDestroy {
       this.rideOfferService.acceptOffer(offerId).subscribe({
         next: (rideOffer) => {
 
-          const start = this.geoService.getStart();
-          const destination = this.geoService.getDestination();
-          const route: GeoJsonRoute = this.geoService.route.getValue()
+          const start = this.geoStoreService.start.getValue();
+          const destination = this.geoStoreService.destination.getValue();
+          const route: GeoJsonRoute = this.geoStoreService.route.getValue()
 
           let rideDto: RideDto = {
             driverId: rideOffer.driverId,
@@ -159,7 +158,7 @@ export class RideOffersComponent implements OnInit, OnDestroy {
           console.log("customerId from acceptOffer: ", rideDto.customerId);
           console.log("driverid from acceptOffer: ", rideDto.driverId);
 
-          const carType = this.geoService.carType.getValue();
+          const carType = this.geoStoreService.carType.getValue();
           console.log(carType);
 
           this.rideService.createRide(rideDto);
