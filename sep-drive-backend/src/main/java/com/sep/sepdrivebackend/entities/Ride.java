@@ -26,12 +26,13 @@ public class Ride {
     private double price;
     private float distance;
     private float duration;
+    private CarType carType;
     private RideStatus status;
     private int coordsIndex;
     @Lob
     private String geoJson;
 
-    public Ride(User driver, User customer, float speed, double price, float distance, String geoJson, float duration) {
+    public Ride(User driver, User customer, float speed, double price, float distance, String geoJson, float duration, CarType carType) {
         this.driver = driver;
         this.customer = customer;
         this.speed = speed;
@@ -41,6 +42,7 @@ public class Ride {
         this.duration = duration;
         this.status = RideStatus.PAUSED;
         this.coordsIndex = 0;
+        this.carType = carType;
     }
 
     @Embedded
@@ -55,7 +57,7 @@ public class Ride {
             @AttributeOverride(name = "latitude", column = @Column(name = "end_latitude")),
             @AttributeOverride(name = "longitude", column = @Column(name = "end_longitude"))
     })
-    private Location endLocation;
+    private Location destination;
 
     @ElementCollection
     @CollectionTable(name = "ride_waypoints", joinColumns = @JoinColumn(name = "ride_id"))

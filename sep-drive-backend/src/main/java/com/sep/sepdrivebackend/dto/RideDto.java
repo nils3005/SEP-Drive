@@ -21,6 +21,6 @@ public class RideDto {
     private float duration;
     private String geoJson;
     private Location startLocation;
-    private Location endLocation;
+    private Location destination;
     private List<Location> waypoints;
 }

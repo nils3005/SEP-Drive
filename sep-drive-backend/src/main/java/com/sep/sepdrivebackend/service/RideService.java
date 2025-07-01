@@ -7,9 +7,7 @@ import com.sep.sepdrivebackend.dto.RideDto;
 import com.sep.sepdrivebackend.dto.RidePriceDto;
 import com.sep.sepdrivebackend.dto.RideUpdateDto;
 import com.sep.sepdrivebackend.entities.*;
-import com.sep.sepdrivebackend.exception.RideNotFoundException;
-import com.sep.sepdrivebackend.exception.UserHasRideExcpetion;
-import com.sep.sepdrivebackend.exception.UserNotFoundException;
+import com.sep.sepdrivebackend.exception.*;
 import com.sep.sepdrivebackend.repository.RideRepository;
 import com.sep.sepdrivebackend.repository.RideRequestRepository;
 import jakarta.transaction.Transactional;
@@ -41,6 +39,42 @@ public class RideService {
         this.financialsService = financialsService;
     }
 
+    //Live Änderung während der Fahrt
+    public void editRide(RideUpdateDto rideUpdateDto) throws RideNotFoundException, UserNotPartOfRideException, RideNotPausedException, InsufficientFundsException{
+        //Get current Ride and User
+        Ride ride = rideRepository.findById(rideUpdateDto.getRideId()).orElseThrow(()->new RideNotFoundException("Ride not found"));
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User customer = userService.findByUsername(username);
+
+        //Check if User part of Ride
+        if(!ride.getCustomer().getUsername().equals(username) && !ride.getDriver().getUsername().equals(username)) {
+            throw new UserNotPartOfRideException("User is not part of ride");
+        }
+        //Check if Ride is paused
+        if(ride.getStatus() != RideStatus.PAUSED) throw new RideNotPausedException("Ride is not paused");
+
+        //Get new price for the Ride
+        RidePriceDto rpd = new RidePriceDto(rideUpdateDto.getDistance(), ride.getCarType());
+        double price = rideRequestService.ridePrice(rpd);
+
+        //Check if Customer has enough money for new Ride
+        if(customer.getFinancials().getBalance() < price) throw new InsufficientFundsException("Customer is too broke to book this ride");
+
+        //Set new Data to Ride
+        ride.setPrice(price);
+        ride.setDistance(rideUpdateDto.getDistance());
+        ride.setGeoJson(rideUpdateDto.getGeoJson());
+        ride.setDuration(rideUpdateDto.getDuration());
+
+        //Set calculated price to rideUpdateDto
+        rideUpdateDto.setPrice((float)price);
+
+        //Update Ride in Database
+        rideRepository.save(ride);
+        //Send the new Ride information to all Clients through WebSocket
+        rideWebSocketController.sendMessage(rideUpdateDto);
+    }
+
     @Transactional
     public void addRide(RideDto rideDto) {
         User driver = userService.findByUserId(rideDto.getDriverId());
@@ -58,6 +92,7 @@ public class RideService {
         ride.setEndLocation(rideDto.getEndLocation());
         ride.setWaypoints(rideDto.getWaypoints());
         rideRepository.save(ride);
+
         activeRideRequest.setActive(false);
         rideRequestRepository.save(activeRideRequest);
     }
@@ -83,7 +118,6 @@ public class RideService {
         if(ride.getStatus() == RideStatus.COMPLETED) return;
         if(rideUpdateDTO.isCompleted()) {
             completeRide(ride, rideUpdateDTO);
-            /*wapoitnts aktualisieren wenn anders */
         }
         else {
             updateRideStatus(ride, rideUpdateDTO);
