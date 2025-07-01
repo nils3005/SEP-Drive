@@ -54,6 +54,8 @@ public class RideService {
         double price = rideRequestService.ridePrice(ridePriceDto);
 
         Ride ride = new Ride(driver, customer, rideDto.getSpeed(), price, rideDto.getDistance(), rideDto.getGeoJson(), rideDto.getDuration());
+        ride.setStartLocation(rideDto.getStartLocation());
+        ride.setEndLocation(rideDto.getEndLocation());
         ride.setWaypoints(rideDto.getWaypoints());
         rideRepository.save(ride);
         activeRideRequest.setActive(false);
@@ -81,6 +83,7 @@ public class RideService {
         if(ride.getStatus() == RideStatus.COMPLETED) return;
         if(rideUpdateDTO.isCompleted()) {
             completeRide(ride, rideUpdateDTO);
+            /*wapoitnts aktualisieren wenn anders */
         }
         else {
             updateRideStatus(ride, rideUpdateDTO);
