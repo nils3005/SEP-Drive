@@ -134,6 +134,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   sendMessage(message: string) {
+    const trimmed = message.trim();
+    if (!trimmed) return; // Verhindere Leertext
+
     if (!this.chatId()) {
       console.warn('Sendeverhinderung: chatId noch nicht gesetzt!');
       return;
