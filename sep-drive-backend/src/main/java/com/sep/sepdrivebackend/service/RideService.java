@@ -66,6 +66,11 @@ public class RideService {
         ride.setGeoJson(rideUpdateDto.getGeoJson());
         ride.setDuration(rideUpdateDto.getDuration());
 
+        if (rideUpdateDto.getWaypoints() != null) {
+            ride.setWaypoints(rideUpdateDto.getWaypoints());
+        }
+
+
         //Set calculated price to rideUpdateDto
         rideUpdateDto.setPrice((float)price);
 
@@ -87,9 +92,9 @@ public class RideService {
         RidePriceDto ridePriceDto = new RidePriceDto(rideDto.getDistance(), activeRideRequest.getCarType());
         double price = rideRequestService.ridePrice(ridePriceDto);
 
-        Ride ride = new Ride(driver, customer, rideDto.getSpeed(), price, rideDto.getDistance(), rideDto.getGeoJson(), rideDto.getDuration());
+        Ride ride = new Ride(driver, customer, rideDto.getSpeed(), price, rideDto.getDistance(), rideDto.getGeoJson(), rideDto.getDuration(), activeRideRequest.getCarType());
         ride.setStartLocation(rideDto.getStartLocation());
-        ride.setEndLocation(rideDto.getEndLocation());
+        ride.setDestination(rideDto.getDestination());
         ride.setWaypoints(rideDto.getWaypoints());
         rideRepository.save(ride);
 

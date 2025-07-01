@@ -1,5 +1,6 @@
 package com.sep.sepdrivebackend.dto;
 
+import com.sep.sepdrivebackend.entities.CarType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,4 +24,5 @@ public class RideDto {
     private Location startLocation;
     private Location destination;
     private List<Location> waypoints;
+
 }

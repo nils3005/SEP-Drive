@@ -18,12 +18,12 @@ public class RideUpdateDto {
     private float speed;
     private int coordsIndex;
     private Long historyId;
+    private List<Location> waypoints;
 
     private float price;
     private float distance;
     private float duration;
     private String geoJson;
-    private List<Location> newWaypoints;
 
 
 }
