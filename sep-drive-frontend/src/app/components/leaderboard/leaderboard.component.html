@@ -27,12 +27,16 @@
 
       <ng-container matColumnDef="distance">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Gesamtdistanz</th>
-        <td mat-cell *matCellDef="let leaderboard">{{ leaderboard.distance / 1000 | number:'1.0-2' }} km</td>
+        <td mat-cell *matCellDef="let leaderboard">{{
+            leaderboard.distance == undefined || leaderboard.distance < 0 ? 0 :
+            leaderboard.distance / 1000 | number:'1.0-2' }} km</td>
       </ng-container>
 
       <ng-container matColumnDef="money">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Einnahmen</th> // ?? Null coalescing operator
-        <td mat-cell *matCellDef="let leaderboard">{{ leaderboard.money ?? 0 | number:'1.0-2'}} €</td>
+        <td mat-cell *matCellDef="let leaderboard">{{
+            leaderboard.money == undefined || leaderboard.money < 0 ? 0 : leaderboard.money |
+              number:'1.0-2'}} €</td>
       </ng-container>
 
       <ng-container matColumnDef="numberOfRides">
@@ -50,7 +54,9 @@
 
       <ng-container matColumnDef="driveTime">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Gefahrene Zeit</th>
-        <td mat-cell *matCellDef="let leaderboard"> {{ leaderboard.driveTime / 60 | number:'1.0-2' }} min</td>
+        <td mat-cell *matCellDef="let leaderboard"> {{
+            leaderboard.driveTime == undefined || leaderboard.driveTime < 0 ? 0 : leaderboard.driveTime / 60 |
+              number:'1.0-2' }} min</td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns" class="!bg-[#dbabab]"></tr>
