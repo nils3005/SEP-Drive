@@ -22,7 +22,7 @@
 
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-        <td mat-cell *matCellDef="let leaderboard">{{ leaderboard.name }} ({{leaderboard.username}})</td>
+        <td mat-cell *matCellDef="let leaderboard">{{ leaderboard.name ?? "#NONAME"}} ({{leaderboard.username ?? "#NOUSERNAME"}})</td>
       </ng-container>
 
       <ng-container matColumnDef="distance">
