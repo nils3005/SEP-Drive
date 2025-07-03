@@ -67,6 +67,7 @@ export class RideRequestSummaryComponent {
         this.rideRequestService.requestRide(
             start,
             destination,
+            this.geoStoreService.stops.getValue(),
             carType.toUpperCase()
         ).subscribe({
           next: () => {

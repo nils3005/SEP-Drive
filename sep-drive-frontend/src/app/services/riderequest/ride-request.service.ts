@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {GeocodeFeature, GeoJsonRoute, RideRequest, RideRequestSummary} from '../../types';
+import {Coordinates, GeocodeFeature, GeoJsonRoute, RideRequest, RideRequestSummary} from '../../types';
 import {BehaviorSubject, firstValueFrom, Observable, of} from 'rxjs';
 import {GeoService} from '../geo/geo.service';
 import {CarType} from "../../enums/car-type";
@@ -31,13 +31,14 @@ export class RideRequestService {
     }
   }
 
-  public requestRide (start: GeocodeFeature, destination: GeocodeFeature, carType: string): Observable<HttpResponse<any>>
+  public requestRide (start: GeocodeFeature, destination: GeocodeFeature, stops: GeocodeFeature[], carType: string): Observable<HttpResponse<any>>
   {
     const rideRequest = {
       startLocation: {
         latitude: start.geometry.coordinates[1],
         longitude: start.geometry.coordinates[0]
       },
+      stops: this.getCoordinateArrayFromGeocodeFeatures(stops),
       destination: {
         latitude: destination.geometry.coordinates[1],
         longitude: destination.geometry.coordinates[0]
@@ -194,5 +195,18 @@ export class RideRequestService {
         observe: 'response'
       }
     )
+  }
+
+  public getCoordinateArrayFromGeocodeFeatures(geocodeFeatures: GeocodeFeature[]): Coordinates[]
+  {
+    let coordinates: Coordinates[] = [];
+
+    for (const geocodeFeature of geocodeFeatures) {
+        coordinates.push({
+          latitude: geocodeFeature.geometry.coordinates[1],
+          longitude: geocodeFeature.geometry.coordinates[0],
+        })
+    }
+    return coordinates;
   }
 }
