@@ -137,8 +137,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       console.warn('Sendeverhinderung: chatId noch nicht gesetzt!');
       return;
     }
-    console.log(message, this.chatId()!);
-    this.chatService.sendMessage(this.chatId()!, message).subscribe({
+    this.chatService.sendMessage(this.chatId()!, trimmed).subscribe({
       next: _ => {
         this.chatService.getChat(this.chatId()!).subscribe({
           next: chat => {
