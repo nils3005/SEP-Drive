@@ -223,3 +223,13 @@ export type Message = {
   message: string;
   seen: boolean;
 }
+
+export type StatisticsDto = {
+  timespan: number;
+  username: string;
+  drivenRides: number;
+  income: number;
+  drivenDistance: number;
+  drivenTime: number;
+  averageRating: number;
+}

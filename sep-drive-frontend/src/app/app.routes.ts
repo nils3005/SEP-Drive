@@ -10,6 +10,7 @@ import { PaymentMethodComponent } from './components/payment-method/payment-meth
 import {BalanceComponent} from './components/balance/balance.component';
 import {DrivinghistoryComponent} from './components/drivinghistory/drivinghistory.component';
 import {SimulationPageComponent} from "./pages/simulation-page/simulation-page.component";
+import {StatisticsComponent} from './components/statistics/statistics.component';
 
 export const routes: Routes = [{ path: 'login', component: LoginComponent },
   { path: 'password', component: PasswordComponent },
@@ -22,5 +23,6 @@ export const routes: Routes = [{ path: 'login', component: LoginComponent },
   { path: 'payment-method', component: PaymentMethodComponent },
   { path: 'balance' , component: BalanceComponent },
   { path: 'simulation', component: SimulationPageComponent },
+  { path: 'statistics', component: StatisticsComponent },
   { path: '**', redirectTo: '' }
 ];

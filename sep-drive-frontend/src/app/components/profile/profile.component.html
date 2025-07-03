@@ -79,6 +79,11 @@
               <button (click)= "drivinghistory()" class="bg-[#914141] text-white hover:bg-[#733C3C] rounded h-13 px-4 py-2">
                 Fahrthistorie
               </button>
+              @if (rolleFahrer()){
+                <button (click)= "statistics()" class="bg-[#914141] text-white hover:bg-[#733C3C] rounded h-13 px-4 py-2">
+                  Statistik
+                </button>
+              }
             </div>
           }
         </div>

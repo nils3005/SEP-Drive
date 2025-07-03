@@ -74,4 +74,14 @@ export class ProfileComponent {
   }
 
 
+  rolleFahrer = computed(() => {
+    const current = this.auth.user();
+
+
+    return !!current && current?.role==='DRIVER';
+  });
+
+  statistics() {
+    this.router.navigate(['/statistics']);
+  }
 }
