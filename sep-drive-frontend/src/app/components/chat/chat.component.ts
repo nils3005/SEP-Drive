@@ -16,7 +16,7 @@ import {WebsocketService} from "../../services/websocket/web-socket.service";
 import {Chat, Message, RideOffer} from "../../types";
 import {AuthService} from "../../services/auth/auth-service.service";
 import {RideofferService} from "../../services/rideoffer/rideoffer.service";
-import {Subscription, switchMap} from "rxjs";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-chat',
@@ -27,9 +27,9 @@ import {Subscription, switchMap} from "rxjs";
   styleUrl: './chat.component.scss'
 })
 export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input('rideOfferId') rideOfferId: number | null = null;
+  @Input('rideOfferId') rideOfferId: number | null = null; // Nur gesetzt, wenn man aus Kunden-View kommt
   @ViewChild('chatInput') chatInputRef!: ElementRef<HTMLTextAreaElement>;
-  @ViewChild('messagesContainer') messagesContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('messagesContainer') messagesContainerRef!: ElementRef<HTMLDivElement>;
   @ViewChild('editInput') editInputRef!: ElementRef<HTMLInputElement>;
 
   private chatService: ChatService = inject(ChatService);
@@ -128,7 +128,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     this.sub?.unsubscribe();
   }
 
-  sendMessage(message: string) {
+  sendMessage() {
+    const message = this.newMessage();
     const trimmed = message.trim();
     if (!trimmed) return; // Verhindere Leertext
 
@@ -203,8 +204,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private scrollToBottom(): void {
     setTimeout(() => { // Damit nach dem Rendern gescrollt wird
-      if (this.messagesContainer?.nativeElement) {
-        this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
+      if (this.messagesContainerRef?.nativeElement) {
+        this.messagesContainerRef.nativeElement.scrollTop = this.messagesContainerRef.nativeElement.scrollHeight;
       }
     }, 0);
   }
@@ -215,7 +216,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     const kEvent = event as KeyboardEvent;
     if(!kEvent.shiftKey) {
       event.preventDefault();
-      this.sendMessage(this.newMessage());
+      this.sendMessage();
     }
   }
 }

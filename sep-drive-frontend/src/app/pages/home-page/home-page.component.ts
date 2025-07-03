@@ -25,8 +25,7 @@ import {toObservable, toSignal} from "@angular/core/rxjs-interop";
     RideOffersComponent,
     RideRequestListComponent,
     RouterLink,
-    ChatComponent,
-    AsyncPipe
+    ChatComponent
   ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'
@@ -40,19 +39,19 @@ export class HomePageComponent implements OnInit {
   private router: Router = inject(Router)
   public rideOfferService: RideofferService = inject(RideofferService);
 
-  user$ = toObservable(this.authService.user);
+  user$ = toObservable(this.authService.user); // Observable notwendig für Polling
   hasRideOffer = toSignal(
-      interval(3000).pipe(             // alle 3 Sekunden
-          startWith(0),
-          switchMap(() => this.user$),            // Wenn user() ein Signal ist:
-          switchMap(user => {
+      interval(3000).pipe(             // alle 3 Sekunden, pipe verkettet rxjs operatoren
+          startWith(0),                // Sofort beim Start event emittieren
+          switchMap(() => this.user$),   // Bei jedem Tick wird user subscribed
+          switchMap(user => {                       // Für das Ergebnis aus dem susbcribe (user) prüfen ob Fahrer
             if (user?.role === 'DRIVER') {
               return this.rideOfferService.getPendingOfferForDriver(user.id).pipe(
-                  map(offer => !!offer),
+                  map(offer => !!offer), // wenn offer existiert, signal auf true setzen
                   catchError(() => of(false))
               );
             } else {
-              return of(false);
+              return of(false); // User ist Kunde => kein offer => signal ist false
             }
           })
       ),
