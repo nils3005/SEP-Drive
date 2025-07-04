@@ -10,8 +10,10 @@ import { PaymentMethodComponent } from './components/payment-method/payment-meth
 import {BalanceComponent} from './components/balance/balance.component';
 import {DrivinghistoryComponent} from './components/drivinghistory/drivinghistory.component';
 import {SimulationPageComponent} from "./pages/simulation-page/simulation-page.component";
+import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 
-export const routes: Routes = [{ path: 'login', component: LoginComponent },
+export const routes: Routes = [
+  { path: 'login', component: LoginComponent },
   { path: 'password', component: PasswordComponent },
   { path: 'authentication', component: AuthenticationComponent},
   { path: 'register', component: RegistrierungComponent},
@@ -22,5 +24,6 @@ export const routes: Routes = [{ path: 'login', component: LoginComponent },
   { path: 'payment-method', component: PaymentMethodComponent },
   { path: 'balance' , component: BalanceComponent },
   { path: 'simulation', component: SimulationPageComponent },
+  { path: 'leaderboard', component: LeaderboardComponent },
   { path: '**', redirectTo: '' }
 ];
