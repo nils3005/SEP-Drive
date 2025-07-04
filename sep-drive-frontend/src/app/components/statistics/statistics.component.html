@@ -29,8 +29,7 @@
       </button>
     </div>
 
-    <!-- Charts -->
-    <div *ngIf="statistics.length > 0" class="space-y-8">
+    <div *ngIf="statistics.length >= 0" class="space-y-8">
       <div class="bg-white rounded shadow p-4">
         <h3 class="text-lg font-semibold mb-2">Einnahmen</h3>
         <canvas baseChart
