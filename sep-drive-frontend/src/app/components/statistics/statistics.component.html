@@ -31,7 +31,7 @@
 
     <div *ngIf="statistics.length >= 0" class="space-y-8">
       <div class="bg-white rounded shadow p-4">
-        <h3 class="text-lg font-semibold mb-2">Einnahmen</h3>
+        <h3 class="text-lg font-semibold mb-2">Einnahmen (in EUR)</h3>
         <canvas baseChart
                 [data]="incomeChartData"
                 [options]="chartOptions"
@@ -40,7 +40,7 @@
       </div>
 
       <div class="bg-white rounded shadow p-4">
-        <h3 class="text-lg font-semibold mb-2">Gefahrene Distanz</h3>
+        <h3 class="text-lg font-semibold mb-2">Gefahrene Distanz (in Km)</h3>
         <canvas baseChart
                 [data]="distanceChartData"
                 [options]="chartOptions"
@@ -49,7 +49,7 @@
       </div>
 
       <div class="bg-white rounded shadow p-4">
-        <h3 class="text-lg font-semibold mb-2">Fahrzeit</h3>
+        <h3 class="text-lg font-semibold mb-2">Fahrzeit (in Min.)</h3>
         <canvas baseChart
                 [data]="timeChartData"
                 [options]="chartOptions"
