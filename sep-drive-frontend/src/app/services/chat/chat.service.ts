@@ -13,18 +13,11 @@ export class ChatService {
   /**
    * Erstellt neuen Chat mit Customer
    */
-  createChat(customerId: number, driverId: number): Observable<any> {
+  createChat(customerId: number, driverId: number): Observable<number> {
     const params = new HttpParams()
         .set('customerId', customerId + '')
         .set('driverId', driverId + '');
-    return this.http.post(`${this.apiUrl}/create`, null, { params });
-  }
-
-  /**
-   * Holt alle Chats für den User
-   */
-  getAllChats(): Observable<Chat[]> {
-    return this.http.get<Chat[]>(`${this.apiUrl}/all`);
+    return this.http.post<number>(`${this.apiUrl}/create`, null, { params });
   }
 
   /**
@@ -71,12 +64,5 @@ export class ChatService {
    */
   markAsRead(chatId: number, messageId: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/markAsRead/${chatId}/${messageId}`, {});
-  }
-
-  /**
-   * Löscht einen Chat
-   */
-  deleteChat(chatId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/delete/${chatId}`);
   }
 }

@@ -1,7 +1,6 @@
 import {
   AfterViewInit,
   Component,
-  effect,
   ElementRef,
   inject,
   Input,
@@ -46,10 +45,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   public messages = signal<Message[] | null>(null);
 
   constructor() {
-    effect(() => {
-      this.messages(); // Signals lösen aus
-      this.scrollToBottom();
-    });
+    this.scrollToBottom();
   }
 
   ngOnInit(): void {
@@ -88,7 +84,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loadMessages(chat);
         this.subscribeToChat(chat);
       },
-      error: err => {
+      error: _ => {
         // Chat existiert nicht
         this.chatService.createChat(customerId, driverId).subscribe({
           next: (chatId: number) => {
@@ -118,9 +114,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  // Wird aufgerufen, wenn das HTML gerendert ist. Erst dann kann man auf die Objekte zugreifen
   ngAfterViewInit(): void {
     // Beim Laden Textarea fokussieren
-    this.chatInputRef.nativeElement.focus();
+    this.chatInputRef.nativeElement.focus(); // Mit nativeElement bekommt man das echte DOM Objekt vom Typ HTMLTextAreaElement
   }
 
   ngOnDestroy(): void {
@@ -134,9 +131,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!trimmed) return; // Verhindere Leertext
 
     if (!this.chatId()) {
-      console.warn('Sendeverhinderung: chatId noch nicht gesetzt!');
+      console.warn('Konnte Nachricht nicht senden, weil chatId noch nicht gesetzt ist');
       return;
     }
+
     this.chatService.sendMessage(this.chatId()!, trimmed).subscribe({
       next: _ => {
         this.chatService.getChat(this.chatId()!).subscribe({
@@ -147,6 +145,18 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         this.newMessage.set('');
       }
     });
+  }
+
+  /**
+   * Damit Enter die Nachricht sendet und kein Zeilenumbruch hinzufügt und Shift + Enter eine neue Zeile hinzufügt
+   */
+  sendMessageWrapper(event: Event) {
+    // Nur Enter ohne Shift schickt Nachricht ab
+    const kEvent = event as KeyboardEvent;
+    if(!kEvent.shiftKey) {
+      event.preventDefault(); // Verhindert, dass eine neue Zeile hinzugefügt wird
+      this.sendMessage();
+    }
   }
 
   startEdit(message: Message) {
@@ -173,8 +183,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cancelEdit();
       },
       error: err => {
-        alert('Bearbeiten fehlgeschlagen:\n' + (err?.error ?? err));
-        // Bleibe ggf. im Edit-Mode
+        alert('Bearbeiten fehlgeschlagen: ' + (err?.error ?? err));
+        this.cancelEdit(); // Schließt die Edit-View, z.B. wenn ein User eine Nachricht bearbeitet, der andere User die Nachricht erst sieht, wenn der andere schon in der Edit-View ist
       }
     });
   }
@@ -199,23 +209,19 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
     }
+    this.scrollToBottom();
   }
 
+  /**
+   * Scroll den Message Container immer nach unten, damit die neue Nachricht zu sehen ist.
+   */
   private scrollToBottom(): void {
-    setTimeout(() => { // Damit nach dem Rendern gescrollt wird
+    // Das setTimeout() verschiebt den Callback auf den nächsten Tick in der Event-Queue von JavaScript
+    // Trick, um asynchron auf das vollständige Rendern der View zu warten
+    setTimeout(() => {
       if (this.messagesContainerRef?.nativeElement) {
         this.messagesContainerRef.nativeElement.scrollTop = this.messagesContainerRef.nativeElement.scrollHeight;
       }
     }, 0);
-  }
-
-  // Damit Enter die Nachricht sendet und kein Zeilenumbruch hinzufügt und Shift + Enter eine neue Zeile hinzufügt
-  sendMessageWrapper(event: Event) {
-    // Nur Enter ohne Shift schickt Nachricht ab
-    const kEvent = event as KeyboardEvent;
-    if(!kEvent.shiftKey) {
-      event.preventDefault();
-      this.sendMessage();
-    }
   }
 }
