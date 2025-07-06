@@ -38,7 +38,7 @@ export class RideRequestService {
         latitude: start.geometry.coordinates[1],
         longitude: start.geometry.coordinates[0]
       },
-      stops: this.getCoordinateArrayFromGeocodeFeatures(stops),
+      waypoints: this.getCoordinateArrayFromGeocodeFeatures(stops),
       destination: {
         latitude: destination.geometry.coordinates[1],
         longitude: destination.geometry.coordinates[0]
@@ -118,17 +118,36 @@ export class RideRequestService {
         latitude: rideRequest.destination.latitude,
       })
     );
+    let stops: GeocodeFeature[] = [];
+    for (const stop of rideRequest.waypoints) {
+      const stopResponse = await firstValueFrom(
+        this.openRouteService.getGeocodeFeatureByCoordinates({
+          longitude: stop.longitude,
+          latitude: stop.latitude
+        })
+      )
+      if (stopResponse.body) {
+        stops.push(stopResponse.body.features[0])
+      }
+    }
     const startFeature = startResponse.body?.features[0]
     const endFeature = endFeatureResponse.body?.features[0]
 
+
+
     if (startFeature && endFeature) {
-      const cordsArray = this.geoService.getCoordinateArray([startFeature, endFeature]);
+      let waypointsArray: GeocodeFeature[] = [];
+      waypointsArray.push(startFeature);
+      waypointsArray = waypointsArray.concat(stops);
+      waypointsArray.push(endFeature);
+      const cordsArray = this.geoService.getCoordinateArray(waypointsArray);
       const routeResponse = await firstValueFrom(
           this.openRouteService.getRouteFromPointArray(cordsArray)
       );
       const route = routeResponse.body;
       if (route) {
         this.geoStoreService.start.next(startFeature)
+        this.geoStoreService.stops.next(stops)
         this.geoStoreService.destination.next(endFeature)
         this.geoStoreService.route.next(route)
         let jsonRoute: GeoJsonRoute = route;
@@ -146,7 +165,7 @@ export class RideRequestService {
           duration: parseFloat((jsonRoute.features[0].properties.summary.duration / 60).toFixed(2)),
           price: price.body ? parseFloat(price.body.toFixed(2)) : 0,
           carType: rideRequest.carType[0] + rideRequest.carType.slice(1).toLowerCase(),
-          stops: []
+          waypoints: stops
         };
       }
     }
@@ -154,7 +173,7 @@ export class RideRequestService {
       start: "",
       end: "",
       distance: 0,
-      stops: [],
+      waypoints: [],
       duration: 0,
       price: 0,
       carType: ""
@@ -172,7 +191,7 @@ export class RideRequestService {
       console.log(this.geoStoreService.stops.getValue());
       return {
         start: this.geoStoreService.start.getValue()?.properties.label ?? '',
-        stops: this.geoStoreService.stops.getValue(),
+        waypoints: this.geoStoreService.stops.getValue(),
         end: this.geoStoreService.destination.getValue()?.properties.label ?? '',
         distance: parseFloat((jsonRoute.features[0].properties.summary.distance / 1000).toFixed(2)),
         duration: parseFloat((jsonRoute.features[0].properties.summary.duration / 60).toFixed(2)),

@@ -153,7 +153,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
     console.log(ride)
     return {
       start: start,
-      stops: [],
+      waypoints: [],
       end: end,
       distance: parseFloat((ride.distance / 1000).toFixed(2)),
       duration: parseFloat((ride.duration / 60).toFixed(2)),

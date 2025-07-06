@@ -78,6 +78,7 @@ export type RideRequest = {
   customer: User
   startLocation: Coordinates
   destination: Coordinates
+  waypoints: Coordinates[]
   carType: CarType
   active: boolean
   createdAt: string
@@ -107,7 +108,7 @@ export type RideOfferNotification = {
 
 export type RideRequestSummary = {
   start: string
-  stops: GeocodeFeature[]
+  waypoints: GeocodeFeature[]
   end: string
   distance: number
   duration: number

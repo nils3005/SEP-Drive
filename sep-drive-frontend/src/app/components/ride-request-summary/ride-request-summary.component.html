@@ -7,8 +7,8 @@
             <div class="infoText">{{ summaryData?.start }}</div>
         </div>
     </div>
-    @if (summaryData?.stops) {
-      @for (stop of summaryData?.stops; track stop; let i = $index) {
+    @if (summaryData?.waypoints) {
+      @for (stop of summaryData?.waypoints; track stop; let i = $index) {
         <div class="infoField">
           <div class="infoLabel">
             <div class="infoText">Zwischenstopp {{ i + 1 }}</div>
