@@ -36,4 +36,16 @@
       </div>
     }
   </div>
+  @if (rideSimulationStore.rideData.getValue().paused) {
+    @if (showStopInput) {
+<!--      <app-location-stop-input (onStopsChange)="onStopChange($event)"/>-->
+      <app-location-stop-input />
+    } @else {
+      <div class="inputRow">
+        <i class="fa-solid fa-plus" (click)="showStopInput = !showStopInput"></i>
+      </div>
+    }
+<!--    <app-location-input placeholder="Ziel" (onLocationSelected)="onDestinationSelect($event)" [location]="geoStoreService.destination.getValue()"/>-->
+    <app-location-input placeholder="Ziel" />
+  }
 </div>

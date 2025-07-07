@@ -12,10 +12,12 @@ import {toSignal} from '@angular/core/rxjs-interop';
 import {RideRequestService} from '../../services/riderequest/ride-request.service';
 import {BehaviorSubject} from 'rxjs';
 import {GeoStoreService} from '../../stores/geo/geo-store.service';
+import {LocationInputComponent} from '../core/location-input/location-input.component';
+import {LocationStopInputComponent} from '../core/location-stop-input/location-stop-input.component';
 
 @Component({
   selector: 'app-ride-simulation',
-  imports: [DataDisplayComponent],
+  imports: [DataDisplayComponent, LocationInputComponent, LocationStopInputComponent],
   templateUrl: './ride-simulation.component.html',
   styleUrl: './ride-simulation.component.scss',
 })
@@ -25,6 +27,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
   private started: number = 0;
 
   public rideData: BehaviorSubject<RideRequestSummary | null> = new BehaviorSubject<RideRequestSummary | null>(null);
+  public showStopInput: boolean = false;
 
   constructor(
     private mapService: MapService,
