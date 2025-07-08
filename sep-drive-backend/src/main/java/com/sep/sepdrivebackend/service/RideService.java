@@ -28,7 +28,6 @@ public class RideService {
     private final RideRequestService rideRequestService;
     private final RideRequestRepository rideRequestRepository;
     private final FinancialsService financialsService;
-    private final RouteOptimizationService routeOptimizationService   ;
 
 
     public RideService(RideRepository rideRepository, RideWebSocketController rideWebSocketController, UserService userService, GeoJsonRouteParser geoJsonRouteParser, HistoryService historyService, RideRequestService rideRequestService, RideRequestRepository rideRequestRepository, FinancialsService financialsService, RouteOptimizationService routeOptimizationService) {
@@ -40,7 +39,6 @@ public class RideService {
         this.rideRequestService = rideRequestService;
         this.rideRequestRepository = rideRequestRepository;
         this.financialsService = financialsService;
-        this.routeOptimizationService = routeOptimizationService;
     }
 
 
@@ -104,23 +102,6 @@ public class RideService {
         ride.setStartLocation(rideDto.getStartLocation());
         ride.setDestination(rideDto.getDestination());
 
-        
-        List<Location> optimizedWaypoints = routeOptimizationService.getOptimizedWaypoints(
-                rideDto.getStartLocation(),
-                rideDto.getWaypoints()
-        );
-
-        String optimizedGeoJson = geoJsonRouteParser.generateGeoJson(
-                rideDto.getStartLocation(),
-                optimizedWaypoints,
-                rideDto.getDestination()
-        );
-
-        ride.setOptimizedWaypoints(optimizedWaypoints);
-        ride.setGeoJson(optimizedGeoJson);
-
-
-        
 
         ride.setWaypoints(rideDto.getWaypoints());
         rideRepository.save(ride);

@@ -61,49 +61,6 @@ public class GeoJsonRouteParser {
         return 1000 * R * c;
     }
 
-    public String generateGeoJson(Location start, List<Location> waypoints, Location destination) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            List<double[]> coordsList = new ArrayList<>();
-            coordsList.add(new double[]{Double.parseDouble(start.getLongitude()), Double.parseDouble(start.getLatitude())});
-            if (waypoints != null) {
-                for (Location wp : waypoints) {
-                    coordsList.add(new double[]{
-                            Double.parseDouble(wp.getLongitude()),
-                            Double.parseDouble(wp.getLatitude())
-                    });
-                }
-            }
-            coordsList.add(new double[]{Double.parseDouble(destination.getLongitude()), Double.parseDouble(destination.getLatitude())});
-
-            ObjectNode geometry = objectMapper.createObjectNode();
-            geometry.put("type", "LineString");
-            ArrayNode coordinates = objectMapper.createArrayNode();
-            for (double[] coord : coordsList) {
-                ArrayNode point = objectMapper.createArrayNode();
-                point.add(coord[0]);
-                point.add(coord[1]);
-                coordinates.add(point);
-            }
-            geometry.set("coordinates", coordinates);
-
-            ObjectNode feature = objectMapper.createObjectNode();
-            feature.put("type", "Feature");
-            feature.set("geometry", geometry);
-
-            ArrayNode features = objectMapper.createArrayNode();
-            features.add(feature);
-
-            ObjectNode geoJson = objectMapper.createObjectNode();
-            geoJson.put("type", "FeatureCollection");
-            geoJson.set("features", features);
-
-            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(geoJson);
-        } catch (Exception e) {
-            throw new GeoJsonParsingException("Failed to generate GeoJSON.");
-        }
-    }
 
 }
 
