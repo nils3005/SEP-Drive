@@ -38,15 +38,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private sub?: Subscription;
   public editingMessage: Message | null = null;
-  public editedMessageText: string = '';
-
-  public newMessage = signal('');
-  public chatId = signal<number | null>(null);
-  public messages = signal<Message[] | null>(null);
-
-  constructor() {
-    this.scrollToBottom();
-  }
+  public editedMessageText: string | null = null;
+  public newMessage: string | null = null;
+  public chatId: number | null = null;
+  public messages: Message[] | null = null;
 
   ngOnInit(): void {
     // Aus der RideOffer holt man sich entsprechend die Id des anderen Users
@@ -80,7 +75,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chatService.getChatsByUsers(customerId, driverId).subscribe({
       next: chat => {
         // Chat existiert
-        this.chatId.set(chat.id);
+        this.chatId = chat.id;
         this.loadMessages(chat);
         this.subscribeToChat(chat);
       },
@@ -91,15 +86,14 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
             // Chat existiert nach dem Erstellen
             this.chatService.getChat(chatId).subscribe({
               next: (chat: Chat) => {
-                this.chatId.set(chat.id);
-                this.loadMessages(chat);
+                this.chatId = chat.id;
                 this.subscribeToChat(chat);
               }
             })
           },
           error: err => {
             console.log('Chat konnte nicht erstellt werden', err)
-            this.chatId.set(null);
+            this.chatId = null;
           }
         });
       }
@@ -118,6 +112,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     // Beim Laden Textarea fokussieren
     this.chatInputRef.nativeElement.focus(); // Mit nativeElement bekommt man das echte DOM Objekt vom Typ HTMLTextAreaElement
+    this.scrollToBottom();
   }
 
   ngOnDestroy(): void {
@@ -126,23 +121,23 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   sendMessage() {
-    const message = this.newMessage();
-    const trimmed = message.trim();
+    const message = this.newMessage;
+    const trimmed = message?.trim();
     if (!trimmed) return; // Verhindere Leertext
 
-    if (!this.chatId()) {
+    if (!this.chatId) {
       console.warn('Konnte Nachricht nicht senden, weil chatId noch nicht gesetzt ist');
       return;
     }
 
-    this.chatService.sendMessage(this.chatId()!, trimmed).subscribe({
+    this.chatService.sendMessage(this.chatId!, trimmed).subscribe({
       next: _ => {
-        this.chatService.getChat(this.chatId()!).subscribe({
+        this.chatService.getChat(this.chatId!).subscribe({
           next: chat => {
             this.loadMessages(chat);
           }
         });
-        this.newMessage.set('');
+        this.newMessage = null;
       }
     });
   }
@@ -164,22 +159,22 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     this.editedMessageText = message.message;
     setTimeout(() => {
       this.editInputRef.nativeElement.focus();
-    });
+    }, 0);
   }
 
   cancelEdit() {
     this.editingMessage = null;
-    this.editedMessageText = '';
+    this.editedMessageText = null;
   }
 
   saveEditedMessage(message: Message) {
-    const trimmed = this.editedMessageText.trim();
+    const trimmed = this.editedMessageText?.trim();
     if (!trimmed) return; // Optional: Verhindere Leertext
 
-    this.chatService.editMessage(this.chatId()!, message.id, trimmed).subscribe({
+    this.chatService.editMessage(this.chatId!, message.id, trimmed).subscribe({
       next: () => {
         // Nach erfolgreichem Edit mit aktuellen Nachrichten aktualisieren
-        this.chatService.getChat(this.chatId()!).subscribe(chat => this.loadMessages(chat));
+        this.chatService.getChat(this.chatId!).subscribe(chat => this.loadMessages(chat));
         this.cancelEdit();
       },
       error: err => {
@@ -190,22 +185,22 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   deleteMessage(message: Message) {
-    this.chatService.deleteMessage(this.chatId()!, message.id).subscribe({
-      next: () => this.chatService.getChat(this.chatId()!).subscribe(c => this.loadMessages(c))
+    this.chatService.deleteMessage(this.chatId!, message.id).subscribe({
+      next: () => this.chatService.getChat(this.chatId!).subscribe(c => this.loadMessages(c))
     });
   }
 
   private loadMessages(chat: Chat): void {
-    this.messages.set(chat.messages);
+    this.messages = chat.messages;
 
     // Gelesen markieren (nur empfangene, ungelesene Nachrichten)
     const currentUserRole = this.authService.user()?.role;
     if (!currentUserRole) return;
 
-    if (chat.messages && this.chatId()) {
+    if (chat.messages && this.chatId) {
       chat.messages.forEach(message => {
         if (message.senderRole !== currentUserRole && !message.seen) { // empfangen und noch nicht gelesen
-          this.chatService.markAsRead(this.chatId()!, message.id).subscribe();
+          this.chatService.markAsRead(this.chatId!, message.id).subscribe();
         }
       });
     }
