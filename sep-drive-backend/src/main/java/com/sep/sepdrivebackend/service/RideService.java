@@ -104,25 +104,22 @@ public class RideService {
         ride.setStartLocation(rideDto.getStartLocation());
         ride.setDestination(rideDto.getDestination());
 
-        // ✅ Step 1: Get optimized waypoints
+        
         List<Location> optimizedWaypoints = routeOptimizationService.getOptimizedWaypoints(
                 rideDto.getStartLocation(),
                 rideDto.getWaypoints()
         );
 
-        // ✅ Step 2: Generate new GeoJSON for optimized route
         String optimizedGeoJson = geoJsonRouteParser.generateGeoJson(
                 rideDto.getStartLocation(),
                 optimizedWaypoints,
                 rideDto.getDestination()
         );
 
-        // ✅ Save optimized data
         ride.setOptimizedWaypoints(optimizedWaypoints);
         ride.setGeoJson(optimizedGeoJson);
 
 
-        ride.setOptimizedWaypoints(optimizedWaypoints);
         
 
         ride.setWaypoints(rideDto.getWaypoints());
