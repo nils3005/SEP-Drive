@@ -6,7 +6,6 @@ import {
   Input,
   OnDestroy,
   OnInit,
-  signal,
   ViewChild
 } from '@angular/core';
 import {ChatService} from "../../services/chat/chat.service";
