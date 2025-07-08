@@ -45,25 +45,16 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     // Aus der RideOffer holt man sich entsprechend die Id des anderen Users
     if (this.authService.user()?.role === 'CUSTOMER') {
-      this.handleChatForCustomer()
-    } else {
-      // Driver
-      this.handleChatForDriver()
+      // this.rideOfferId ist nur gesetzt, wenn der Kunde den Chat öffnet
+      this.rideOfferService.getRideOfferById(this.rideOfferId!).subscribe(
+          (rideOffer: RideOffer) => this.handleChatForAllUsers(rideOffer.customerId, rideOffer.driverId)
+      );
+    } else { // Driver
+      // Wenn der Fahrer den Chat öffnet müssen wir die rideOfferId vom Server mit der driverId holen
+      this.rideOfferService.getPendingOfferForDriver(this.authService.user()!.id).subscribe(
+          (rideOffer: RideOffer) => this.handleChatForAllUsers(rideOffer.customerId, rideOffer.driverId)
+      );
     }
-  }
-
-  private handleChatForCustomer(): void {
-    // this.rideOfferId ist nur gesetzt, wenn der Kunde den Chat öffnet
-    this.rideOfferService.getRideOfferById(this.rideOfferId!).subscribe(
-        (rideOffer: RideOffer) => this.handleChatForAllUsers(rideOffer.customerId, rideOffer.driverId)
-    );
-  }
-
-  private handleChatForDriver(): void {
-    // Wenn der Fahrer den Chat öffnet müssen wir die rideOfferId vom Server mit der driverId holen
-    this.rideOfferService.getPendingOfferForDriver(this.authService.user()!.id).subscribe(
-      (rideOffer: RideOffer) => this.handleChatForAllUsers(rideOffer.customerId, rideOffer.driverId)
-    );
   }
 
   private handleChatForAllUsers(customerId: number, driverId: number): void {
@@ -97,7 +88,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscribeToChat(chat: Chat): void {
     this.sub = this.webSocketService.subscribe<Chat>('/topic/chat/' + chat.id).subscribe(
-      (chat) => this.loadMessages(chat)
+      (chat: Chat) => this.loadMessages(chat)
     );
   }
 
@@ -114,8 +105,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   sendMessage() {
-    const message = this.newMessage;
-    const trimmed = message?.trim();
+    const trimmed = this.newMessage?.trim();
     if (!trimmed) return; // Verhindere Leertext
 
     if (!this.chatId) {
@@ -123,14 +113,14 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    this.chatService.sendMessage(this.chatId!, trimmed).subscribe({
-      next: _ => {
+    this.chatService.sendMessage(this.chatId!, trimmed).subscribe(
+      () => {
         this.chatService.getChat(this.chatId!).subscribe(
             (chat: Chat) => this.loadMessages(chat)
         );
         this.newMessage = null;
       }
-    });
+    );
   }
 
   /**
