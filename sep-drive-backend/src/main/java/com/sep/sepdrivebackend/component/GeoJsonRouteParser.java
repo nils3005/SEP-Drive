@@ -65,7 +65,6 @@ public class GeoJsonRouteParser {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
 
-            // Collect coordinates
             List<double[]> coordsList = new ArrayList<>();
             coordsList.add(new double[]{Double.parseDouble(start.getLongitude()), Double.parseDouble(start.getLatitude())});
             if (waypoints != null) {
@@ -78,7 +77,6 @@ public class GeoJsonRouteParser {
             }
             coordsList.add(new double[]{Double.parseDouble(destination.getLongitude()), Double.parseDouble(destination.getLatitude())});
 
-            // Build GeoJSON structure
             ObjectNode geometry = objectMapper.createObjectNode();
             geometry.put("type", "LineString");
             ArrayNode coordinates = objectMapper.createArrayNode();
