@@ -85,7 +85,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         this.subscribeToChat(chat);
       },
       error: _ => {
-        // Chat existiert nicht
+        // Chat existiert noch nicht, dann erstelle ihn
         this.chatService.createChat(customerId, driverId).subscribe({
           next: (chatId: number) => {
             // Chat existiert nach dem Erstellen
@@ -163,7 +163,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     this.editingMessage = message;
     this.editedMessageText = message.message;
     setTimeout(() => {
-      this.editInputRef?.nativeElement?.focus();
+      this.editInputRef.nativeElement.focus();
     });
   }
 
@@ -219,9 +219,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     // Das setTimeout() verschiebt den Callback auf den nächsten Tick in der Event-Queue von JavaScript
     // Trick, um asynchron auf das vollständige Rendern der View zu warten
     setTimeout(() => {
-      if (this.messagesContainerRef?.nativeElement) {
         this.messagesContainerRef.nativeElement.scrollTop = this.messagesContainerRef.nativeElement.scrollHeight;
-      }
     }, 0);
   }
 }

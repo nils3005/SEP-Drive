@@ -7,7 +7,7 @@
         }
     </div>
     <div class="messages" #messagesContainer>
-        @if (this.messages()) {
+        @if (this.messages()?.length) {
             @for (message of this.messages(); track message.id) {
                 @if (message.senderRole === this.authService.user()?.role) {
                     <!-- Message ist vom eingeloggten User also rechtsbündig -->
@@ -47,6 +47,8 @@
                     </div>
                 }
             }
+        } @else {
+            <div class="notification">Es wurden noch keine Nachrichten im Chat gesendet</div>
         }
     </div>
     <div class="input">

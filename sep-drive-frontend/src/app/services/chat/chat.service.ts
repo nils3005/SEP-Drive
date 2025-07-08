@@ -41,28 +41,28 @@ export class ChatService {
   /**
    * Sendet eine neue Nachricht in den Chat
    */
-  sendMessage(chatId: number, message: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/send/${chatId}`, { message });
+  sendMessage(chatId: number, message: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/send/${chatId}`, { message });
   }
 
   /**
    * Löscht eine Nachricht
    */
-  deleteMessage(chatId: number, messageId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/deleteMessage/${chatId}/${messageId}`);
+  deleteMessage(chatId: number, messageId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/deleteMessage/${chatId}/${messageId}`);
   }
 
   /**
    * Bearbeitet eine existierende Nachricht
    */
-  editMessage(chatId: number, messageId: number, message: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/editMessage/${chatId}/${messageId}`, { message });
+  editMessage(chatId: number, messageId: number, message: string): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/editMessage/${chatId}/${messageId}`, { message });
   }
 
   /**
    * Markiert Nachricht als gelesen
    */
-  markAsRead(chatId: number, messageId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/markAsRead/${chatId}/${messageId}`, {});
+  markAsRead(chatId: number, messageId: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/markAsRead/${chatId}/${messageId}`, {});
   }
 }
