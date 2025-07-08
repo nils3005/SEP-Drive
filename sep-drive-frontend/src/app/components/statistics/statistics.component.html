@@ -29,7 +29,9 @@
       </button>
     </div>
 
-    <div *ngIf="statistics.length >= 0" class="space-y-8">
+    @if (noInput()){
+      <!--
+    <div *ngIf="statistics.length >= 0" class="space-y-8">-->
       <div class="bg-white rounded shadow p-4">
         <h3 class="text-lg font-semibold mb-2">Einnahmen (in EUR)</h3>
         <canvas baseChart
@@ -65,7 +67,9 @@
                 chartType="bar"
                 class="w-full"></canvas>
       </div>
-    </div>
+      <!--</div>-->
+    }
+
   </div>
 
 }

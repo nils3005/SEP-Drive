@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, computed, inject, signal} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChartData, ChartOptions } from 'chart.js';
@@ -25,6 +25,9 @@ export class StatisticsComponent {
   selectedYear = new Date().getFullYear();
   selectedMonth = new Date().getMonth() + 1;
 
+  noInput = signal(false);
+
+
   statistics: StatisticsDto[] = [];
 
   incomeChartData: ChartData<'bar'> = { labels: [], datasets: [] };
@@ -34,9 +37,12 @@ export class StatisticsComponent {
 
   chartOptions: ChartOptions = { responsive: true };
 
-  constructor(private statisticsService: StatisticsService) {}
+  constructor(private statisticsService: StatisticsService) {
+    this.noInput = signal(false);
+  }
 
   onSubmit(): void {
+    this.noInput.set(true);
     const { start, end } = this.calculateTimespan();
     const obs$ = this.viewType === 'month'
       ? this.statisticsService.getDailyStatistics(start, end)
