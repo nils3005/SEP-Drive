@@ -1,10 +1,10 @@
-import {Component, computed, inject, signal} from '@angular/core';
+import {Component, computed, effect, inject, signal} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChartData, ChartOptions } from 'chart.js';
 
 import { StatisticsService } from '../../services/statistics/statistics.service';
-import { StatisticsDto } from '../../types';
+import {StatisticsDto, User} from '../../types';
 import {BaseChartDirective} from 'ng2-charts';
 import {AuthService} from '../../services/auth/auth-service.service';
 
@@ -27,6 +27,8 @@ export class StatisticsComponent {
 
   noInput = signal(false);
 
+  user = signal<User|null>(null);
+
 
   statistics: StatisticsDto[] = [];
 
@@ -39,6 +41,9 @@ export class StatisticsComponent {
 
   constructor(private statisticsService: StatisticsService) {
     this.noInput = signal(false);
+    effect(() => {
+      this.user.set(this.auth.user());
+    });
   }
 
   onSubmit(): void {
