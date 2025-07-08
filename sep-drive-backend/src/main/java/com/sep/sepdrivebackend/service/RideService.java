@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,8 +28,10 @@ public class RideService {
     private final RideRequestService rideRequestService;
     private final RideRequestRepository rideRequestRepository;
     private final FinancialsService financialsService;
+    private final RouteOptimizationService routeOptimizationService   ;
 
-    public RideService(RideRepository rideRepository, RideWebSocketController rideWebSocketController, UserService userService, GeoJsonRouteParser geoJsonRouteParser, HistoryService historyService, RideRequestService rideRequestService, RideRequestRepository rideRequestRepository, FinancialsService financialsService) {
+
+    public RideService(RideRepository rideRepository, RideWebSocketController rideWebSocketController, UserService userService, GeoJsonRouteParser geoJsonRouteParser, HistoryService historyService, RideRequestService rideRequestService, RideRequestRepository rideRequestRepository, FinancialsService financialsService, RouteOptimizationService routeOptimizationService) {
         this.rideRepository = rideRepository;
         this.rideWebSocketController = rideWebSocketController;
         this.userService = userService;
@@ -37,7 +40,12 @@ public class RideService {
         this.rideRequestService = rideRequestService;
         this.rideRequestRepository = rideRequestRepository;
         this.financialsService = financialsService;
+        this.routeOptimizationService = routeOptimizationService;
     }
+
+
+
+
 
     //Live Änderung während der Fahrt
     public void editRide(RideUpdateDto rideUpdateDto) throws RideNotFoundException, UserNotPartOfRideException, RideNotPausedException, InsufficientFundsException{
@@ -95,6 +103,19 @@ public class RideService {
         Ride ride = new Ride(driver, customer, rideDto.getSpeed(), price, rideDto.getDistance(), rideDto.getGeoJson(), rideDto.getDuration(), activeRideRequest.getCarType());
         ride.setStartLocation(rideDto.getStartLocation());
         ride.setDestination(rideDto.getDestination());
+
+        /*hier code geschrieben*/
+        List<Location> optimizedWaypoints = routeOptimizationService.getOptimizedWaypoints(
+                rideDto.getStartLocation(),
+                rideDto.getWaypoints()
+        );
+
+
+
+
+        ride.setOptimizedWaypoints(optimizedWaypoints);
+        
+
         ride.setWaypoints(rideDto.getWaypoints());
         rideRepository.save(ride);
 
@@ -182,3 +203,4 @@ public class RideService {
         financialsService.transfer(customer, driver, ride.getPrice());
     }
 }
+

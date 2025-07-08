@@ -2,11 +2,14 @@ package com.sep.sepdrivebackend.controller;
 
 import com.sep.sepdrivebackend.dto.RideDto;
 import com.sep.sepdrivebackend.dto.RideUpdateDto;
+import com.sep.sepdrivebackend.entities.Location;
 import com.sep.sepdrivebackend.exception.*;
 import com.sep.sepdrivebackend.service.RideService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/ride")
@@ -79,5 +82,6 @@ public class RideController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
 }
 
