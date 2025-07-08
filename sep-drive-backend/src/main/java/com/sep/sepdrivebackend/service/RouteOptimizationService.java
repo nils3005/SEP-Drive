@@ -9,11 +9,6 @@ import java.util.List;
 @Service
 public class RouteOptimizationService {
 
-    /**
-     * NEW METHOD:
-     * Given a Ride, returns a list of waypoints sorted
-     * by distance from the start location.
-     */
     public List<Location> getOptimizedWaypoints(Location start, List<Location> waypoints) {
         if (waypoints == null || waypoints.size() <= 1) {
             return waypoints;
