@@ -55,20 +55,16 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private handleChatForCustomer(): void {
     // this.rideOfferId ist nur gesetzt, wenn der Kunde den Chat öffnet
-    this.rideOfferService.getRideOfferById(this.rideOfferId!).subscribe({
-      next: (rideOffer: RideOffer) => {
-        this.handleChatForAllUsers(rideOffer.customerId, rideOffer.driverId);
-      }
-    })
+    this.rideOfferService.getRideOfferById(this.rideOfferId!).subscribe(
+        (rideOffer: RideOffer) => this.handleChatForAllUsers(rideOffer.customerId, rideOffer.driverId)
+    );
   }
 
   private handleChatForDriver(): void {
     // Wenn der Fahrer den Chat öffnet müssen wir die rideOfferId vom Server mit der driverId holen
-    this.rideOfferService.getPendingOfferForDriver(this.authService.user()!.id).subscribe({
-      next: (rideOffer: RideOffer) => {
-        this.handleChatForAllUsers(rideOffer.customerId, rideOffer.driverId);
-      }
-    });
+    this.rideOfferService.getPendingOfferForDriver(this.authService.user()!.id).subscribe(
+      (rideOffer: RideOffer) => this.handleChatForAllUsers(rideOffer.customerId, rideOffer.driverId)
+    );
   }
 
   private handleChatForAllUsers(customerId: number, driverId: number): void {
@@ -101,11 +97,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private subscribeToChat(chat: Chat): void {
-    this.sub = this.webSocketService.subscribe<Chat>('/topic/chat/' + chat.id).subscribe({
-      next: (chat) => {
-        this.loadMessages(chat);
-      }
-    });
+    this.sub = this.webSocketService.subscribe<Chat>('/topic/chat/' + chat.id).subscribe(
+      (chat) => this.loadMessages(chat)
+    );
   }
 
   // Wird aufgerufen, wenn das HTML gerendert ist. Erst dann kann man auf die Objekte zugreifen
@@ -132,11 +126,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.chatService.sendMessage(this.chatId!, trimmed).subscribe({
       next: _ => {
-        this.chatService.getChat(this.chatId!).subscribe({
-          next: chat => {
-            this.loadMessages(chat);
-          }
-        });
+        this.chatService.getChat(this.chatId!).subscribe(
+            (chat: Chat) => this.loadMessages(chat)
+        );
         this.newMessage = null;
       }
     });
@@ -174,7 +166,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chatService.editMessage(this.chatId!, message.id, trimmed).subscribe({
       next: () => {
         // Nach erfolgreichem Edit mit aktuellen Nachrichten aktualisieren
-        this.chatService.getChat(this.chatId!).subscribe(chat => this.loadMessages(chat));
+        this.chatService.getChat(this.chatId!).subscribe((chat: Chat) => this.loadMessages(chat));
         this.cancelEdit();
       },
       error: err => {
@@ -185,9 +177,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   deleteMessage(message: Message) {
-    this.chatService.deleteMessage(this.chatId!, message.id).subscribe({
-      next: () => this.chatService.getChat(this.chatId!).subscribe(c => this.loadMessages(c))
-    });
+    this.chatService.deleteMessage(this.chatId!, message.id).subscribe(
+      () => this.chatService.getChat(this.chatId!).subscribe(
+          (chat: Chat) => this.loadMessages(chat))
+    );
   }
 
   private loadMessages(chat: Chat): void {
