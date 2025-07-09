@@ -76,6 +76,10 @@ public class RideService {
             ride.setWaypoints(rideUpdateDto.getWaypoints());
         }
 
+        if (rideUpdateDto.getDestination() != null) {
+            ride.setDestination(rideUpdateDto.getDestination());
+        }
+
 
         //Set calculated price to rideUpdateDto
         rideUpdateDto.setPrice((float)price);

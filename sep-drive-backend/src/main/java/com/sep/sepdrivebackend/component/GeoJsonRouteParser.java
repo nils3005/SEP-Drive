@@ -3,9 +3,6 @@ package com.sep.sepdrivebackend.component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sep.sepdrivebackend.entities.Location;
 import com.sep.sepdrivebackend.exception.GeoJsonParsingException;
 import org.springframework.stereotype.Component;
 

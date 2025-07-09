@@ -64,9 +64,6 @@ public class Ride {
     private List<Location> waypoints;
 
 
-    @ElementCollection
-    @CollectionTable(name = "ride_optimized_waypoints", joinColumns = @JoinColumn(name = "ride_id"))
-    private List<Location> optimizedWaypoints;
 
 }
 

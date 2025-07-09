@@ -19,7 +19,7 @@ public class RideUpdateDto {
     private int coordsIndex;
     private Long historyId;
     private List<Location> waypoints;
-
+    private Location destination;
     private float price;
     private float distance;
     private float duration;
