@@ -36,12 +36,12 @@ public class RideRequest{
     })
     private Location destination;
 
-
     
     @ElementCollection
     @CollectionTable(name = "ride_request_waypoints", joinColumns = @JoinColumn(name = "ride_request_id"))
     private List<Location> waypoints;
-
+    
+    
     @Enumerated(EnumType.STRING)
     private CarType carType;
 

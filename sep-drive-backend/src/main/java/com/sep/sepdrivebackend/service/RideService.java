@@ -29,7 +29,6 @@ public class RideService {
     private final RideRequestRepository rideRequestRepository;
     private final FinancialsService financialsService;
 
-
     public RideService(RideRepository rideRepository, RideWebSocketController rideWebSocketController, UserService userService, GeoJsonRouteParser geoJsonRouteParser, HistoryService historyService, RideRequestService rideRequestService, RideRequestRepository rideRequestRepository, FinancialsService financialsService, RouteOptimizationService routeOptimizationService) {
         this.rideRepository = rideRepository;
         this.rideWebSocketController = rideWebSocketController;
@@ -40,10 +39,6 @@ public class RideService {
         this.rideRequestRepository = rideRequestRepository;
         this.financialsService = financialsService;
     }
-
-
-
-
 
     //Live Änderung während der Fahrt
     public void editRide(RideUpdateDto rideUpdateDto) throws RideNotFoundException, UserNotPartOfRideException, RideNotPausedException, InsufficientFundsException{
@@ -114,7 +109,6 @@ public class RideService {
         rideRequestRepository.save(activeRideRequest);
     }
 
-
     @Transactional
     public ActiveRideDto getRide(){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -155,7 +149,6 @@ public class RideService {
         ride.setCoordsIndex(index);
         rideRepository.save(ride);
     }
-
 
     public void updateRideStatus(Ride ride, RideUpdateDto rideUpdateDTO) {
         if (rideUpdateDTO.isPaused()) {

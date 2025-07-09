@@ -41,7 +41,4 @@ public interface RideRequestRepository extends JpaRepository<RideRequest, Long> 
     List<RideRequest> findByCustomerAndActiveTrue(User customer);
 
     Optional<RideRequest> findByCustomerIdAndActiveTrue(Long customerId);
-
-
-
 }

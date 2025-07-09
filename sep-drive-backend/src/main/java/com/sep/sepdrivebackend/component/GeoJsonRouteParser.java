@@ -1,6 +1,5 @@
 package com.sep.sepdrivebackend.component;
 
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sep.sepdrivebackend.exception.GeoJsonParsingException;
@@ -57,8 +56,5 @@ public class GeoJsonRouteParser {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return 1000 * R * c;
     }
-
-
 }
-
 

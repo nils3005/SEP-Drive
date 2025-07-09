@@ -25,7 +25,6 @@ public class RideRequestDto {
     private Double userRating;
     // Liste der RideOffers nicht mitschicken => kann man über RideOfferController mit rrId holen
 
-
     public static RideRequestDto fromEntity(RideRequest rideRequest) {
         return RideRequestDto.builder()
                 .id(rideRequest.getId())
@@ -42,4 +41,3 @@ public class RideRequestDto {
     }
 
 }
-

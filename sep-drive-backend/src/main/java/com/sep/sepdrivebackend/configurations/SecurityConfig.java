@@ -19,8 +19,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
-
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -29,7 +27,6 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 
    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
@@ -45,8 +42,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-
 
     @Bean
     public JwtFilter jwtFilter(JwtService jwtService, UserDetailsService userDetailsService) {
