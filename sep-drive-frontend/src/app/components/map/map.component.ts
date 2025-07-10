@@ -26,8 +26,7 @@ L.Marker.prototype.options.icon = iconDefault;
 })
 export class MapComponent implements AfterViewInit {
 
-  constructor(private geoService: GeoService, private geoStoreService: GeoStoreService) {
-    this.geoService = geoService;
+  constructor(private geoStoreService: GeoStoreService) {
   }
 
   private initMap(): void {

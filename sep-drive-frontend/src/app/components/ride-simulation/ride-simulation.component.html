@@ -37,8 +37,8 @@
     }
   </div>
   @if (rideSimulationStore.rideData.getValue().paused) {
-    @if (showStopInput) {
-      <app-location-stop-input [stops]="geoStoreService.stops.getValue()"/>
+    @if (geoStoreService.stops.getValue().length > 0) {
+      <app-location-stop-input (onStopsChange)="onStopChange($event)"/>
 
 <!--      Impelemnt without component to disable button if index is past stop -->
     } @else {

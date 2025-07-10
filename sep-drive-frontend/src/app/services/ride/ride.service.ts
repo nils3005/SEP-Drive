@@ -138,7 +138,7 @@ export class RideService {
         longitude: destination.geometry.coordinates[1]
       }
     }
-    if (waypoints && waypoints.length > 0) {
+    if (waypoints) {
       let stops: Coordinates[] = [];
       for (const waypoint of waypoints) {
         stops.push({
