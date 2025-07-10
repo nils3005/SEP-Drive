@@ -64,7 +64,9 @@ public class RideService {
         //Set new Data to Ride
         ride.setPrice(price);
         ride.setDistance(rideUpdateDto.getDistance());
-        ride.setGeoJson(rideUpdateDto.getGeoJson());
+        if (rideUpdateDto.getGeoJson() != null) {
+            ride.setGeoJson(rideUpdateDto.getGeoJson());
+        }
         ride.setDuration(rideUpdateDto.getDuration());
 
         if (rideUpdateDto.getWaypoints() != null) {
