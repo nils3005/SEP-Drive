@@ -17,6 +17,7 @@ export class LocationInputComponent implements OnInit {
   @Input() showGpsLocationButton: boolean = false;
   @Input() location: GeocodeFeature | null = null;
   @Input() clearAfterSelect: boolean = false;
+  @Input() disabled = false;
   @Output() onLocationSelected = new EventEmitter<GeocodeFeature>()
   public useCoords: boolean = false;
 
@@ -25,9 +26,9 @@ export class LocationInputComponent implements OnInit {
   private suppressSuggestions: boolean = false;
 
   public locationForm = new FormGroup({
-    locationInput: new FormControl(""),
-    latitudeInput: new FormControl(""),
-    longitudeInput: new FormControl(""),
+    locationInput: new FormControl({value: "", disabled: this.disabled}),
+    latitudeInput: new FormControl({value: "", disabled: this.disabled}),
+    longitudeInput: new FormControl({value: "", disabled: this.disabled}),
   })
 
 

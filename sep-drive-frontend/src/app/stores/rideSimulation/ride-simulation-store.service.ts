@@ -1,5 +1,5 @@
 import {Injectable, signal, Signal} from '@angular/core';
-import {Ride, RideRequestSummary, RideResponse, RideUpdateDTO} from '../../types';
+import {GeocodeFeature, Ride, RideRequestSummary, RideResponse, RideUpdateDTO} from '../../types';
 import {BehaviorSubject} from 'rxjs';
 import * as L from 'leaflet';
 
@@ -16,8 +16,6 @@ export class RideSimulationStore {
 
   public simulationLayer = L.layerGroup();
 
-  public rideSummary: BehaviorSubject<RideRequestSummary | null> = new BehaviorSubject<RideRequestSummary | null>(null);
-
   public ridePrice: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
   public rideData : BehaviorSubject<RideUpdateDTO> = new BehaviorSubject<RideUpdateDTO>({
@@ -30,8 +28,9 @@ export class RideSimulationStore {
     historyId: null
   });
 
-  public start = signal<string>('');
-  public destination = signal<string>('');
+  public start = signal<GeocodeFeature | null>(null);
+  public waypoints = signal<GeocodeFeature[]>([]);
+  public destination = signal<GeocodeFeature | null>(null);
 
   constructor() {
   }

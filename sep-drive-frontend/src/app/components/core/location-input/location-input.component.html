@@ -1,6 +1,10 @@
 <form [formGroup]="locationForm"  class="inputRow">
-  <button class="imageButton" type="button" (click)="useCoords = !useCoords">
-    <i class="fa-solid fa-pencil"></i>
+  <button class="imageButton" type="button" (click)="useCoords = !useCoords" [disabled]="disabled">
+    @if (useCoords) {
+        <i class="fa-solid fa-magnifying-glass"></i>
+    } @else {
+        <i class="fa-solid fa-pencil"></i>
+    }
   </button>
   @if (!useCoords) {
     <div class="textInputContainer">
@@ -12,9 +16,10 @@
         class="textInput"
         (blur)="onBlur()"
         (focus)="onFocus()"
+        [disabled]="disabled"
       >
       @if (showGpsLocationButton) {
-        <button type="button" class="imageButton" (click)="getLocation()">
+        <button type="button" class="imageButton" (click)="getLocation()" [disabled]="disabled">
           <i class="fa-solid fa-location-dot"></i>
         </button>
       }
@@ -36,6 +41,7 @@
         formControlName="longitudeInput"
         placeholder="50.000000"
         class="textInput"
+        [disabled]="disabled"
       >
     </div>
     <div class="textInputContainer">
@@ -45,9 +51,10 @@
         formControlName="latitudeInput"
         placeholder="50.000000"
         class="textInput"
+        [disabled]="disabled"
       >
     </div>
-    <button class="imageButton" type="button" (click)="checkCoordinates()">
+    <button class="imageButton" type="button" (click)="checkCoordinates()" [disabled]="disabled">
       <i class="fa-solid fa-check"></i>
     </button>
   }

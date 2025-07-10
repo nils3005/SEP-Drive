@@ -105,6 +105,20 @@ export class RideRequestService {
     )
   }
 
+  public getRideRequestById(rideRequestId: number): Observable<HttpResponse<RideRequest>>
+  {
+    return this.http.get<RideRequest>(
+      `http://localhost:8080/api/ride-requests/${rideRequestId}`,
+      {
+        headers: {
+          accept: 'application/json',
+        }
+        ,
+        observe: 'response'
+      }
+    )
+  }
+
   public async getRideRequestSummaryFromRideRequest(rideRequest: RideRequest): Promise<RideRequestSummary> {
     const startResponse = await firstValueFrom(
       this.openRouteService.getGeocodeFeatureByCoordinates({

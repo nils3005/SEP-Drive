@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {GeoService} from '../geo/geo.service';
 import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
 import {GeoStoreService} from '../../stores/geo/geo-store.service';
+import {Coordinates} from '../../types';
 
 @Injectable({
   providedIn: 'root'
@@ -46,5 +47,10 @@ export class MapService {
     this.geoStoreService.carType.next(null)
     this.rideSimulationStore.simulationLayer.clearLayers()
     this.flyMapTo(51.1657, 10.4515, 6, 1)
+  }
+
+  public loadMapByCoordinates(start: Coordinates, destination: Coordinates, waypoints: Coordinates[]): void
+  {
+
   }
 }

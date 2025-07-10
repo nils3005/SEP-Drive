@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {GeocodeFeature, RideRequestSummary} from '../../types';
+import {Coordinates, GeocodeFeature, RideRequestSummary} from '../../types';
 import {BehaviorSubject} from "rxjs";
 import {OpenRouteServiceService} from "../openroute/open-route-service.service";
 import {ErrorService} from '../error/error.service';
@@ -56,5 +56,13 @@ export class GeoService {
       waypoints.push(destination);
     }
     return this.getCoordinateArray(waypoints);
+  }
+
+  public getCoordinatesByGeoCodeFeature(feature: GeocodeFeature): Coordinates
+  {
+    return {
+      latitude: feature.geometry.coordinates[1],
+      longitude: feature.geometry.coordinates[0],
+    }
   }
 }

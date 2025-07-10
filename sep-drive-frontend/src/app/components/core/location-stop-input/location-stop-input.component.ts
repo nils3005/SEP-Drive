@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {LocationInputComponent} from '../location-input/location-input.component';
 import {GeocodeFeature, RouteStopEventEmitterDto} from '../../../types';
 
@@ -11,10 +11,11 @@ import {GeocodeFeature, RouteStopEventEmitterDto} from '../../../types';
   styleUrl: './location-stop-input.component.scss'
 })
 export class LocationStopInputComponent {
+  @Input() stops: GeocodeFeature[] = [];
   @Output() onStopsChange: EventEmitter<RouteStopEventEmitterDto> = new EventEmitter();
 
   public inputLocation: GeocodeFeature | null = null;
-  public stops: GeocodeFeature[] = [];
+  // public stops: GeocodeFeature[] = [];
 
   addStop($event: GeocodeFeature) {
     this.stops.push($event);

@@ -28,6 +28,7 @@ export type GeocodeFeature = {
     region?: string | undefined,
     locality?: string | undefined,
     label: string
+    index: number | undefined,
   }
 }
 
@@ -39,6 +40,9 @@ export type GeoJsonRoute = {
           distance: number,
           duration: number
         }
+      },
+      geometry: {
+        coordinates: RideCords
       }
     }
   ]
@@ -184,6 +188,9 @@ export type Ride = {
   geoJson: any
   coords: [[number, number]]
   speeds: number[]
+  startLocation: Coordinates
+  destination: Coordinates
+  waypoints: Coordinates[]
 }
 
 export type RideDto = {
@@ -193,9 +200,12 @@ export type RideDto = {
   speed: number,
   distance: number,
   geoJson: any
+  startLocation: Coordinates
+  destination: Coordinates
+  waypoints: Coordinates[]
 }
 
-export type RideCords = [[number, number]]
+export type RideCords = [number, number][]
 
 export type Speeds = number[]
 
@@ -207,6 +217,11 @@ export type RideUpdateDTO = {
   speed: number
   coordsIndex: number
   historyId: number | null
+  waypoints?: Coordinates[],
+  destination?: Coordinates
+  distance?: number
+  duration?: number
+  geoJson?: any
 }
 
 export type Coord = [number, number]
