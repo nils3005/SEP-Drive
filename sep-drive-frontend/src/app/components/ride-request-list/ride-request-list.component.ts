@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
+import {Component, inject, Input, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
 import {WebsocketService} from "../../services/websocket/websocket.service";
 import {GeocodeFeature, RideOffer, RideOfferNotification, RideRequest, RideRequestSummary} from "../../types";
 import {BehaviorSubject, Subscription} from "rxjs";
@@ -42,6 +42,8 @@ export interface RideTableRow {
   imports: [FormsModule, CommonModule, MatTableModule, MatSortModule, ReactiveFormsModule]
 })
 export class RideRequestListComponent implements OnInit, OnDestroy {
+  @Input('hasRideOffer') hasRideOffer = signal<boolean>(false);
+
   private rideOfferService: RideofferService = inject(RideofferService);
   private rideRequestService: RideRequestService = inject(RideRequestService);
   private openRouteService: OpenRouteServiceService = inject(OpenRouteServiceService);
@@ -87,6 +89,7 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
         // Wenn ein PENDING Angebot existiert, dann setze die Buttons entsprechend
         next: rideOffer => {
           this.selectedRideRequestId.set(rideOffer.rideRequestId);
+          this.hasRideOffer.set(true);
           this.subscribeToTopic(rideOffer.offerId);
         }
       })
@@ -120,6 +123,7 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
     this.rideOfferService.createOffer(rideRequestId).subscribe({
       next: (rideOffer: RideOffer) => {
         this.selectedRideRequestId.set(rideRequestId);
+        this.hasRideOffer.set(true);
         this.subscribeToTopic(rideOffer.offerId);
       },
       error: err => {
@@ -133,6 +137,7 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
     this.rideOfferService.withdrawRideOfferWithRideRequestId(rideRequestId).subscribe({
       next: _ => {
         this.selectedRideRequestId.set(-1);
+        this.hasRideOffer.set(false);
         this.updateDistanceAndData()
       },
       error: err => {
@@ -158,6 +163,7 @@ export class RideRequestListComponent implements OnInit, OnDestroy {
                 this.updateDistanceAndData()
                 this.notificationSignal.set("Dein Angebot für Fahranfrage " + notification.rideRequestId + " wurde abgelehnt.");
                 this.selectedRideRequestId.set(-1);
+                this.hasRideOffer.set(false);
                 break;
             }
 

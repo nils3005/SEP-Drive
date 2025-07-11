@@ -34,29 +34,10 @@ export class HomePageComponent implements OnInit {
   public authService: AuthService = inject(AuthService);
   public geoService: GeoService = inject(GeoService);
   public rideRequestService: RideRequestService = inject(RideRequestService)
-  private userService: UserService = inject(UserService)
   private rideService: RideService = inject(RideService)
   private router: Router = inject(Router)
-  public rideOfferService: RideofferService = inject(RideofferService);
 
-  user$ = toObservable(this.authService.user);
-  hasRideOffer = toSignal(
-      interval(3000).pipe(             // alle 3 Sekunden
-          startWith(0),
-          switchMap(() => this.user$),            // Wenn user() ein Signal ist:
-          switchMap(user => {
-            if (user?.role === 'DRIVER') {
-              return this.rideOfferService.getPendingOfferForDriver(user.id).pipe(
-                  map(offer => !!offer),
-                  catchError(() => of(false))
-              );
-            } else {
-              return of(false);
-            }
-          })
-      ),
-      { initialValue: false }
-  );
+  hasRideOffer = signal<boolean>(false);
 
   ngOnInit(): void {
     this.rideRequestService.getActiveRideRequest().subscribe({
