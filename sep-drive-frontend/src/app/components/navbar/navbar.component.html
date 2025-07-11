@@ -29,6 +29,16 @@
                         <a routerLink="/social" routerLinkActive="active">Social</a>
                     </li>
                 }
+              <!-- Link zum Leaderboard
+                Sobald der Wert von isLoggedIn true ist, wird der Code im if-statement ausgeführt.
+                Link zu "/leaderboard" mit Klasse "active", wenn auf der URL - wenn man auf dem Leaderboard
+                ist, ist Leaderboard auch fett, weil /leaderboard
+                --->
+              @if (this.auth.isLoggedIn()) {
+                <li>
+                  <a routerLink="/leaderboard" routerLinkActive="active">Leaderboard</a>
+                </li>
+              }
             </ul>
         </div>
         <div id="innerNavbar-right">

@@ -11,8 +11,10 @@ import {BalanceComponent} from './components/balance/balance.component';
 import {DrivinghistoryComponent} from './components/drivinghistory/drivinghistory.component';
 import {SimulationPageComponent} from "./pages/simulation-page/simulation-page.component";
 import {StatisticsComponent} from './components/statistics/statistics.component';
+import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 
-export const routes: Routes = [{ path: 'login', component: LoginComponent },
+export const routes: Routes = [
+  { path: 'login', component: LoginComponent },
   { path: 'password', component: PasswordComponent },
   { path: 'authentication', component: AuthenticationComponent},
   { path: 'register', component: RegistrierungComponent},
@@ -24,5 +26,6 @@ export const routes: Routes = [{ path: 'login', component: LoginComponent },
   { path: 'balance' , component: BalanceComponent },
   { path: 'simulation', component: SimulationPageComponent },
   { path: 'statistics', component: StatisticsComponent },
+  { path: 'leaderboard', component: LeaderboardComponent },
   { path: '**', redirectTo: '' }
 ];

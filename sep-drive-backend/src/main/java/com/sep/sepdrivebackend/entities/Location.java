@@ -6,7 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Embeddable
-@Getter @Setter @NoArgsConstructor
+@Getter @Setter
+@NoArgsConstructor
 public class Location {
     private String latitude;
     private String longitude;

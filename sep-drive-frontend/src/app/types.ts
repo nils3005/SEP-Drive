@@ -233,3 +233,13 @@ export type StatisticsDto = {
   drivenTime: number;
   averageRating: number;
 }
+
+export type leaderboard = {
+  username: string;
+  name: string;
+  distance: number;
+  money: number;
+  rating: number;
+  numberOfRides: number;
+  driveTime: number;
+}
