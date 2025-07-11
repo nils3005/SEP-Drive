@@ -53,7 +53,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log('Hello from chatOnInit');
     // Aus der RideOffer holt man sich entsprechend die Id des anderen Users
     if (this.authService.user()?.role === 'CUSTOMER') {
       this.handleChatForCustomer()
@@ -87,7 +86,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         // Chat existiert
         this.chatId.set(chat.id);
         this.loadMessages(chat);
-        console.log('subcribe to chat line 90', chat);
         this.subscribeToChat(chat);
       },
       error: err => {
@@ -97,10 +95,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
             // Chat existiert nach dem Erstellen
             this.chatService.getChat(chatId).subscribe({
               next: (chat: Chat) => {
-                console.log('chat objekt aus chat existiert nicht chat component:', chat); // Gibt die korrekte Id zurück
                 this.chatId.set(chat.id);
                 this.loadMessages(chat);
-                console.log('subcribe to chat line 101', chat);
                 this.subscribeToChat(chat);
               }
             })
@@ -115,7 +111,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private subscribeToChat(chat: Chat): void {
-    console.log('/topic/chat/' + chat.id);
     this.sub = this.webSocketService.subscribe<Chat>('/topic/chat/' + chat.id).subscribe({
       next: (chat) => {
         this.loadMessages(chat);
@@ -134,6 +129,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   sendMessage(message: string) {
+    const trimmed = message.trim();
+    if (!trimmed) return; // Verhindere Leertext
+
     if (!this.chatId()) {
       console.warn('Sendeverhinderung: chatId noch nicht gesetzt!');
       return;
@@ -204,7 +202,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private scrollToBottom(): void {
-    setTimeout(() => { // Damit nach dem Rendern gescrollt wird!
+    setTimeout(() => { // Damit nach dem Rendern gescrollt wird
       if (this.messagesContainer?.nativeElement) {
         this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
       }

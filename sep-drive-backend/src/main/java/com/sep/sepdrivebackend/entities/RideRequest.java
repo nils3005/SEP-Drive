@@ -21,7 +21,12 @@ public class RideRequest{
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
     private User customer;
 
+    
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "latitude", column = @Column(name = "start_latitude")),
+            @AttributeOverride(name = "longitude", column = @Column(name = "start_longitude"))
+    })
     private Location startLocation;
 
     @Embedded
@@ -31,6 +36,12 @@ public class RideRequest{
     })
     private Location destination;
 
+    
+    @ElementCollection
+    @CollectionTable(name = "ride_request_waypoints", joinColumns = @JoinColumn(name = "ride_request_id"))
+    private List<Location> waypoints;
+    
+    
     @Enumerated(EnumType.STRING)
     private CarType carType;
 

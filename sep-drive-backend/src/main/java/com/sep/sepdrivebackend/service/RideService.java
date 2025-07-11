@@ -7,14 +7,13 @@ import com.sep.sepdrivebackend.dto.RideDto;
 import com.sep.sepdrivebackend.dto.RidePriceDto;
 import com.sep.sepdrivebackend.dto.RideUpdateDto;
 import com.sep.sepdrivebackend.entities.*;
-import com.sep.sepdrivebackend.exception.RideNotFoundException;
-import com.sep.sepdrivebackend.exception.UserHasRideExcpetion;
-import com.sep.sepdrivebackend.exception.UserNotFoundException;
+import com.sep.sepdrivebackend.exception.*;
 import com.sep.sepdrivebackend.repository.RideRepository;
 import com.sep.sepdrivebackend.repository.RideRequestRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,7 +29,7 @@ public class RideService {
     private final RideRequestRepository rideRequestRepository;
     private final FinancialsService financialsService;
 
-    public RideService(RideRepository rideRepository, RideWebSocketController rideWebSocketController, UserService userService, GeoJsonRouteParser geoJsonRouteParser, HistoryService historyService, RideRequestService rideRequestService, RideRequestRepository rideRequestRepository, FinancialsService financialsService) {
+    public RideService(RideRepository rideRepository, RideWebSocketController rideWebSocketController, UserService userService, GeoJsonRouteParser geoJsonRouteParser, HistoryService historyService, RideRequestService rideRequestService, RideRequestRepository rideRequestRepository, FinancialsService financialsService, RouteOptimizationService routeOptimizationService) {
         this.rideRepository = rideRepository;
         this.rideWebSocketController = rideWebSocketController;
         this.userService = userService;
@@ -39,6 +38,53 @@ public class RideService {
         this.rideRequestService = rideRequestService;
         this.rideRequestRepository = rideRequestRepository;
         this.financialsService = financialsService;
+    }
+
+    //Live Änderung während der Fahrt
+    public void editRide(RideUpdateDto rideUpdateDto) throws RideNotFoundException, UserNotPartOfRideException, RideNotPausedException, InsufficientFundsException{
+        //Get current Ride and User
+        Ride ride = rideRepository.findById(rideUpdateDto.getRideId()).orElseThrow(()->new RideNotFoundException("Ride not found"));
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User customer = userService.findByUsername(username);
+
+        //Check if User part of Ride
+        if(!ride.getCustomer().getUsername().equals(username) && !ride.getDriver().getUsername().equals(username)) {
+            throw new UserNotPartOfRideException("User is not part of ride");
+        }
+        //Check if Ride is paused
+        if(ride.getStatus() != RideStatus.PAUSED) throw new RideNotPausedException("Ride is not paused");
+
+        //Get new price for the Ride
+        RidePriceDto rpd = new RidePriceDto(rideUpdateDto.getDistance(), ride.getCarType());
+        double price = rideRequestService.ridePrice(rpd);
+
+        //Check if Customer has enough money for new Ride
+        if(customer.getFinancials().getBalance() < price) throw new InsufficientFundsException("Customer is too broke to book this ride");
+
+        //Set new Data to Ride
+        ride.setPrice(price);
+        ride.setDistance(rideUpdateDto.getDistance());
+        if (rideUpdateDto.getGeoJson() != null) {
+            ride.setGeoJson(rideUpdateDto.getGeoJson());
+        }
+        ride.setDuration(rideUpdateDto.getDuration());
+
+        if (rideUpdateDto.getWaypoints() != null) {
+            ride.setWaypoints(rideUpdateDto.getWaypoints());
+        }
+
+        if (rideUpdateDto.getDestination() != null) {
+            ride.setDestination(rideUpdateDto.getDestination());
+        }
+
+
+        //Set calculated price to rideUpdateDto
+        rideUpdateDto.setPrice((float)price);
+
+        //Update Ride in Database
+        rideRepository.save(ride);
+        //Send the new Ride information to all Clients through WebSocket
+        rideWebSocketController.sendMessage(rideUpdateDto);
     }
 
     @Transactional
@@ -53,13 +99,17 @@ public class RideService {
         RidePriceDto ridePriceDto = new RidePriceDto(rideDto.getDistance(), activeRideRequest.getCarType());
         double price = rideRequestService.ridePrice(ridePriceDto);
 
-        Ride ride = new Ride(driver, customer, rideDto.getSpeed(), price, rideDto.getDistance(), rideDto.getGeoJson(), rideDto.getDuration());
+        Ride ride = new Ride(driver, customer, rideDto.getSpeed(), price, rideDto.getDistance(), rideDto.getGeoJson(), rideDto.getDuration(), activeRideRequest.getCarType());
+        ride.setStartLocation(rideDto.getStartLocation());
+        ride.setDestination(rideDto.getDestination());
+
+
+        ride.setWaypoints(rideDto.getWaypoints());
         rideRepository.save(ride);
 
         activeRideRequest.setActive(false);
         rideRequestRepository.save(activeRideRequest);
     }
-
 
     @Transactional
     public ActiveRideDto getRide(){
@@ -102,7 +152,6 @@ public class RideService {
         rideRepository.save(ride);
     }
 
-
     public void updateRideStatus(Ride ride, RideUpdateDto rideUpdateDTO) {
         if (rideUpdateDTO.isPaused()) {
             ride.setStatus(RideStatus.PAUSED);
@@ -140,3 +189,4 @@ public class RideService {
         financialsService.transfer(customer, driver, ride.getPrice());
     }
 }
+
