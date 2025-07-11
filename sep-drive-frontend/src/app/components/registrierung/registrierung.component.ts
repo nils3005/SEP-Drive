@@ -70,7 +70,10 @@ export class RegistrierungComponent {
 
     }
     else if(/[äöüÄÖÜß]/.test(this.registrierungsUser.email)){
-      this.errorMessage.showError('Die eingegebene E-Mail enthält unerlaubte Zeichen (Umlaute)!')
+      this.errorMessage.showError('Die eingegebene E-Mail enthält unerlaubte Zeichen (Umlaute, ß)!')
+    }
+    else if(/[äöüÄÖÜß]/.test(this.registrierungsUser.username)){
+      this.errorMessage.showError('Der eingegebene Username enthält unerlaubte Zeichen (Umlaute, ß)!')
     }
     else if (this.registrierungsUser.password!=this.registrierungsUser.wdhpasswort){
       this.errorMessage.showError ('Die eingegebenen Passwörter stimmen nicht überein!');
