@@ -49,20 +49,24 @@ export class WebsocketService implements OnDestroy {
    * @param topic z.B. "/topic/offers.123"
    */
   public subscribe<T>(topic: string): Observable<T> {
-    return new Observable<T>((observer) => {
-      // Sobald verbunden, subscriben
-      const subscription = this.client.subscribe(topic, (message: IMessage) => {
-        try {
-          const payload = JSON.parse(message.body) as T;
-          observer.next(payload);
-        } catch (e) {
-          observer.error(e);
+    return new Observable<T>(observer => {
+      let stompSubscription: any;
+      const connectSub = this.isConnected.subscribe(isConnected => {
+        if (isConnected) {
+          stompSubscription = this.client.subscribe(topic, (message: IMessage) => {
+            try {
+              observer.next(JSON.parse(message.body) as T);
+            } catch (e) {
+              observer.error(e);
+            }
+          });
         }
       });
 
-      // Cleanup: beim Unsubscribe
+      // Cleanup
       return () => {
-        subscription.unsubscribe();
+        connectSub.unsubscribe();
+        if (stompSubscription) stompSubscription.unsubscribe();
       };
     });
   }
