@@ -188,6 +188,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
             next: data => {
               if (data.body) {
                 features.push(data.body.features[0]);
+                console.log("Feature", data.body.features[0]);
               }
             }
           })
@@ -307,7 +308,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
         })
       }
     } else {
-      this.geoStoreService.stops.next(event.stops);
+      // this.geoStoreService.stops.next(event.stops);
       const ride = this.rideSimulationStore.ride.getValue();
       const start = this.geoStoreService.start.getValue();
       const destination = this.geoStoreService.destination.getValue();

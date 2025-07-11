@@ -58,8 +58,8 @@ export class MapComponent implements AfterViewInit {
 
   checkChanges(): void {
     this.geoStoreService.stops.asObservable().subscribe(stopps => {
-        this.geoStoreService.routeLayer.clearLayers()
-        this.geoStoreService.stoppsLayer.clearLayers()
+        // this.geoStoreService.routeLayer.clearLayers()
+        // this.geoStoreService.stoppsLayer.clearLayers()
         for (const stopp of stopps) {
           if (stopp) {
             let marker = L.marker(
