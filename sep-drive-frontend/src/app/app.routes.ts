@@ -10,6 +10,7 @@ import { PaymentMethodComponent } from './components/payment-method/payment-meth
 import {BalanceComponent} from './components/balance/balance.component';
 import {DrivinghistoryComponent} from './components/drivinghistory/drivinghistory.component';
 import {SimulationPageComponent} from "./pages/simulation-page/simulation-page.component";
+import {StatisticsComponent} from './components/statistics/statistics.component';
 import { LeaderboardComponent } from './components/leaderboard/leaderboard.component';
 
 export const routes: Routes = [
@@ -24,6 +25,7 @@ export const routes: Routes = [
   { path: 'payment-method', component: PaymentMethodComponent },
   { path: 'balance' , component: BalanceComponent },
   { path: 'simulation', component: SimulationPageComponent },
+  { path: 'statistics', component: StatisticsComponent },
   { path: 'leaderboard', component: LeaderboardComponent },
   { path: '**', redirectTo: '' }
 ];

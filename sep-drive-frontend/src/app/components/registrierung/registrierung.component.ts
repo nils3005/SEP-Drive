@@ -66,7 +66,8 @@ export class RegistrierungComponent {
     const email :string= this.registrierungsUser.email;
 
     if(regex.exec(email)==null){
-      this.errorMessage.showError("Fehler: E-Mail ungültig!")
+      this.errorMessage.showError("Fehler: E-Mail ungültig!");
+
     }
     else if(/[äöüÄÖÜß]/.test(this.registrierungsUser.email)){
       this.errorMessage.showError('Die eingegebene E-Mail enthält unerlaubte Zeichen (Umlaute)!')
@@ -75,8 +76,7 @@ export class RegistrierungComponent {
       this.errorMessage.showError ('Die eingegebenen Passwörter stimmen nicht überein!');
     }
     else{
-    }
-    this.auth.register(
+      this.auth.register(
         this.registrierungsUser.username,
         this.registrierungsUser.firstName,
         this.registrierungsUser.lastName,
@@ -86,16 +86,18 @@ export class RegistrierungComponent {
         this.registrierungsUser.birthDate,
         this.registrierungsUser.profilePicture,
         this.registrierungsUser.carType
-    ).subscribe({
-      next: () => {
-        console.log("Registrierung erfolgreich")
-        this.router.navigate(['/login'])
-      },
-      error: (error) => {
-        console.log(error);
-        this.errorMessage.showError (error.error);
-      }
-    });
+      ).subscribe({
+        next: () => {
+          console.log("Registrierung erfolgreich")
+          this.router.navigate(['/login'])
+        },
+        error: (error) => {
+          console.log(error);
+          this.errorMessage.showError (error.error);
+        }
+      });
+    }
+
   }
 
 }

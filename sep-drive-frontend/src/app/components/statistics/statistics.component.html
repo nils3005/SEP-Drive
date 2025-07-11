@@ -1,0 +1,76 @@
+@if (this.auth.isLoggedIn()){
+  <div *ngIf="user()?.role === 'DRIVER'">
+    <div class="grid grid-cols-3 grid-rows-1 gap-1 font-sans mb-10"></div>
+    <div class="max-w-4xl mx-auto p-4">
+
+      <div class="flex flex-wrap items-center gap-4 mb-6">
+        <label class="font-semibold">Ansicht:</label>
+        <select [(ngModel)]="viewType" class="border border-gray-300 rounded px-2 py-1">
+          <option value="month">Monat</option>
+          <option value="year">Jahr</option>
+        </select>
+
+        <label class="font-semibold">Jahr:</label>
+        <input type="number" [(ngModel)]="selectedYear"
+               class="border border-gray-300 rounded px-2 py-1 w-24" />
+
+        <ng-container *ngIf="viewType === 'month'">
+          <label class="font-semibold">Monat:</label>
+          <select [(ngModel)]="selectedMonth"
+                  class="border border-gray-300 rounded px-2 py-1">
+            <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [value]="m">
+              {{ m }}
+            </option>
+          </select>
+        </ng-container>
+
+        <button (click)="onSubmit()"
+                class="bg-[#914141] hover:bg-[#733C3C] text-white px-4 py-2 rounded shadow">
+          Anzeigen
+        </button>
+      </div>
+
+      @if (noInput()){
+        <!--
+      <div *ngIf="statistics.length >= 0" class="space-y-8">-->
+        <div class="bg-white rounded shadow p-4">
+          <h3 class="text-lg font-semibold mb-2">Einnahmen (in EUR)</h3>
+          <canvas baseChart
+                  [data]="incomeChartData"
+                  [options]="chartOptions"
+                  chartType="bar"
+                  class="w-full"></canvas>
+        </div>
+
+        <div class="bg-white rounded shadow p-4">
+          <h3 class="text-lg font-semibold mb-2">Gefahrene Distanz (in Km)</h3>
+          <canvas baseChart
+                  [data]="distanceChartData"
+                  [options]="chartOptions"
+                  chartType="bar"
+                  class="w-full"></canvas>
+        </div>
+
+        <div class="bg-white rounded shadow p-4">
+          <h3 class="text-lg font-semibold mb-2">Fahrzeit (in Min.)</h3>
+          <canvas baseChart
+                  [data]="timeChartData"
+                  [options]="chartOptions"
+                  chartType="bar"
+                  class="w-full"></canvas>
+        </div>
+
+        <div class="bg-white rounded shadow p-4">
+          <h3 class="text-lg font-semibold mb-2">Bewertungen</h3>
+          <canvas baseChart
+                  [data]="ratingChartData"
+                  [options]="chartOptions"
+                  chartType="bar"
+                  class="w-full"></canvas>
+        </div>
+        <!--</div>-->
+      }
+
+    </div>
+  </div>
+}

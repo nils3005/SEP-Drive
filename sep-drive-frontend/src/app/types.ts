@@ -224,6 +224,16 @@ export type Message = {
   seen: boolean;
 }
 
+export type StatisticsDto = {
+  timespan: number;
+  username: string;
+  drivenRides: number;
+  income: number;
+  drivenDistance: number;
+  drivenTime: number;
+  averageRating: number;
+}
+
 export type leaderboard = {
   username: string;
   name: string;
