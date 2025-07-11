@@ -71,23 +71,6 @@ export class WebsocketService implements OnDestroy {
     });
   }
 
-  /**
-   * Sendet eine Nachricht (JSON) an den STOMP-Endpunkt.
-   *
-   * @param destination z.B. "/app/send-offer"
-   * @param body Beliebiges Objekt, das zu JSON serialisiert wird
-   */
-  public send(destination: string, body: any): void {
-    if (this.client && this.client.active) {
-      this.client.publish({
-        destination,
-        body: JSON.stringify(body)
-      });
-    } else {
-      console.warn('STOMP-Client ist nicht aktiv. Nachricht nicht gesendet.');
-    }
-  }
-
   ngOnDestroy(): void {
     // Verbindungen sauber schließen
     if (this.client && this.client.active) {
