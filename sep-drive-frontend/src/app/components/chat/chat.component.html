@@ -7,12 +7,11 @@
         }
     </div>
     <div class="messages" #messagesContainer>
-        @if (this.messages()) {
-            @for (message of this.messages(); track message.id) {
+        @if (this.messages?.length) {
+            @for (message of this.messages; track message.id) {
                 @if (message.senderRole === this.authService.user()?.role) {
                     <!-- Message ist vom eingeloggten User also rechtsbündig -->
                     <div class="message-right">
-
                         @if (editingMessage?.id === message.id) {
                             <input
                                     type="text"
@@ -22,19 +21,19 @@
                                     #editInput
                             />
                             <button (click)="saveEditedMessage(message)">
-                                <i class="fas fa-save" aria-hidden="true"></i>
+                                <i class="fas fa-save"></i>
                             </button>
                             <button (click)="cancelEdit()">
-                                <i class="fa fa-times" aria-hidden="true"></i>
+                                <i class="fa fa-times"></i>
                             </button>
                         } @else {
                             {{ message.message }}
                             @if (!message.seen) {
                                 <button (click)="startEdit(message)">
-                                    <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-pencil"></i>
                                 </button>
                                 <button (click)="deleteMessage(message)">
-                                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-trash"></i>
                                 </button>
                             }
                         }
@@ -48,9 +47,7 @@
                 }
             }
         } @else {
-            <div class="notification">
-                Der Chat ist leer
-            </div>
+            <div class="notification">Es wurden noch keine Nachrichten im Chat gesendet</div>
         }
     </div>
     <div class="input">
@@ -61,8 +58,8 @@
                     class="chat-textarea"
                     (keydown.enter)="sendMessageWrapper($event)"
             ></textarea>
-            <button (click)="sendMessage(newMessage())">
-                <i class="fa fa-paper-plane" aria-hidden="true"></i>
+            <button (click)="sendMessage()">
+                <i class="fa fa-paper-plane"></i>
             </button>
     </div>
 </div>

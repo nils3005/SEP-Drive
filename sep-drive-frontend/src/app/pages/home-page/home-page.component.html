@@ -13,7 +13,7 @@
             <!-- User ist eingeloggt -->
             @if (this.authService.user()?.role === "DRIVER") { <!-- Kunde ist Driver -->
             <div class="left-container">
-                <app-ride-request-list class="ride-request-list"/>
+                <app-ride-request-list [hasRideOffer]="this.hasRideOffer" class="ride-request-list"/>
             </div>
             @if (this.hasRideOffer()) {
                 <div class="right-container">
