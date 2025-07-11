@@ -101,8 +101,8 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
             for (const stop of rideResponse.ride.waypoints) {
               const stopResponse = await firstValueFrom(
                 this.openRouteService.getGeocodeFeatureByCoordinates({
-                  longitude: stop.latitude,
-                  latitude: stop.longitude
+                  longitude: stop.longitude,
+                  latitude: stop.latitude
                 })
               )
               if (stopResponse.body) {
