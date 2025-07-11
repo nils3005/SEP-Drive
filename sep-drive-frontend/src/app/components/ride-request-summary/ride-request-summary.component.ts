@@ -10,6 +10,7 @@ import {BehaviorSubject} from "rxjs";
 import {Util} from "leaflet";
 import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
 import {AuthService} from '../../services/auth/auth-service.service';
+import {GeoStoreService} from '../../stores/geo/geo-store.service';
 
 @Component({
   selector: 'app-ride-request-summary',
@@ -25,6 +26,7 @@ export class RideRequestSummaryComponent {
       private mapService: MapService,
       private rideRequestService: RideRequestService,
       public geoService: GeoService,
+      public geoStoreService: GeoStoreService,
       private errorService: ErrorService,
       private router: Router,
       private rideSimulationStore: RideSimulationStore,
@@ -34,6 +36,7 @@ export class RideRequestSummaryComponent {
       if (data == null) {
         geoService.showInput.next(false);
       } else {
+        console.log(data);
         this.summaryData = data;
         this.rideSimulationStore.ridePrice.next(this.summaryData.price)
       }
@@ -51,17 +54,20 @@ export class RideRequestSummaryComponent {
 
   public minutesToHHMM(minutes: number): string {
     const hours = Math.floor(minutes / 60);
-    const mins = Math.floor(minutes % 60); // Ensure no fractions here
+    const mins = Math.floor(minutes % 60);
     return `${hours}:${mins.toString().padStart(2, '0')}`;
   }
 
   onSubmit() {
-    const carType = this.geoService.carType.getValue();
-    if (this.geoService.waypoints.getValue().length > 1 && carType) {
+    const carType = this.geoStoreService.carType.getValue();
+    const start = this.geoStoreService.start.getValue();
+    const destination = this.geoStoreService.destination.getValue();
+    if (start && destination && carType) {
       if (this.summaryData && this.authService.user()!.financials?.balance >= this.summaryData?.price) {
         this.rideRequestService.requestRide(
-            this.geoService.waypoints.getValue()[0],
-            this.geoService.waypoints.getValue()[1],
+            start,
+            destination,
+            this.geoStoreService.stops.getValue(),
             carType.toUpperCase()
         ).subscribe({
           next: () => {
@@ -107,7 +113,4 @@ export class RideRequestSummaryComponent {
     this.mapService.resetMap()
     this.geoService.showInput.next(true);
   }
-
-  protected readonly parseFloat = parseFloat;
-  protected readonly Util = Util;
 }

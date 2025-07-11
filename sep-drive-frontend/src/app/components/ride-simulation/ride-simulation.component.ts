@@ -1,20 +1,30 @@
-import {Component, OnDestroy, OnInit, Signal} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {DataDisplayComponent} from '../core/data-display/data-display.component';
 import {MapService} from '../../services/map/map.service';
 import {RideService} from '../../services/ride/ride.service';
 import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
-import {Coordinates, Ride, RideRequestSummary, RideResponse, RideUpdateDTO} from '../../types';
+import {
+  Coord,
+  Coordinates,
+  GeocodeFeature,
+  GeoJsonRoute,
+  Ride,
+  RideRequestSummary,
+  RideUpdateDTO,
+  RouteStopEventEmitterDto
+} from '../../types';
 import {OpenRouteServiceService} from '../../services/openroute/open-route-service.service';
-import {GeoService} from '../../services/geo/geo.service';
 import {WebsocketService} from '../../services/websocket/web-socket.service';
 import {Router} from '@angular/router';
-import {toSignal} from '@angular/core/rxjs-interop';
-import {RideRequestService} from '../../services/riderequest/ride-request.service';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, firstValueFrom} from 'rxjs';
+import {GeoStoreService} from '../../stores/geo/geo-store.service';
+import {LocationInputComponent} from '../core/location-input/location-input.component';
+import {LocationStopInputComponent} from '../core/location-stop-input/location-stop-input.component';
+import {GeoService} from '../../services/geo/geo.service';
 
 @Component({
   selector: 'app-ride-simulation',
-  imports: [DataDisplayComponent],
+  imports: [DataDisplayComponent, LocationInputComponent, LocationStopInputComponent],
   templateUrl: './ride-simulation.component.html',
   styleUrl: './ride-simulation.component.scss',
 })
@@ -24,16 +34,17 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
   private started: number = 0;
 
   public rideData: BehaviorSubject<RideRequestSummary | null> = new BehaviorSubject<RideRequestSummary | null>(null);
+  public showStopInput: boolean = false;
 
   constructor(
     private mapService: MapService,
     private rideService: RideService,
     public rideSimulationStore: RideSimulationStore,
-    private rideRequestService: RideRequestService,
     private openRouteService: OpenRouteServiceService,
-    private geoService: GeoService,
+    public geoStoreService: GeoStoreService,
     private webSocketService: WebsocketService,
-    private router: Router
+    private router: Router,
+    private geoService: GeoService
     ) {
     this.webSocketService.isConnected.subscribe(isConnected => {
       if (isConnected) {
@@ -56,11 +67,11 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
     this.rideSimulationStore.started = false;
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
     this.mapService.clearMap()
     this.rideService.getActiveRide()
       .subscribe({
-        next: rideResponse => {
+        next: async rideResponse => {
           this.rideSimulationStore.ride.next(rideResponse);
           if (rideResponse.ride) {
             this.rideSimulationStore.rideData.next({
@@ -72,19 +83,40 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
               coordsIndex: rideResponse.ride.coordsIndex,
               historyId: null
             });
+            console.log(rideResponse)
             if (rideResponse.ride.coordsIndex > 0) {
               this.rideSimulationStore.started = true;
             }
             const startCords: Coordinates = {
-              latitude: rideResponse.coords[0][0],
-              longitude: rideResponse.coords[0][1]
+              latitude: rideResponse.ride.startLocation.latitude,
+              longitude: rideResponse.ride.startLocation.longitude,
             }
+            const endCords: Coordinates = {
+              latitude: rideResponse.ride.destination.latitude,
+              longitude: rideResponse.ride.destination.longitude
+            }
+
+            let stops: GeocodeFeature[] = [];
+
+            for (const stop of rideResponse.ride.waypoints) {
+              const stopResponse = await firstValueFrom(
+                this.openRouteService.getGeocodeFeatureByCoordinates({
+                  longitude: stop.latitude,
+                  latitude: stop.longitude
+                })
+              )
+              if (stopResponse.body) {
+                stops.push(stopResponse.body.features[0])
+              }
+            }
+
+            this.geoStoreService.stops.next(stops);
+
             this.speedValue = rideResponse.ride.speed;
             this.openRouteService.getGeocodeFeatureByCoordinates(startCords).subscribe({
               next: data => {
                 if (data.body) {
-                  this.rideSimulationStore.start.set(data.body.features[0].properties.label)
-                  this.geoService.updateStart(data.body.features[0], false)
+                  this.geoStoreService.start.next(data.body.features[0])
                   const endCords: Coordinates = {
                     latitude: rideResponse.coords[rideResponse.coords.length - 1][0],
                     longitude: rideResponse.coords[rideResponse.coords.length - 1][1]
@@ -92,10 +124,9 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
                   this.openRouteService.getGeocodeFeatureByCoordinates(endCords).subscribe({
                     next: data => {
                       if (data.body) {
-                        this.rideSimulationStore.destination.set(data.body.features[0].properties.label)
-                        this.geoService.updateDestination(data.body.features[0], false)
-                        this.geoService.route.next(JSON.parse(rideResponse.ride.geoJson))
-                        this.rideData.next(this.getRideSummaryFromRide(rideResponse.ride, this.rideSimulationStore.start(), this.rideSimulationStore.destination()))
+                        this.geoStoreService.destination.next(data.body.features[0])
+                        this.geoStoreService.route.next(JSON.parse(rideResponse.ride.geoJson))
+                        this.rideData.next(this.getRideSummaryFromRide(rideResponse.ride, this.rideSimulationStore.start()?.properties.label ?? '', this.rideSimulationStore.destination()?.properties.label ?? ''))
                         this.started = 0;
                         this.rideService.simulateRide()
                         this.checkUpdates()
@@ -124,7 +155,6 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
     this.rideSimulationStore.rideData.asObservable().subscribe((rideData) => {
       console.log("Update");
       if (rideData.paused && this.rideSimulationStore.motionPolyLine) {
-        // this.rideSimulationStore.motionPolyLine.motionToggle();
         this.rideSimulationStore.motionPolyLine.motionPause()
       }
       if (rideData.resuming && this.rideSimulationStore.motionPolyLine) {
@@ -136,6 +166,49 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
         }
         this.started += 1;
       }
+
+      if (rideData.geoJson != this.geoStoreService.route.getValue() && rideData.geoJson) {
+        this.geoStoreService.route.next(JSON.parse(rideData.geoJson));
+        const jsonRoute: GeoJsonRoute = JSON.parse(rideData.geoJson);
+        let ride = this.rideSimulationStore.ride.getValue()
+        if (ride) {
+          ride.coords = jsonRoute.features[0].geometry.coordinates;
+          this.rideSimulationStore.ride.next(ride)
+        }
+      }
+
+      if (rideData.waypoints) {
+        let features: GeocodeFeature[] = []
+        for (const point of rideData.waypoints) {
+          const invertedPoint: Coordinates = {
+            latitude: point.longitude,
+            longitude: point.latitude,
+          }
+          this.openRouteService.getGeocodeFeatureByCoordinates(invertedPoint).subscribe({
+            next: data => {
+              if (data.body) {
+                features.push(data.body.features[0]);
+              }
+            }
+          })
+        }
+        this.geoStoreService.stops.next(features)
+      }
+
+      if (rideData.destination != this.geoService.getCoordinatesByGeoCodeFeature(this.geoStoreService.destination.getValue()!) && rideData.destination) {
+        this.openRouteService.getGeocodeFeatureByCoordinates({
+          latitude: rideData.destination.longitude,
+          longitude: rideData.destination.latitude,
+        }).subscribe({
+          next: data => {
+            if (data.body) {
+              console.log("Updating Destination: ", data.body.features[0]);
+              this.geoStoreService.destination.next(data.body.features[0])
+            }
+          }
+        })
+      }
+
       if (this.started > 1) {
         const ride = this.rideSimulationStore.ride.getValue();
         if (this.rideSimulationStore.motionPolyLine && ride) {
@@ -151,7 +224,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
     console.log(ride)
     return {
       start: start,
-      stops: [],
+      waypoints: [],
       end: end,
       distance: parseFloat((ride.distance / 1000).toFixed(2)),
       duration: parseFloat((ride.duration / 60).toFixed(2)),
@@ -179,5 +252,83 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
     this.rideSimulationStore.started = true;
     let rideData = this.rideSimulationStore.rideData.getValue();
     this.rideService.updateRideData(!rideData.paused, !rideData.resuming, null, null);
+  }
+
+  onDestinationChange(event: GeocodeFeature) {
+    this.geoStoreService.destination.next(event);
+    // this.rideService.addMarkerPositionToWaypointArray(passedWaypoints).then(stops => {
+    //   stops.push(event);
+    //   const coordinates = this.rideService.getCoordsArrayFromGeocodeFeatureArray(stops)
+    // })
+    const ride = this.rideSimulationStore.ride.getValue();
+    const start = this.geoStoreService.start.getValue();
+    if (ride && start) {
+      let cords = this.rideService.mergePastRouteAndFutureWaypoints(ride, this.geoStoreService.stops.getValue())
+      cords.splice(0, 0, [start.geometry.coordinates[0], start.geometry.coordinates[1]]);
+      cords.push([event.geometry.coordinates[0], event.geometry.coordinates[1]]);
+      this.openRouteService.getRouteFromPointArray(
+        cords
+      ).subscribe({
+        next: data => {
+          this.rideService.editRideData(
+            10,
+            10,
+            event,
+            null,
+            data.body
+          )
+        }
+      })
+    }
+  }
+
+  onStopChange(event: RouteStopEventEmitterDto) {
+    if (event.removed) {
+      this.geoStoreService.stops.next(event.stops);
+      const ride = this.rideSimulationStore.ride.getValue();
+      const start = this.geoStoreService.start.getValue();
+      const destination = this.geoStoreService.destination.getValue();
+      if (ride && start && destination) {
+        let cords = this.rideService.mergePastRouteAndFutureWaypoints(ride, this.geoStoreService.stops.getValue())
+        cords.splice(0, 0, [start.geometry.coordinates[0], start.geometry.coordinates[1]]);
+        cords.push([destination.geometry.coordinates[0], destination.geometry.coordinates[1]]);
+        this.openRouteService.getRouteFromPointArray(
+          cords
+        ).subscribe({
+          next: data => {
+            this.rideService.editRideData(
+              10,
+              10,
+              destination,
+              null,
+              data.body
+            )
+          }
+        })
+      }
+    } else {
+      this.geoStoreService.stops.next(event.stops);
+      const ride = this.rideSimulationStore.ride.getValue();
+      const start = this.geoStoreService.start.getValue();
+      const destination = this.geoStoreService.destination.getValue();
+      if (ride && start && destination) {
+        let cords = this.rideService.mergePastRouteAndFutureWaypoints(ride, this.geoStoreService.stops.getValue())
+        cords.splice(0, 0, [start.geometry.coordinates[0], start.geometry.coordinates[1]]);
+        cords.push([destination.geometry.coordinates[0], destination.geometry.coordinates[1]]);
+        this.openRouteService.getRouteFromPointArray(
+          cords
+        ).subscribe({
+          next: data => {
+            this.rideService.editRideData(
+              10,
+              10,
+              null,
+              event.stops,
+              data.body
+            )
+          }
+        })
+      }
+    }
   }
 }

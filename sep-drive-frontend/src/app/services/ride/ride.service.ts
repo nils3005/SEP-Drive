@@ -1,17 +1,28 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient, HttpResponse} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
-import {Coord, Ride, RideDto, RideResponse, RideUpdateDTO} from '../../types';
+import {
+  Coord,
+  Coordinates,
+  GeocodeFeature,
+  GeoJsonRoute, Ride, RideCords,
+  RideDto,
+  RideResponse,
+  RideUpdateDTO
+} from '../../types';
 import {ErrorService} from '../error/error.service';
-import {Observable} from 'rxjs';
+import {firstValueFrom, Observable} from 'rxjs';
 
 /**
  * import in main.ts wird vor angular bootstraps evaluiert
  * funktioniert bei ng serve, da das script injection verhalten nicht so strikt ist, wie bei ng build, was im docker benutzt wird
  */
 declare const L: any;
-import {GeoService} from '../geo/geo.service';
 import {Router} from "@angular/router";
+import {GeoStoreService} from '../../stores/geo/geo-store.service';
+import {marker} from 'leaflet';
+import {GeoService} from '../geo/geo.service';
+import {OpenRouteServiceService} from '../openroute/open-route-service.service';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +36,8 @@ export class RideService {
   constructor(
     private rideSimulationStore: RideSimulationStore,
     private errorService: ErrorService,
-    private geoService: GeoService
+    private geoStoreService: GeoStoreService,
+    private openRouteService: OpenRouteServiceService
   ) {
   }
 
@@ -45,7 +57,7 @@ export class RideService {
           iconSize: L.point(27.5, 24)
         })
       });
-      this.rideSimulationStore.motionPolyLine.addTo(this.geoService.map);
+      this.rideSimulationStore.motionPolyLine.addTo(this.geoStoreService.map);
       this.checkUpdates()
     }
   }
@@ -66,7 +78,7 @@ export class RideService {
     )
   }
 
-  updateRide(rideData: RideUpdateDTO): void
+  private updateRide(rideData: RideUpdateDTO): void
   {
     this.httpClient.post(
       'http://localhost:8080/ride/updateRide',
@@ -93,7 +105,12 @@ export class RideService {
     })
   }
 
-  updateRideData(paused: boolean | null, resuming: boolean | null, speed: number | null, completed: boolean |null): void
+  updateRideData(
+    paused: boolean | null,
+    resuming: boolean | null,
+    speed: number | null,
+    completed: boolean |null
+  ): void
   {
     let rideData: RideUpdateDTO = this.rideSimulationStore.rideData.getValue();
     rideData.completed = completed ?? rideData.completed;
@@ -105,12 +122,82 @@ export class RideService {
     this.updateRide(rideData)
   }
 
+  editRideData(
+    distance: number,
+    duration: number,
+    destination: GeocodeFeature | null = null,
+    waypoints: GeocodeFeature[] | null = null,
+    geoJson: any = null
+  ): void {
+    let rideData: RideUpdateDTO = this.rideSimulationStore.rideData.getValue();
+    rideData.distance = distance;
+    rideData.duration = duration;
+    if (destination) {
+      rideData.destination = {
+        latitude: destination.geometry.coordinates[0],
+        longitude: destination.geometry.coordinates[1]
+      }
+    }
+    if (waypoints) {
+      let stops: Coordinates[] = [];
+      for (const waypoint of waypoints) {
+        stops.push({
+          latitude: waypoint.geometry.coordinates[0],
+          longitude: waypoint.geometry.coordinates[1]
+        });
+      }
+      rideData.waypoints = stops;
+    }
+    if (geoJson) {
+      const tempJson: GeoJsonRoute = geoJson;
+      rideData.geoJson = JSON.stringify(geoJson);
+      rideData.distance = tempJson.features[0].properties.summary.distance;
+      rideData.duration = tempJson.features[0].properties.summary.duration;
+    }
+    this.editRide(rideData);
+  }
+
+  private editRide(rideData: RideUpdateDTO): void {
+    this.httpClient.post(
+      'http://localhost:8080/ride/updateRoute',
+      rideData,
+      {responseType: "text"}
+    ).subscribe((response) => {
+      if (response != "Route updated") {
+        this.errorService.showError(response)
+      }
+    })
+  }
+
   getCoordsIndex(): number {
     const ride = this.rideSimulationStore.ride.getValue();
     if (ride) {
       return this.findClosestCoordinateIndex(ride.coords, [this.rideSimulationStore.motionPolyLine.__marker.getLatLng().lat, this.rideSimulationStore.motionPolyLine.__marker.getLatLng().lng])
     }
     return -1;
+  }
+
+  async addMarkerPositionToWaypointArray(waypoints: GeocodeFeature[]): Promise<GeocodeFeature[]> {
+    const markerPosition = this.getMarkerPosition()
+    const markerFeature = await firstValueFrom(
+      this.openRouteService.getGeocodeFeatureByCoordinates(markerPosition)
+    );
+    const ride = this.rideSimulationStore.ride.getValue();
+    if (ride) {
+      let closestIndex = this.findClosestCoordinateIndex(this.getCoordsArrayFromGeocodeFeatureArray(waypoints), [Number(markerPosition.latitude), Number(markerPosition.longitude)])
+      if (markerFeature.body) {
+        waypoints.splice(closestIndex, 0, markerFeature.body.features[0]);
+      }
+    }
+    return waypoints;
+  }
+
+  getCoordsArrayFromGeocodeFeatureArray(features: GeocodeFeature[]): Coord[] {
+    let coords: Coord[] = []
+    for (const feature of features) {
+      coords.push([feature.geometry.coordinates[0], feature.geometry.coordinates[1]])
+    }
+    return coords;
   }
 
   updateIndex(): void {
@@ -136,6 +223,57 @@ export class RideService {
         console.log("Error ", err)
       }
     })
+  }
+
+  getMarkerPosition(): Coordinates {
+    const markerPosition = this.rideSimulationStore.motionPolyLine.__marker.getLatLng();
+    return {
+      latitude: markerPosition.lat,
+      longitude: markerPosition.lng
+    }
+  }
+
+  updateIndexesOnGeocodeFeatures(ride: RideResponse, features: GeocodeFeature[]): GeocodeFeature[] {
+    for (const feature of features) {
+      feature.properties.index = this.findClosestCoordinateIndex(
+        ride.coords,
+        [feature.geometry.coordinates[0], feature.geometry.coordinates[1]],
+      )
+    }
+    return features;
+  }
+
+  mergePastRouteAndFutureWaypoints(ride: RideResponse, waypoints: GeocodeFeature[]): RideCords {
+    const routeCords = ride.coords;
+    const markerPosition = this.getMarkerPosition();
+    const markerIndex = this.findClosestCoordinateIndex(routeCords, [Number(markerPosition.latitude), Number(markerPosition.longitude)]);
+    const indexedWaypoints = this.updateIndexesOnGeocodeFeatures(ride, waypoints);
+
+    let routeWaypointArray: RideCords = [];
+    let markerInserted = false;
+
+    for (const waypoint of indexedWaypoints) {
+      if (
+        !markerInserted &&
+        waypoint.properties.index !== undefined &&
+        waypoint.properties.index > markerIndex
+      ) {
+        routeWaypointArray.push([Number(markerPosition.longitude), Number(markerPosition.latitude)]);
+        markerInserted = true;
+      }
+      routeWaypointArray.push([
+        waypoint.geometry.coordinates[0],
+        waypoint.geometry.coordinates[1],
+      ]);
+    }
+
+    if (!markerInserted) {
+      routeWaypointArray.push([Number(markerPosition.longitude), Number(markerPosition.latitude)]);
+    }
+
+    console.log(routeWaypointArray)
+
+    return routeWaypointArray;
   }
 
   calculateKmh(meters: number, seconds: number): number {

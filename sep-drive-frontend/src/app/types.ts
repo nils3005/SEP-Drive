@@ -28,6 +28,7 @@ export type GeocodeFeature = {
     region?: string | undefined,
     locality?: string | undefined,
     label: string
+    index: number | undefined,
   }
 }
 
@@ -39,6 +40,9 @@ export type GeoJsonRoute = {
           distance: number,
           duration: number
         }
+      },
+      geometry: {
+        coordinates: RideCords
       }
     }
   ]
@@ -78,6 +82,7 @@ export type RideRequest = {
   customer: User
   startLocation: Coordinates
   destination: Coordinates
+  waypoints: Coordinates[]
   carType: CarType
   active: boolean
   createdAt: string
@@ -107,7 +112,7 @@ export type RideOfferNotification = {
 
 export type RideRequestSummary = {
   start: string
-  stops: GeocodeFeature[]
+  waypoints: GeocodeFeature[]
   end: string
   distance: number
   duration: number
@@ -183,6 +188,9 @@ export type Ride = {
   geoJson: any
   coords: [[number, number]]
   speeds: number[]
+  startLocation: Coordinates
+  destination: Coordinates
+  waypoints: Coordinates[]
 }
 
 export type RideDto = {
@@ -192,9 +200,12 @@ export type RideDto = {
   speed: number,
   distance: number,
   geoJson: any
+  startLocation: Coordinates
+  destination: Coordinates
+  waypoints: Coordinates[]
 }
 
-export type RideCords = [[number, number]]
+export type RideCords = [number, number][]
 
 export type Speeds = number[]
 
@@ -206,6 +217,11 @@ export type RideUpdateDTO = {
   speed: number
   coordsIndex: number
   historyId: number | null
+  waypoints?: Coordinates[],
+  destination?: Coordinates
+  distance?: number
+  duration?: number
+  geoJson?: any
 }
 
 export type Coord = [number, number]
@@ -222,6 +238,12 @@ export type Message = {
   senderRole: 'DRIVER' | 'CUSTOMER';
   message: string;
   seen: boolean;
+}
+
+export type RouteStopEventEmitterDto = {
+  stops: GeocodeFeature[],
+  changedStop: GeocodeFeature,
+  removed: boolean,
 }
 
 export type StatisticsDto = {

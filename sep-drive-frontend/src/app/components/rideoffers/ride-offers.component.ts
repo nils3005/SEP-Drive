@@ -5,7 +5,7 @@ import {GeoJsonRoute, RideDto, RideOffer, RideOfferNotification} from '../../typ
 
 import {WebsocketService} from "../../services/websocket/websocket.service";
 import {RideRequestService} from "../../services/riderequest/ride-request.service";
-import {firstValueFrom, Subscription} from "rxjs";
+import {Subscription} from "rxjs";
 import { Router } from '@angular/router';
 import {GeoService} from '../../services/geo/geo.service';
 import {RideService} from '../../services/ride/ride.service';
@@ -13,6 +13,7 @@ import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-s
 import {AuthService} from '../../services/auth/auth-service.service';
 import {ErrorService} from '../../services/error/error.service';
 import {ChatComponent} from "../chat/chat.component";
+import {GeoStoreService} from '../../stores/geo/geo-store.service';
 
 @Component({
   selector: 'app-rideoffers',
@@ -30,9 +31,7 @@ export class RideOffersComponent implements OnInit, OnDestroy {
   private rideRequestService: RideRequestService = inject(RideRequestService);
   private geoService = inject(GeoService);
   private rideService: RideService = inject(RideService);
-  private rideSimulationStore = inject(RideSimulationStore);
-  private authService: AuthService = inject(AuthService);
-  private errorService: ErrorService = inject(ErrorService);
+  private geoStoreService: GeoStoreService = inject(GeoStoreService);
 
   /** Aktuelle Liste, vom Websocket-Stream befüllt */
   offers = signal<RideOffer[]>([]);
@@ -142,31 +141,38 @@ export class RideOffersComponent implements OnInit, OnDestroy {
     if (confirm('Möchtest du dieses Angebot annehmen?')) {
       this.rideOfferService.acceptOffer(offerId).subscribe({
         next: (rideOffer) => {
+          const route: GeoJsonRoute = this.geoStoreService.route.getValue()
 
-          const start = this.geoService.getStart();
-          const destination = this.geoService.getDestination();
-          const route: GeoJsonRoute = this.geoService.route.getValue()
+          this.rideRequestService.getRideRequestById(rideOffer.rideRequestId).subscribe({
+            next: (rideRequest) => {
+              if (rideRequest.body) {
+                let rideDto: RideDto = {
+                  driverId: rideOffer.driverId,
+                  customerId: rideOffer.customerId,
+                  speed: 15,
+                  duration: route.features[0].properties.summary.duration,
+                  distance: route.features[0].properties.summary.distance,
+                  geoJson: JSON.stringify(route),
+                  startLocation: rideRequest.body?.startLocation,
+                  destination: rideRequest.body.destination,
+                  waypoints: rideRequest.body.waypoints,
+                };
+                console.log("customerId from acceptOffer: ", rideDto.customerId);
+                console.log("driverid from acceptOffer: ", rideDto.driverId);
 
-          let rideDto: RideDto = {
-            driverId: rideOffer.driverId,
-            customerId: rideOffer.customerId,
-            speed: 15,
-            duration: route.features[0].properties.summary.duration,
-            distance: route.features[0].properties.summary.distance,
-            geoJson: JSON.stringify(route)
-          };
+                const carType = this.geoStoreService.carType.getValue();
+                console.log(carType);
 
-          console.log("customerId from acceptOffer: ", rideDto.customerId);
-          console.log("driverid from acceptOffer: ", rideDto.driverId);
+                this.rideService.createRide(rideDto);
+                console.log("Created ride")
+                this.router.navigate(['/simulation']);
 
-          const carType = this.geoService.carType.getValue();
-          console.log(carType);
+                this.loadOffers();
+              }
+            }
+          })
 
-          this.rideService.createRide(rideDto);
-          console.log("Created ride")
-          this.router.navigate(['/simulation']);
 
-          this.loadOffers();
         },
         error: (err) => {
           console.log('Fehler beim Annehmen: ' + err.message);

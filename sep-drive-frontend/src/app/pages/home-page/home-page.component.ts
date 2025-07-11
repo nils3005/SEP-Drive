@@ -25,7 +25,7 @@ import {toObservable, toSignal} from "@angular/core/rxjs-interop";
     RideOffersComponent,
     RideRequestListComponent,
     RouterLink,
-    ChatComponent
+    ChatComponent,
   ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'
