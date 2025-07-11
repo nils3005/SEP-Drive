@@ -6,6 +6,7 @@ import {ErrorService} from '../../services/error/error.service';
 import {paymentMethodCustomer, paymentMethodDriver, User} from '../../types';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgIf} from '@angular/common';
+import {SuccessService} from '../../services/success/success.service';
 
 @Component({
   selector: 'app-payment-method',
@@ -21,6 +22,7 @@ export class PaymentMethodComponent {
   auth = inject(AuthService);
   private userService = inject(UserService);
   private errorMessage = inject(ErrorService);
+  private successMessage = inject(SuccessService);
 
   user = signal<User|null>(null);
   constructor(private router: Router) {
@@ -82,7 +84,7 @@ export class PaymentMethodComponent {
 
       this.userService.addCreditCard(dto).subscribe({
         next: () => {
-          this.errorMessage.showError("Zahlungsmethode erfolgreich gespeichert.");
+          this.successMessage.showSuccess("Zahlungsmethode erfolgreich gespeichert.");
           this.auth.updateUserData();
           this.router.navigate(['/social/user', this.user()?.id]);
         },
@@ -103,7 +105,7 @@ export class PaymentMethodComponent {
 
       this.userService.addBankAccount(dto).subscribe({
         next: () => {
-          this.errorMessage.showError("Bankkonto erfolgreich gespeichert.");
+          this.successMessage.showSuccess("Bankkonto erfolgreich gespeichert.");
           this.auth.updateUserData();
           this.router.navigate(['/social/user', this.user()?.id]);
         },

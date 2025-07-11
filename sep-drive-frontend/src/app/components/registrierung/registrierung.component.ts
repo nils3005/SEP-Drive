@@ -5,6 +5,7 @@ import {NgIf} from '@angular/common';
 import {Router} from '@angular/router';
 import {ErrorService} from "../../services/error/error.service";
 import {AuthService} from "../../services/auth/auth-service.service";
+import {SuccessService} from '../../services/success/success.service';
 
 @Component({
   selector: 'app-registrierung',
@@ -31,6 +32,7 @@ export class RegistrierungComponent {
   @Input() carType: any;
 
   private errorMessage = inject(ErrorService);
+  private successMessage = inject(SuccessService);
   private auth: AuthService = inject(AuthService);
   registrierungsUser: DriveUser;
 
@@ -91,7 +93,7 @@ export class RegistrierungComponent {
         this.registrierungsUser.carType
       ).subscribe({
         next: () => {
-          console.log("Registrierung erfolgreich")
+          this.successMessage.showSuccess("Registrierung erfolgreich");
           this.router.navigate(['/login'])
         },
         error: (error) => {

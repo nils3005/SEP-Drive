@@ -6,6 +6,7 @@ import {UserService} from '../../services/user/user.service';
 import {ErrorService} from '../../services/error/error.service';
 import {Router} from '@angular/router';
 import {User, Balance} from '../../types';
+import {SuccessService} from '../../services/success/success.service';
 
 @Component({
   selector: 'app-balance',
@@ -21,6 +22,7 @@ export class BalanceComponent {
   auth = inject(AuthService);
   private userService = inject(UserService);
   private errorMessage = inject(ErrorService);
+  private successMessage = inject(SuccessService);
 
   balance: Balance ={
     balance: 0
@@ -55,13 +57,13 @@ export class BalanceComponent {
         this.router.navigate(['payment-method']);
         return;
       }
-      if (this.balance.balance > 1000){
+      else if (this.balance.balance > 1000){
         this.errorMessage.showError("Zu hoher Betrag. Bitte wähle einen Betrag unter 1000€");
       }
       else{
         this.userService.deposit(this.balance.balance).subscribe({
           next: () => {
-            this.errorMessage.showError("Guthaben wurde erfolgreich aufgeladen");
+            this.successMessage.showSuccess("Guthaben wurde erfolgreich aufgeladen");
             this.auth.updateUserData();
             this.router.navigate(['/social/user', this.user()?.id]);
           },
@@ -90,7 +92,7 @@ export class BalanceComponent {
       else{
         this.userService.disburse(this.balance.balance).subscribe({
           next: () => {
-            this.errorMessage.showError("Guthaben wurde erfolgreich abgebucht"),
+            this.successMessage.showSuccess("Guthaben wurde erfolgreich abgebucht"),
               this.router.navigate(['/social/user', this.user()?.id]);
           },
           error: err => this.errorMessage.showError("Fehler bei der Abbuchung: " + err.error.message)
