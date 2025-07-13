@@ -20,8 +20,6 @@ import {firstValueFrom, Observable} from 'rxjs';
 declare const L: any;
 import {Router} from "@angular/router";
 import {GeoStoreService} from '../../stores/geo/geo-store.service';
-import {marker} from 'leaflet';
-import {GeoService} from '../geo/geo.service';
 import {OpenRouteServiceService} from '../openroute/open-route-service.service';
 
 @Injectable({
@@ -142,8 +140,8 @@ export class RideService {
       let stops: Coordinates[] = [];
       for (const waypoint of waypoints) {
         stops.push({
-          latitude: waypoint.geometry.coordinates[0],
-          longitude: waypoint.geometry.coordinates[1]
+          latitude: waypoint.geometry.coordinates[1],
+          longitude: waypoint.geometry.coordinates[0]
         });
       }
       rideData.waypoints = stops;
@@ -271,9 +269,16 @@ export class RideService {
       routeWaypointArray.push([Number(markerPosition.longitude), Number(markerPosition.latitude)]);
     }
 
-    console.log(routeWaypointArray)
-
     return routeWaypointArray;
+  }
+
+  invertCordsArray(cords: RideCords): RideCords
+  {
+    let retCords: RideCords = [];
+    for (const feature of cords) {
+      retCords.push([feature[1], feature[0]]);
+    }
+    return retCords;
   }
 
   calculateKmh(meters: number, seconds: number): number {

@@ -83,7 +83,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
               coordsIndex: rideResponse.ride.coordsIndex,
               historyId: null
             });
-            console.log(rideResponse)
+            // console.log(rideResponse)
             if (rideResponse.ride.coordsIndex > 0) {
               this.rideSimulationStore.started = true;
             }
@@ -153,7 +153,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
   checkUpdates(): void
   {
     this.rideSimulationStore.rideData.asObservable().subscribe((rideData) => {
-      console.log("Update");
+      // console.log("Update");
       if (rideData.paused && this.rideSimulationStore.motionPolyLine) {
         this.rideSimulationStore.motionPolyLine.motionPause()
       }
@@ -181,14 +181,13 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
         let features: GeocodeFeature[] = []
         for (const point of rideData.waypoints) {
           const invertedPoint: Coordinates = {
-            latitude: point.longitude,
-            longitude: point.latitude,
+            latitude: point.latitude,
+            longitude: point.longitude,
           }
           this.openRouteService.getGeocodeFeatureByCoordinates(invertedPoint).subscribe({
             next: data => {
               if (data.body) {
                 features.push(data.body.features[0]);
-                console.log("Feature", data.body.features[0]);
               }
             }
           })
@@ -203,7 +202,6 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
         }).subscribe({
           next: data => {
             if (data.body) {
-              console.log("Updating Destination: ", data.body.features[0]);
               this.geoStoreService.destination.next(data.body.features[0])
             }
           }
@@ -222,7 +220,6 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
 
   getRideSummaryFromRide(ride: Ride, start: string, end: string): RideRequestSummary
   {
-    console.log(ride)
     return {
       start: start,
       waypoints: [],
@@ -248,7 +245,6 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
   }
 
   toggleRideStatus() {
-    // console.log("Button press")
     this.rideSimulationStore.motionPolyLine.motionToggle();
     this.rideSimulationStore.started = true;
     let rideData = this.rideSimulationStore.rideData.getValue();
@@ -257,10 +253,6 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
 
   onDestinationChange(event: GeocodeFeature) {
     this.geoStoreService.destination.next(event);
-    // this.rideService.addMarkerPositionToWaypointArray(passedWaypoints).then(stops => {
-    //   stops.push(event);
-    //   const coordinates = this.rideService.getCoordsArrayFromGeocodeFeatureArray(stops)
-    // })
     const ride = this.rideSimulationStore.ride.getValue();
     const start = this.geoStoreService.start.getValue();
     if (ride && start) {
@@ -308,7 +300,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
         })
       }
     } else {
-      // this.geoStoreService.stops.next(event.stops);
+      this.geoStoreService.stops.next(event.stops);
       const ride = this.rideSimulationStore.ride.getValue();
       const start = this.geoStoreService.start.getValue();
       const destination = this.geoStoreService.destination.getValue();
