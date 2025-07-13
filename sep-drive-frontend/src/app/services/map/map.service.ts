@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {GeoService} from '../geo/geo.service';
 import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
 import {GeoStoreService} from '../../stores/geo/geo-store.service';
-import {Coordinates} from '../../types';
+import {Coordinates, GeoJsonRoute, RideUpdateDTO} from '../../types';
 
 @Injectable({
   providedIn: 'root'
@@ -49,8 +49,14 @@ export class MapService {
     this.flyMapTo(51.1657, 10.4515, 6, 1)
   }
 
-  public loadMapByCoordinates(start: Coordinates, destination: Coordinates, waypoints: Coordinates[]): void
+  public updateRoute(rideData: RideUpdateDTO): void
   {
-
+    this.geoStoreService.route.next(JSON.parse(rideData.geoJson));
+    const jsonRoute: GeoJsonRoute = JSON.parse(rideData.geoJson);
+    let ride = this.rideSimulationStore.ride.getValue()
+    if (ride) {
+      ride.coords = jsonRoute.features[0].geometry.coordinates;
+      this.rideSimulationStore.ride.next(ride)
+    }
   }
 }

@@ -14,7 +14,7 @@ export class GeoStoreService {
 
   public routeLayer: L.LayerGroup = L.layerGroup();
   public startLayer: L.LayerGroup = L.layerGroup();
-  public stoppsLayer: L.LayerGroup = L.layerGroup();
+  public stoppsLayer: L.FeatureGroup = L.featureGroup();
   public destinationLayer: L.LayerGroup = L.layerGroup();
 
   public currentPoint: BehaviorSubject<GeocodeFeature | null> = new BehaviorSubject<GeocodeFeature | null>(null);
