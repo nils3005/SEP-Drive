@@ -82,4 +82,15 @@ public class RideController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
+    @PostMapping("/addPastWaypoint/{rideId}/{waypointId}")
+    public ResponseEntity<?> addPassedWaypoint(@PathVariable Long rideId, @PathVariable String waypointId)
+    {
+        try {
+            rideService.addPassedWaypoint(rideId, waypointId);
+            return ResponseEntity.ok("Passed waypoint added");
+        } catch (RideNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 }
