@@ -32,18 +32,8 @@ public class Ride {
     @Lob
     private String geoJson;
 
-    public Ride(User driver, User customer, float speed, double price, float distance, String geoJson, float duration, CarType carType) {
-        this.driver = driver;
-        this.customer = customer;
-        this.speed = speed;
-        this.price = new BigDecimal(price).setScale(2, RoundingMode.HALF_UP).doubleValue();
-        this.distance = distance;
-        this.geoJson = geoJson;
-        this.duration = duration;
-        this.status = RideStatus.PAUSED;
-        this.coordsIndex = 0;
-        this.carType = carType;
-    }
+    @ElementCollection
+    private List<String> passedWaypoints;
 
     @Embedded
     @AttributeOverrides({
@@ -62,4 +52,23 @@ public class Ride {
     @ElementCollection
     @CollectionTable(name = "ride_waypoints", joinColumns = @JoinColumn(name = "ride_id"))
     private List<Location> waypoints;
+
+    public void addPassedWaypoint(String waypointId) {
+        passedWaypoints.add(waypointId);
+    }
+
+    public Ride(User driver, User customer, float speed, double price, float distance, String geoJson, float duration, CarType carType) {
+        this.driver = driver;
+        this.customer = customer;
+        this.speed = speed;
+        this.price = new BigDecimal(price).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        this.distance = distance;
+        this.geoJson = geoJson;
+        this.duration = duration;
+        this.status = RideStatus.PAUSED;
+        this.coordsIndex = 0;
+        this.carType = carType;
+    }
+
+
 }

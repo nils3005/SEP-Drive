@@ -188,5 +188,17 @@ public class RideService {
         User driver = ride.getDriver();
         financialsService.transfer(customer, driver, ride.getPrice());
     }
+
+    public void addPassedWaypoint(Long rideId, String waypointId) throws RideNotFoundException
+    {
+        Ride ride = rideRepository.findById(rideId).orElseThrow(() -> new RideNotFoundException("Ride not found"));
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (!ride.getCustomer().getUsername().equals(username) && !ride.getDriver().getUsername().equals(username)) {
+            throw new RuntimeException("User is not part of ride");
+        }
+        ride.addPassedWaypoint(waypointId);
+        rideRepository.save(ride);
+    }
 }
 
