@@ -59,5 +59,6 @@ export class MapService {
       ride.coords = jsonRoute.features[0].geometry.coordinates;
       this.rideSimulationStore.ride.next(ride)
     }
+    location.reload()
   }
 }
