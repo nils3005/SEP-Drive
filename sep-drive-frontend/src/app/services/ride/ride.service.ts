@@ -55,18 +55,62 @@ export class RideService {
           iconSize: L.point(27.5, 24)
         })
       });
-      this.rideSimulationStore.motionPolyLine.addTo(this.geoStoreService.map);
+      this.rideSimulationStore.motionPolyLine.addTo(this.rideSimulationStore.simulationLayer);
       this.checkUpdates()
     }
   }
 
   checkUpdates() {
-    this.rideSimulationStore.motionPolyLine.on((L as any).Motion.Event.Ended, () => {
-      let rideData: RideUpdateDTO = this.rideSimulationStore.rideData.getValue();
-      rideData.completed = true;
-      this.rideSimulationStore.rideData.next(rideData);
-      this.updateRide(rideData)
-    });
+    const marker = this.rideSimulationStore.motionPolyLine.getMarker();
+    if (marker) {
+      marker.on('move', (e: any) => {
+        if (this.geoStoreService.destination.getValue() && !this.rideSimulationStore.rideData.getValue().completed && this.isStopPassed(this.geoStoreService.destination.getValue()!, [e.latlng.lat, e.latlng.lng])) {
+          console.log("ended")
+          let rideData: RideUpdateDTO = this.rideSimulationStore.rideData.getValue();
+          rideData.completed = true;
+          this.rideSimulationStore.rideData.next(rideData);
+          this.updateRide(rideData)
+          return
+        }
+        for (const stop of this.geoStoreService.stops.getValue()) {
+          if (this.isStopPassed(stop, [e.latlng.lat, e.latlng.lng])) {
+            console.log("Passed a waypoint")
+            this.addPassedWaypoint(stop.properties.id)
+          }
+        }
+      })
+    }
+  }
+
+  private addPassedWaypoint(waypointId: string) {
+    const extractedId = waypointId.split('/')[1]
+    if (!this.rideSimulationStore.passedWaypoints.includes(extractedId)) {
+      this.rideSimulationStore.passedWaypoints.push(extractedId)
+      const ride = this.rideSimulationStore.ride.getValue();
+      if (ride) {
+        this.httpClient.post<string>(
+          `http://localhost:8080/ride/addPastWaypoint/${ride.ride.rideId}/${extractedId}`,
+          {responseType: "text"}
+        )
+      }
+    }
+  }
+
+  isStopPassed(stop: GeocodeFeature, markerPosition: Coord): boolean {
+    const toRad = (value: number) => (value * Math.PI) / 180;
+
+    const R = 6371000; // Earth radius in meters
+    const dLat = toRad(stop.geometry.coordinates[1] - markerPosition[0]);
+    const dLon = toRad(stop.geometry.coordinates[0] - markerPosition[1]);
+
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(markerPosition[0])) * Math.cos(toRad(stop.geometry.coordinates[1])) * Math.sin(dLon / 2) ** 2;
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+
+    return distance <= 150;
   }
 
   getActiveRide(): Observable<RideResponse>
@@ -170,24 +214,12 @@ export class RideService {
   getCoordsIndex(): number {
     const ride = this.rideSimulationStore.ride.getValue();
     if (ride) {
-      return this.findClosestCoordinateIndex(ride.coords, [this.rideSimulationStore.motionPolyLine.__marker.getLatLng().lat, this.rideSimulationStore.motionPolyLine.__marker.getLatLng().lng])
+      const closesIndex = this.findClosestCoordinateIndex(ride.coords, [this.rideSimulationStore.motionPolyLine.__marker.getLatLng().lat, this.rideSimulationStore.motionPolyLine.__marker.getLatLng().lng])
+      // console.log("Ride index: ", closesIndex)
+      // console.log("Cords length: ", ride.coords.length)
+      return closesIndex;
     }
     return -1;
-  }
-
-  async addMarkerPositionToWaypointArray(waypoints: GeocodeFeature[]): Promise<GeocodeFeature[]> {
-    const markerPosition = this.getMarkerPosition()
-    const markerFeature = await firstValueFrom(
-      this.openRouteService.getGeocodeFeatureByCoordinates(markerPosition)
-    );
-    const ride = this.rideSimulationStore.ride.getValue();
-    if (ride) {
-      let closestIndex = this.findClosestCoordinateIndex(this.getCoordsArrayFromGeocodeFeatureArray(waypoints), [Number(markerPosition.latitude), Number(markerPosition.longitude)])
-      if (markerFeature.body) {
-        waypoints.splice(closestIndex, 0, markerFeature.body.features[0]);
-      }
-    }
-    return waypoints;
   }
 
   getCoordsArrayFromGeocodeFeatureArray(features: GeocodeFeature[]): Coord[] {
@@ -199,8 +231,9 @@ export class RideService {
   }
 
   updateIndex(): void {
-    if (this.rideSimulationStore.motionPolyLine) {
+    if (this.rideSimulationStore.motionPolyLine && !this.rideSimulationStore.interruptIndexUpdate) {
       const index = this.getCoordsIndex();
+      // console.log(index);
       this.httpClient.post(`http://localhost:8080/ride/updateIndex/${this.rideSimulationStore.ride.getValue()?.ride.rideId ?? 0}/${index}`,
         index,
         {

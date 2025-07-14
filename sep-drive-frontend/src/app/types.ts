@@ -191,6 +191,7 @@ export type Ride = {
   startLocation: Coordinates
   destination: Coordinates
   waypoints: Coordinates[]
+  passedWaypoints: string[]
 }
 
 export type RideDto = {

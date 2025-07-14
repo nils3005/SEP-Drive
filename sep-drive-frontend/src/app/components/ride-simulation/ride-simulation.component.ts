@@ -52,7 +52,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
           if (ride) {
             this.webSocketService.subscribe<RideUpdateDTO>('/topic/ride/' + ride.ride.rideId).subscribe((data) => {
               if (ride.ride.rideId === data.rideId) {
-                console.log("historyId aus Websocket: ", data.historyId)
+                // console.log("historyId aus Websocket: ", data.historyId)
                 this.rideSimulationStore.rideData.next(data);
                 this.speedValue = data.speed;
               }
@@ -74,6 +74,7 @@ export class RideSimulationComponent implements OnInit, OnDestroy {
         next: async rideResponse => {
           this.rideSimulationStore.ride.next(rideResponse);
           if (rideResponse.ride) {
+            this.rideSimulationStore.passedWaypoints = rideResponse.ride.passedWaypoints;
             this.rideSimulationStore.rideData.next({
               rideId: rideResponse.ride.rideId,
               paused: true,

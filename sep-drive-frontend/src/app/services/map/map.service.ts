@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {GeoService} from '../geo/geo.service';
 import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
 import {GeoStoreService} from '../../stores/geo/geo-store.service';
-import {Coordinates, GeoJsonRoute, RideUpdateDTO} from '../../types';
+import {GeoJsonRoute, RideUpdateDTO} from '../../types';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ export class MapService {
   constructor(
     private geoService: GeoService,
     private rideSimulationStore: RideSimulationStore,
-    private geoStoreService: GeoStoreService
+    private geoStoreService: GeoStoreService,
   ) { }
 
 
@@ -51,6 +51,7 @@ export class MapService {
 
   public updateRoute(rideData: RideUpdateDTO): void
   {
+    // this.rideSimulationStore.simulationLayer.removeLayer(this.rideSimulationStore.motionPolyLine)
     this.geoStoreService.route.next(JSON.parse(rideData.geoJson));
     const jsonRoute: GeoJsonRoute = JSON.parse(rideData.geoJson);
     let ride = this.rideSimulationStore.ride.getValue()
