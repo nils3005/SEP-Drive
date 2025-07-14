@@ -191,6 +191,7 @@ export type Ride = {
   startLocation: Coordinates
   destination: Coordinates
   waypoints: Coordinates[]
+  passedWaypoints: string[]
 }
 
 export type RideDto = {
@@ -264,4 +265,8 @@ export type leaderboard = {
   rating: number;
   numberOfRides: number;
   driveTime: number;
+}
+
+export type OptimizedStopsResponse = {
+  optimizedWaypoints: Coordinates[],
 }

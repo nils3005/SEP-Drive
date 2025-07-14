@@ -2,6 +2,8 @@ import {AfterViewInit, Component} from '@angular/core';
 import * as L from 'leaflet';
 import {GeoService} from "../../services/geo/geo.service";
 import {GeoStoreService} from '../../stores/geo/geo-store.service';
+import {delay} from 'rxjs';
+import {RideSimulationStore} from '../../stores/rideSimulation/ride-simulation-store.service';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -26,7 +28,10 @@ L.Marker.prototype.options.icon = iconDefault;
 })
 export class MapComponent implements AfterViewInit {
 
-  constructor(private geoStoreService: GeoStoreService) {
+  constructor(
+    private geoStoreService: GeoStoreService,
+    private rideSimulationStore: RideSimulationStore,
+  ) {
   }
 
   private initMap(): void {
@@ -49,6 +54,7 @@ export class MapComponent implements AfterViewInit {
     this.geoStoreService.startLayer = this.geoStoreService.startLayer.addTo(this.geoStoreService.map);
     this.geoStoreService.stoppsLayer = this.geoStoreService.stoppsLayer.addTo(this.geoStoreService.map);
     this.geoStoreService.destinationLayer = this.geoStoreService.destinationLayer.addTo(this.geoStoreService.map);
+    this.rideSimulationStore.simulationLayer = this.rideSimulationStore.simulationLayer.addTo(this.geoStoreService.map);
   }
 
   ngAfterViewInit(): void {
@@ -58,19 +64,21 @@ export class MapComponent implements AfterViewInit {
 
   checkChanges(): void {
     this.geoStoreService.stops.asObservable().subscribe(stopps => {
-        this.geoStoreService.routeLayer.clearLayers()
-        this.geoStoreService.stoppsLayer.clearLayers()
-        for (const stopp of stopps) {
-          if (stopp) {
-            let marker = L.marker(
-                [
-                  stopp.geometry.coordinates[1],
-                  stopp.geometry.coordinates[0]
-                ]
-            );
-            marker.addTo(this.geoStoreService.stoppsLayer)
-          }
-        }
+      this.geoStoreService.routeLayer.clearLayers()
+      this.geoStoreService.stoppsLayer.clearLayers()
+      this.geoStoreService.stoppsLayer = L.featureGroup();
+      if (this.geoStoreService.map) {
+        this.geoStoreService.stoppsLayer = this.geoStoreService.stoppsLayer.addTo(this.geoStoreService.map);
+      }
+      for (const stopp of stopps) {
+        let marker = L.marker(
+            [
+              stopp.geometry.coordinates[1],
+              stopp.geometry.coordinates[0]
+            ]
+        );
+        marker.addTo(this.geoStoreService.stoppsLayer)
+      }
     })
     this.geoStoreService.start.asObservable().subscribe(start => {
       this.geoStoreService.routeLayer.clearLayers()
