@@ -136,6 +136,7 @@ public class RideService {
             updateRideStatus(ride, rideUpdateDTO);
             ride.setSpeed(rideUpdateDTO.getSpeed());
             ride.setCoordsIndex(rideUpdateDTO.getCoordsIndex());
+            rideUpdateDTO.setWaypoints(null);
             rideRepository.save(ride);
             rideWebSocketController.sendMessage(rideUpdateDTO);
         }
