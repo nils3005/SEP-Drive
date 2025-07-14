@@ -47,6 +47,6 @@
         <i class="fa-solid fa-plus" (click)="showStopInput = !showStopInput"></i>
       </div>
     }
-    <app-location-input placeholder="Ziel" [location]="geoStoreService.destination.getValue()" (onLocationSelected)="onDestinationChange($event)"/>
+    <app-location-input placeholder="Ziel" [location]="geoStoreService.destination.getValue()" (onLocationSelected)="onDestinationChange($event)" [usedInSimulation]="true"/>
   }
 </div>

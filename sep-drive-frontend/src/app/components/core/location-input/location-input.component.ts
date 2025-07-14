@@ -3,6 +3,7 @@ import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {Coordinates, GeocodeFeature} from '../../../types';
 import {OpenRouteServiceService} from '../../../services/openroute/open-route-service.service';
 import {ErrorService} from '../../../services/error/error.service';
+import {GeoStoreService} from '../../../stores/geo/geo-store.service';
 
 @Component({
   selector: 'app-location-input',
@@ -18,6 +19,7 @@ export class LocationInputComponent implements OnInit {
   @Input() location: GeocodeFeature | null = null;
   @Input() clearAfterSelect: boolean = false;
   @Input() disabled = false;
+  @Input() usedInSimulation: boolean = false;
   @Output() onLocationSelected = new EventEmitter<GeocodeFeature>()
   public useCoords: boolean = false;
 
@@ -26,19 +28,29 @@ export class LocationInputComponent implements OnInit {
   private suppressSuggestions: boolean = false;
 
   public locationForm = new FormGroup({
-    locationInput: new FormControl({value: "", disabled: this.disabled}),
-    latitudeInput: new FormControl({value: "", disabled: this.disabled}),
-    longitudeInput: new FormControl({value: "", disabled: this.disabled}),
+    locationInput: new FormControl({value: "", disabled: false}),
+    latitudeInput: new FormControl({value: "", disabled: false}),
+    longitudeInput: new FormControl({value: "", disabled: false}),
   })
 
 
   constructor(
     private openRouteService: OpenRouteServiceService,
-    private errorService: ErrorService
+    private errorService: ErrorService,
+    private geoStoreService: GeoStoreService,
   ) {
   }
 
   ngOnInit(): void {
+    if (this.usedInSimulation && !this.location) {
+      this.geoStoreService.destination.asObservable().subscribe(destination => {
+        if (destination) {
+          this.location = destination;
+          this.suppressSuggestions = true;
+          this.locationForm.controls.locationInput.setValue(destination.properties.label);
+        }
+      })
+    }
     if (this.location) {
       this.suppressSuggestions = true;
       this.locationForm.controls.locationInput.setValue(this.location.properties.label);
