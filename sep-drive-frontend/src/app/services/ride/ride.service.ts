@@ -65,7 +65,6 @@ export class RideService {
     if (marker) {
       marker.on('move', (e: any) => {
         if (this.geoStoreService.destination.getValue() && !this.rideSimulationStore.rideData.getValue().completed && this.isStopPassed(this.geoStoreService.destination.getValue()!, [e.latlng.lat, e.latlng.lng])) {
-          console.log("ended")
           let rideData: RideUpdateDTO = this.rideSimulationStore.rideData.getValue();
           rideData.completed = true;
           this.rideSimulationStore.rideData.next(rideData);
@@ -74,7 +73,6 @@ export class RideService {
         }
         for (const stop of this.geoStoreService.stops.getValue()) {
           if (this.isStopPassed(stop, [e.latlng.lat, e.latlng.lng])) {
-            console.log("Passed a waypoint")
             this.addPassedWaypoint(stop.properties.id)
           }
         }

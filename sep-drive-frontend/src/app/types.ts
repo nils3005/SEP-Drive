@@ -266,3 +266,7 @@ export type leaderboard = {
   numberOfRides: number;
   driveTime: number;
 }
+
+export type OptimizedStopsResponse = {
+  optimizedWaypoints: Coordinates[],
+}

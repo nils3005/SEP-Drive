@@ -16,12 +16,12 @@ export class GeoService {
   constructor(
     private openRouteServiceService: OpenRouteServiceService,
     private errorService: ErrorService,
-    private geoStoreService: GeoStoreService
+    private geoStoreService: GeoStoreService,
   ) {}
 
-  public getCoordinateArray(geoCodes: GeocodeFeature[]): number[][]
+  public getCoordinateArray(geoCodes: GeocodeFeature[]): [number, number][]
   {
-    let coordinates: number[][] = [];
+    let coordinates: [number, number][] = [];
 
     for (const geoCode of geoCodes) {
       coordinates.push([geoCode.geometry.coordinates[0], geoCode.geometry.coordinates[1]]);
@@ -29,9 +29,9 @@ export class GeoService {
     return coordinates;
   }
 
-  public calculateRoute()
+  public calculateRoute(useOptimizedStops: boolean = false)
   {
-    let coordinates = this.getCompleteCoordsArray();
+    let coordinates = this.getCompleteCoordsArray(useOptimizedStops);
     this.openRouteServiceService.getRouteFromPointArray(coordinates).subscribe({
       next: response => {
         this.geoStoreService.route.next(response.body);
@@ -45,14 +45,18 @@ export class GeoService {
     })
   }
 
-  public getCompleteCoordsArray(): number[][]
+  public getCompleteCoordsArray(useOptimizedStops: boolean = false): [number, number][]
   {
     let waypoints: GeocodeFeature[] = []
     const start = this.geoStoreService.start.getValue();
     const destination = this.geoStoreService.destination.getValue();
     if (start && destination) {
       waypoints.push(start);
-      waypoints = waypoints.concat(this.geoStoreService.stops.getValue());
+      if (useOptimizedStops) {
+        waypoints = waypoints.concat(this.geoStoreService.optimizedStops.getValue());
+      } else {
+        waypoints = waypoints.concat(this.geoStoreService.stops.getValue());
+      }
       waypoints.push(destination);
     }
     return this.getCoordinateArray(waypoints);
