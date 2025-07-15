@@ -16,6 +16,8 @@ export class RideSimulationStore {
 
   public simulationLayer = L.layerGroup();
 
+  public interruptIndexUpdate = false;
+
   public ridePrice: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
   public rideData : BehaviorSubject<RideUpdateDTO> = new BehaviorSubject<RideUpdateDTO>({
@@ -27,6 +29,8 @@ export class RideSimulationStore {
     coordsIndex: 0,
     historyId: null
   });
+
+  public passedWaypoints: string[] = [];
 
   public start = signal<GeocodeFeature | null>(null);
   public waypoints = signal<GeocodeFeature[]>([]);

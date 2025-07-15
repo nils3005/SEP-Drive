@@ -1,5 +1,14 @@
 import {inject, Injectable} from '@angular/core';
-import {Coordinates, GeocodeFeature, GeoJsonRoute, RideRequest, RideRequestSummary} from '../../types';
+import {
+  Coord,
+  Coordinates,
+  GeocodeFeature,
+  GeoJsonRoute,
+  OptimizedStopsResponse,
+  RideCords,
+  RideRequest,
+  RideRequestSummary
+} from '../../types';
 import {BehaviorSubject, firstValueFrom, Observable, of} from 'rxjs';
 import {GeoService} from '../geo/geo.service';
 import {CarType} from "../../enums/car-type";
@@ -117,6 +126,40 @@ export class RideRequestService {
         observe: 'response'
       }
     )
+  }
+
+  public getOptimizedStops(start: Coord, stops: RideCords): Observable<HttpResponse<OptimizedStopsResponse>>
+  {
+    const dto = {
+      start: {
+        latitude: start[0],
+        longitude: start[1]
+      },
+      waypoints: this.getCoordinatesFromCords(stops),
+    }
+
+    return this.http.post<OptimizedStopsResponse>(
+      'http://localhost:8080/api/route/optimize-waypoints',
+      dto,
+      {
+        headers: {
+          accept: 'application/json'
+        },
+        observe: 'response'
+      }
+    )
+  }
+
+  private getCoordinatesFromCords(cords: RideCords): Coordinates[]
+  {
+    let ret: Coordinates[] = [];
+    for (const cord of cords) {
+      ret.push({
+        latitude: cord[0],
+        longitude: cord[1]
+      })
+    }
+    return ret
   }
 
   public async getRideRequestSummaryFromRideRequest(rideRequest: RideRequest): Promise<RideRequestSummary> {

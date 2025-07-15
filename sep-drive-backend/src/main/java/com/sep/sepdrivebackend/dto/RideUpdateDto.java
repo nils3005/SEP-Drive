@@ -24,6 +24,4 @@ public class RideUpdateDto {
     private float distance;
     private float duration;
     private String geoJson;
-
-
 }

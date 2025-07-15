@@ -16,7 +16,6 @@
         class="textInput"
         (blur)="onBlur()"
         (focus)="onFocus()"
-        [disabled]="disabled"
       >
       @if (showGpsLocationButton) {
         <button type="button" class="imageButton" (click)="getLocation()" [disabled]="disabled">
@@ -41,7 +40,6 @@
         formControlName="longitudeInput"
         placeholder="50.000000"
         class="textInput"
-        [disabled]="disabled"
       >
     </div>
     <div class="textInputContainer">
@@ -51,7 +49,6 @@
         formControlName="latitudeInput"
         placeholder="50.000000"
         class="textInput"
-        [disabled]="disabled"
       >
     </div>
     <button class="imageButton" type="button" (click)="checkCoordinates()" [disabled]="disabled">

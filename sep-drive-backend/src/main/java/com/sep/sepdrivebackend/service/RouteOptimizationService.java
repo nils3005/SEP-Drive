@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RouteOptimizationService {
@@ -14,12 +15,16 @@ public class RouteOptimizationService {
             return waypoints;
         }
 
+        waypoints = removeWaypointsTooFarAway(start, waypoints, 1800.0);
+        waypoints = removeDuplicateWaypoints(waypoints);
+
+
         waypoints.sort(Comparator.comparingDouble(wp -> haversine(start, wp)));
         return waypoints;
     }
 
     private double haversine(Location a, Location b) {
-        final int R = 6371; // Earth radius km
+        final int R = 6371; // Earth
 
         double latA = Double.parseDouble(a.getLatitude());
         double latB = Double.parseDouble(b.getLatitude());
@@ -41,4 +46,21 @@ public class RouteOptimizationService {
 
         return R * c;
     }
+
+    public List<Location> removeDuplicateWaypoints(List<Location> waypoints) {
+        if (waypoints == null) return null;
+
+        return waypoints.stream()
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public List<Location> removeWaypointsTooFarAway(Location start, List<Location> waypoints, double maxDistanceKm) {
+        return waypoints.stream()
+                .filter(wp -> haversine(start, wp) <= maxDistanceKm)
+                .collect(Collectors.toList());
+    }
+
 }
+
+

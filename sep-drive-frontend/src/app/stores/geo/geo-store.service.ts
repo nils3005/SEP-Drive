@@ -10,11 +10,12 @@ export class GeoStoreService {
 
   public start: BehaviorSubject<GeocodeFeature | null> = new BehaviorSubject<GeocodeFeature | null>(null);
   public stops: BehaviorSubject<GeocodeFeature[]> = new BehaviorSubject<GeocodeFeature[]>([]);
+  public optimizedStops: BehaviorSubject<GeocodeFeature[]> = new BehaviorSubject<GeocodeFeature[]>([]);
   public destination: BehaviorSubject<GeocodeFeature | null> = new BehaviorSubject<GeocodeFeature | null>(null);
 
   public routeLayer: L.LayerGroup = L.layerGroup();
   public startLayer: L.LayerGroup = L.layerGroup();
-  public stoppsLayer: L.LayerGroup = L.layerGroup();
+  public stoppsLayer: L.FeatureGroup = L.featureGroup();
   public destinationLayer: L.LayerGroup = L.layerGroup();
 
   public currentPoint: BehaviorSubject<GeocodeFeature | null> = new BehaviorSubject<GeocodeFeature | null>(null);

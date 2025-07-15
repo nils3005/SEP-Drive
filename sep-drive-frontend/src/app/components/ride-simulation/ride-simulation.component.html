@@ -2,6 +2,9 @@
   <p class="headline">Ride Simulation</p>
   <div class="dataContainer">
     <app-data-display [label]="'Start'" [data]="geoStoreService.start.getValue()?.properties?.label ?? ''"/>
+    @for (stop of geoStoreService.stops.getValue(); track stop; let i = $index) {
+      <app-data-display [label]="'Zwischenstopp ' + (i + 1)" [data]="stop.properties.label"/>
+    }
     <app-data-display [label]="'Ziel'" [data]="geoStoreService.destination.getValue()?.properties?.label ?? ''"/>
     <app-data-display [label]="'Dauer'" [data]="(rideData.getValue()?.duration?.toString() ?? '') + ' min'"/>
     <app-data-display [label]="'Distanz'" [data]="(rideData.getValue()?.distance?.toString() ?? '') + ' km'"/>
@@ -37,15 +40,13 @@
     }
   </div>
   @if (rideSimulationStore.rideData.getValue().paused) {
-    @if (geoStoreService.stops.getValue().length > 0) {
+    @if (geoStoreService.stops.getValue().length > 0 || showStopInput) {
       <app-location-stop-input (onStopsChange)="onStopChange($event)"/>
-
-<!--      Impelemnt without component to disable button if index is past stop -->
     } @else {
       <div class="inputRow">
         <i class="fa-solid fa-plus" (click)="showStopInput = !showStopInput"></i>
       </div>
     }
-    <app-location-input placeholder="Ziel" [location]="geoStoreService.destination.getValue()" (onLocationSelected)="onDestinationChange($event)"/>
+    <app-location-input placeholder="Ziel" [location]="geoStoreService.destination.getValue()" (onLocationSelected)="onDestinationChange($event)" [usedInSimulation]="true"/>
   }
 </div>
