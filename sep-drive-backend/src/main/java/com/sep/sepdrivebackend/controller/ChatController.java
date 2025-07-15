@@ -39,7 +39,6 @@ public class ChatController {
         } catch (UserNotFoundException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
-
     }
 
     @GetMapping("/{chatId}")
@@ -47,8 +46,10 @@ public class ChatController {
         try{
             Chat chat = chatService.getChatById(chatId);
             return new ResponseEntity<>(chat, HttpStatus.OK);
-        } catch(Exception e){
+        } catch(ChatNotFoundException | UserNotFoundException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (UserNotPartOfChatException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -79,8 +80,12 @@ public class ChatController {
         try{
             chatService.deleteMessage(chatId, messageId);
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch(Exception e){
+        } catch(ChatNotFoundException | UserNotFoundException | ChatMessageNotFoundException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch(UserNotPartOfChatException | UnauthorizedMessageActionException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        } catch(MessageNotInChatException | MessageSeenException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -89,10 +94,12 @@ public class ChatController {
         try{
             chatService.editMessage(chatId, messageId, msg.message());
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch(ChatNotFoundException | UserNotFoundException | ChatMessageNotFoundException | MessageNotInChatException e){
+        } catch(ChatNotFoundException | UserNotFoundException | ChatMessageNotFoundException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        } catch(RuntimeException e){
+        } catch(UserNotPartOfChatException | UnauthorizedMessageActionException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        } catch(MessageNotInChatException | MessageSeenException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -101,8 +108,12 @@ public class ChatController {
         try{
             chatService.markAsRead(chatId, messageId);
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch(Exception e){
+        } catch(ChatNotFoundException | UserNotFoundException | ChatMessageNotFoundException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch(UserNotPartOfChatException | UnauthorizedMessageActionException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        } catch(MessageNotInChatException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -111,8 +122,10 @@ public class ChatController {
         try{
             chatService.deleteChat(chatId);
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e){
+        } catch (ChatNotFoundException | UserNotFoundException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (UserNotPartOfChatException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
 }

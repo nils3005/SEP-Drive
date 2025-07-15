@@ -34,19 +34,19 @@ public class History {
 
     //Assoziationen
     @Getter(AccessLevel.NONE)
-    @OneToOne(cascade = CascadeType.ALL, optional = true)
+    @OneToOne(optional = true)
     private Rating ratingCustomer;
 
     @Getter(AccessLevel.NONE)
-    @OneToOne(cascade = CascadeType.ALL, optional = true)
+    @OneToOne(optional = true)
     private Rating ratingDriver;
 
     @Getter(AccessLevel.NONE)
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(optional = false)
     private User customer;
 
     @Getter(AccessLevel.NONE)
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(optional = false)
     private User driver;
 
     //Getter

@@ -24,15 +24,13 @@ public class ChatService {
     private final UserRepository userRepository;
     private final UserService userService;
     private final ChatWebSocketController chatWebSocketController;
-    private final TomcatWebSocketServletWebServerCustomizer websocketServletWebServerCustomizer;
 
-    public ChatService(ChatRepository chatRepository, ChatMessageRepository chatMessageRepository, UserRepository userRepository, UserService userService, ChatWebSocketController chatWebSocketController, TomcatWebSocketServletWebServerCustomizer websocketServletWebServerCustomizer) {
+    public ChatService(ChatRepository chatRepository, ChatMessageRepository chatMessageRepository, UserRepository userRepository, UserService userService, ChatWebSocketController chatWebSocketController) {
         this.chatRepository = chatRepository;
         this.chatMessageRepository = chatMessageRepository;
         this.userRepository = userRepository;
         this.userService = userService;
         this.chatWebSocketController = chatWebSocketController;
-        this.websocketServletWebServerCustomizer = websocketServletWebServerCustomizer;
     }
 
     public Long createChat(Long customerId, Long driverId) throws UserNotFoundException, UsersHaveChatException{
@@ -47,7 +45,7 @@ public class ChatService {
         return chat.getId();
     }
 
-    public List<ChatDto> getChats() throws UserNotFoundException, UsersHaveChatException {
+    public List<ChatDto> getChats() throws UserNotFoundException {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if(username == null) throw new UserNotFoundException("User not found");
         return chatRepository.findAllChatsByUsername(username);
@@ -58,49 +56,40 @@ public class ChatService {
         return chatRepository.findById(chatId).orElseThrow( () -> new ChatNotFoundException("Chat not found"));
     }
 
-    public Chat getChatByUsers(Long customerId, Long driverId) throws UserNotFoundException {
+    public Chat getChatByUsers(Long customerId, Long driverId) throws UserNotFoundException, ChatNotFoundException{
         if (userService.findByUserId(customerId) == null || userService.findByUserId(driverId) == null) {
             throw new UserNotFoundException("User not found");
         }
         return chatRepository.findChatByBothUsers(customerId, driverId).orElseThrow( () -> new ChatNotFoundException("Chat not found"));
     }
 
-    public void markAsRead(long chatId, long messageId) throws ChatNotFoundException, UserNotFoundException, UserNotPartOfChatException {
+    public void markAsRead(long chatId, long messageId) throws ChatNotFoundException, UserNotFoundException, UserNotPartOfChatException, ChatMessageNotFoundException, MessageNotInChatException, UnauthorizedMessageActionException {
         User recipient = userPartOfChat(chatId);
         ChatMessage chatMessage = chatMessageRepository.findById(messageId).orElseThrow( () -> new ChatMessageNotFoundException("ChatMessage not found"));
         if(chatMessage.getChat().getId() != chatId) throw new MessageNotInChatException("Message does not belong to chat");
         Long expectedRecipientId = (chatMessage.getSenderRole() == Role.CUSTOMER)
                 ? chatMessage.getChat().getDriver().getId()
                 : chatMessage.getChat().getCustomer().getId();
-        if (!Objects.equals(expectedRecipientId, recipient.getId())) throw new RuntimeException("Message can only be marked as read by recipient");
+        if (!Objects.equals(expectedRecipientId, recipient.getId())) throw new UnauthorizedMessageActionException("Message can only be marked as read by recipient");
 
         chatMessage.setSeen(true);
         chatMessageRepository.save(chatMessage);
         chatWebSocketController.sendMessage(chatMessage.getChat());
     }
 
-    public void deleteMessage(long chatId, long messageId)  throws ChatNotFoundException, UserNotFoundException, UserNotPartOfChatException, ChatMessageNotFoundException, MessageNotInChatException, MessageSeenException {
+    public void deleteMessage(long chatId, long messageId)  throws ChatNotFoundException, UserNotFoundException, UserNotPartOfChatException, ChatMessageNotFoundException, MessageNotInChatException, MessageSeenException, UnauthorizedMessageActionException {
         User sender = userPartOfChat(chatId);
         ChatMessage chatMessage = chatMessageRepository.findById(messageId).orElseThrow( () -> new ChatMessageNotFoundException("ChatMessage not found"));
-        if(chatMessage.getChat().getId() != chatId) throw new MessageNotInChatException("Message does not belong to chat");
-        if(chatMessage.isSeen()) throw new MessageSeenException("Message already seen");
-        Long expectedSenderId = (chatMessage.getSenderRole() == Role.CUSTOMER)
-                ? chatMessage.getChat().getCustomer().getId()
-                : chatMessage.getChat().getDriver().getId();
-        if (!Objects.equals(expectedSenderId, sender.getId())) throw new RuntimeException("Only sender can delete message");
-
+        Long expectedSenderId = expectedSender(chatMessage, chatId);
+        if (!Objects.equals(expectedSenderId, sender.getId())) throw new UnauthorizedMessageActionException("Only sender can delete message");
         chatMessageRepository.delete(chatMessage);
     }
 
-    public void editMessage(long chatId, long messageId, String message) throws ChatNotFoundException, UserNotFoundException, UserNotPartOfChatException, ChatMessageNotFoundException, MessageNotInChatException, MessageSeenException {
+    public void editMessage(long chatId, long messageId, String message) throws ChatNotFoundException, UserNotFoundException, UserNotPartOfChatException, ChatMessageNotFoundException, MessageNotInChatException, MessageSeenException, UnauthorizedMessageActionException {
         User sender = userPartOfChat(chatId);
         ChatMessage chatMessage = chatMessageRepository.findById(messageId).orElseThrow( () -> new ChatMessageNotFoundException("ChatMessage not found"));
-        if(chatMessage.getChat().getId() != chatId) throw new MessageNotInChatException("Message does not belong to chat");
-        if(chatMessage.isSeen()) throw new MessageSeenException("Message already seen");
-        Long expectedSenderId = (chatMessage.getSenderRole() == Role.CUSTOMER)
-                ? chatMessage.getChat().getCustomer().getId()
-                : chatMessage.getChat().getDriver().getId();
-        if (!Objects.equals(expectedSenderId, sender.getId())) throw new RuntimeException("Only sender can edit  message");
+        Long expectedSenderId = expectedSender(chatMessage, chatId);
+        if (!Objects.equals(expectedSenderId, sender.getId())) throw new UnauthorizedMessageActionException("Only sender can edit  message");
         chatMessage.setMessage(message);
         chatMessageRepository.save(chatMessage);
     }
@@ -117,6 +106,14 @@ public class ChatService {
     public void deleteChat(long chatId) throws ChatNotFoundException, UserNotPartOfChatException, UserNotFoundException{
         userPartOfChat(chatId);
         chatRepository.deleteById(chatId);
+    }
+
+    private Long expectedSender(ChatMessage chatMessage, long chatId){
+        if(chatMessage.getChat().getId() != chatId) throw new MessageNotInChatException("Message does not belong to chat");
+        if(chatMessage.isSeen()) throw new MessageSeenException("Message already seen");
+        return (chatMessage.getSenderRole() == Role.CUSTOMER)
+                ? chatMessage.getChat().getCustomer().getId()
+                : chatMessage.getChat().getDriver().getId();
     }
 
     private User userPartOfChat(long chatId) throws ChatNotFoundException, UserNotPartOfChatException, UserNotFoundException {
