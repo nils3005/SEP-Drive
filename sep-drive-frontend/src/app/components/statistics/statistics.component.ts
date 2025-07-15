@@ -90,10 +90,10 @@ export class StatisticsComponent {
       let value = stat && stat[field] != null ? Number(stat[field]) : 0;
 
       if (field === 'drivenDistance') {
-        value = value / 1000; // z.B. Meter → Kilometer
+        value = value / 1000;
       }
       if (field === 'drivenTime') {
-        value = value / 60;   // z.B. Sekunden → Minuten
+        value = value / 60;
       }
 
       return value;
@@ -112,7 +112,17 @@ export class StatisticsComponent {
         }
         return statMonth === index + 1;
       });
-      return stat && stat[field] != null ? Number(stat[field]) : 0;
+
+      let value = stat && stat[field] != null ? Number(stat[field]) : 0;
+
+      if (field === 'drivenDistance') {
+        value = value / 1000;
+      }
+      if (field === 'drivenTime') {
+        value = value / 60;
+      }
+
+      return value;
     });
   }
 
