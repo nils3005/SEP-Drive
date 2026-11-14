@@ -24,6 +24,9 @@ services:
         container_name: sep-drive-backend
         ports:
             - 8080:8080
+        env_file:
+            - path: .env
+              required: false
         environment:
             DATABASE_URL: postgres://root:root@database:5432/sepdrive
         depends_on:
